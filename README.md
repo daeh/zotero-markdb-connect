@@ -22,7 +22,7 @@ Anton Beloglazov.
 
 ## Plugin Functions
 
-
+Find reading notes in your Obsidian Vault and add a colored tag (`ObsCite`) to the corresponding Zotero items.
 
 ## Instalation
 
@@ -48,7 +48,7 @@ If you're already using [obsidian-citation-plugin](https://github.com/hans/obsid
 
 - Optionally, you can have this plugin read the metadata of your markdown notes and extract the citekey from one of the fields. To enable this, specify the metadata ID (`citekey` is a common value).
 - Run the synchronization function from `Tools` > `Sync ZoteroObsidianCitations Tags`.
-- This will add a `ObsCite` tag to every Zotero item for which there exists and markdown reading note in the Obsidian Vault folder you specified.
+- This will add a `ObsCite` tag to every Zotero item for which there exists a markdown reading note in the Obsidian Vault folder you specify.
 - In the `Tags` plane of Zotero, right click on the `ObsCite` tag and assign it a color, which will mark the tagged items in the preview plane of Zotero.
 
 
