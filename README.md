@@ -2,23 +2,15 @@
 
 ![ZoteroObsidianCitationsScreenshot](https://user-images.githubusercontent.com/12652166/147509331-eee0dad4-8a36-490b-9bb9-f11ca6caa7be.png)
 
-- [GitHub](https://github.com/daeh/zotero-obsidian-citations): Source
-  code repository
-- Will be archived on Zenodo
 
-This is an add-on for [Zotero](https://www.zotero.org), a research
-source management tool. The add-on can auto-fetch citation counts for
-journal articles using various APIs, including
+
+This is an add-on for [Zotero](https://www.zotero.org), a research source management tool. The add-on finds files marked with citekeys in an external folder and adds a colored tag to the corresponding Zotero items.
 
 This is a companion to the [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin) that tags Zotero items for which you have made external notes.
 
 Please report any bugs, questions, or feature requests in the Github repository.
 
-Code for this extension is based on [Zotero Citationcounts](https://github.com/eschnett/zotero-citationcounts), which is based on [Zotero DOI
-Manager](https://github.com/bwiernik/zotero-shortdoi), which is based
-in part on [Zotero Google Scholar
-Citations](https://github.com/beloglazov/zotero-scholar-citations) by
-Anton Beloglazov.
+Code for this extension is based on [Zotero Citationcounts](https://github.com/eschnett/zotero-citationcounts), which is based on [Zotero DOI Manager](https://github.com/bwiernik/zotero-shortdoi), which is based in part on [Zotero Google Scholar Citations](https://github.com/beloglazov/zotero-scholar-citations) by Anton Beloglazov.
 
 ## Plugin Functions
 
@@ -47,10 +39,16 @@ If you're already using [obsidian-citation-plugin](https://github.com/hans/obsid
   - NB this plugin expects that these notes begin with `@citekey` where `citekey` is the BBT citekey.
 
 - Optionally, you can have this plugin read the metadata of your markdown notes and extract the citekey from one of the fields. To enable this, specify the metadata ID (`citekey` is a common value).
-- Run the synchronization function from `Tools` > `ZoteroObsidianCitations Sync Tags`.
+- Run the synchronization function from `Tools -> ZoteroObsidianCitations Sync Tags`.
 - This will add a `ObsCite` tag to every Zotero item for which there exists a markdown reading note in the Obsidian Vault folder you specify.
 - In the `Tags` plane of Zotero, right click on the `ObsCite` tag and assign it a color, which will mark the tagged items in the preview plane of Zotero.
 
+
+
+## Notes
+
+- [GitHub](https://github.com/daeh/zotero-obsidian-citations): Source code repository
+- Will be archived on Zenodo
 
 ## License
 
