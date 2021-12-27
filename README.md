@@ -1,4 +1,6 @@
-# Zotero Citation Counts Manager
+# Zotero Obsidian Citations
+
+![ZoteroObsidianCitationsScreenshot](https://user-images.githubusercontent.com/12652166/147509331-eee0dad4-8a36-490b-9bb9-f11ca6caa7be.png)
 
 - [GitHub](https://github.com/daeh/zotero-obsidian-citations): Source
   code repository
