@@ -1,0 +1,13 @@
+<!ENTITY obscite-name "Zotero Obsidian Citations">
+<!ENTITY obscite-preferences "Zotero Obsidian Citations Preferences">
+
+<!ENTITY vault-source-folder "Obsidian Vault Folder with Reading Notes">
+<!ENTITY vault-source-folder-desc "The directory containing your Obsidian Citation markdown notes (notes should begin with @citekey).">
+
+<!ENTITY bbtjson-source-file "BBT JSON Export of Library">
+<!ENTITY bbtjson-source-file-desc "The BetterBibTex export of your library. Must include the fields 'citekey' and 'itemID'. Should be auto-updating.">
+
+<!ENTITY metadata-keyword "Markdown Metadata Keyword">
+<!ENTITY metadata-keyword-desc "(Optional) If you want to extract the citekey from a MD note's metadata, indicate the keword here. A common value is: citekey. If no value is given, the citekey will be taken from the MD note's title.">
+
+<!ENTITY choose "Choose…">

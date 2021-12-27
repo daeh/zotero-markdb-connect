@@ -1,0 +1,5 @@
+.project
+*.xpi
+.vscode
+*_gitignore
+*-gitignore

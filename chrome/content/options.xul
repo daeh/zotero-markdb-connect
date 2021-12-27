@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://zotero-platform/content/preferences.css"?>
+
+<!DOCTYPE window SYSTEM "chrome://zoteroobscite/locale/options.dtd">
+
+<!-- onload="updatePreferenceWindow('all');" -->
+<prefwindow id="obscite-pref" title="&obscite-preferences;" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+	<stringbundleset id="stringbundleset">
+		<stringbundle id="obscite-options" src="chrome://zotero-obscite/locale/options.properties"/>
+	</stringbundleset>
+  <prefpane label="&obscite-preferences;" id="obscite-prefpane">
+    <preferences>
+      <preference id="pref-obscite-source_dir" name="extensions.obscite.source_dir" type="string"/>
+      <preference id="pref-obscite-bbtjson" name="extensions.obscite.bbtjson" type="string"/>
+      <preference id="pref-obscite-metadatakeyword" name="extensions.obscite.metadatakeyword" type="string"/>
+    </preferences>
+
+
+    <groupbox>
+      <caption label="&vault-source-folder;"/>
+      <description style="width: 420px">&vault-source-folder-desc;</description>
+      <separator/>
+      <hbox  style="margin: 0"  align="center">
+        <textbox id="id-obscite-source_dir" preference="pref-obscite-source_dir" flex="1" />
+        <button id="id-obscite-source_dir-button" label="&choose;" oncommand="Zotero.ObsCite.chooseValueFolder();"/>
+      </hbox>
+    </groupbox>
+    <separator/>
+
+    <groupbox>
+      <caption label="&bbtjson-source-file;"/>
+      <description style="width: 420px">&bbtjson-source-file-desc;</description>
+      <separator/>
+      <hbox  style="margin: 0"  align="center">
+        <textbox id="id-obscite-bbtjson" preference="pref-obscite-bbtjson" flex="1" />
+        <button id="id-obscite-bbtjson-button" label="&choose;" oncommand="Zotero.ObsCite.chooseBBTjson();"/>
+      </hbox>
+    </groupbox>
+    <separator/>
+
+    <groupbox>
+      <label id="id-obscite-metadatakeyword-label" value="&metadata-keyword;"/>
+      <textbox id="id-obscite-metadatakeyword" preference="pref-obscite-metadatakeyword" onchange="Zotero.ObsCite.checkMetadataFormat();"/>
+      <label id="id-obscite-metadatakeyword-desc" style="font-size: 10px" value="&metadata-keyword-desc;"/>
+    </groupbox>
+    <separator/>
+
+  </prefpane>
+
+  <script src="options.js"/>
+  <script src="chrome://zotero/content/include.js"/>
+
+</prefwindow>

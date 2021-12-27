@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE overlay SYSTEM "chrome://zoteroobscite/locale/overlay.dtd">
+
+<overlay
+    id="zoteroobscite"
+    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+    <script src="chrome://zoteroobscite/content/scripts/zoteroobscite.js"/>
+    <script src="chrome://zotero/content/include.js"/>
+
+    <stringbundleset id="stringbundleset">
+        <stringbundle
+            id="obscite-bundle"
+            src="chrome://zoteroobscite/locale/zoteroobscite.properties"/>
+    </stringbundleset>
+    
+    <menupopup id="menu_ToolsPopup">
+      <menuitem id="obscite-options" label="&obscite-syncdb-label;" oncommand="Zotero.ObsCite.syncWithObsidian()"/>
+      <menuitem id="menu_Tools-obscite-preferences" label="&obscite-preferences-label;" oncommand="Zotero.ObsCite.openPreferenceWindow();"/>
+    </menupopup>
+
+
+
+</overlay>
