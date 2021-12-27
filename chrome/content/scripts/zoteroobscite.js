@@ -1,4 +1,4 @@
-Components.utils.import('resource://gre/modules/osfile.jsm')
+Components.utils.import('resource://gre/modules/osfile.jsm');
 
 // Startup -- load Zotero and constants
 if (typeof Zotero === 'undefined') {
@@ -6,34 +6,23 @@ if (typeof Zotero === 'undefined') {
 }
 Zotero.ObsCite = {};
 
-// Definitions
-
-
-// https://github.com/retorquere/zotero-better-bibtex/blob/26a48f6a85705eeb18f31d87269d34906b1d1a94/content/path-search.ts
-
-// !!!! https://udn.realityripple.com/docs/Mozilla/JavaScript_code_modules/OSFile.jsm
-// https://nodejs.org/api/path.html
-
-// !!! https://github.com/jbaiter/zotero-cli
-
-
 
 async function pick(title, mode, filters, suggestion) {
-    ///https://github.com/retorquere/zotero-better-bibtex/blob/fce3078f8c6806d21b95a658527f05e4879d6e7a/content/file-picker.ts
-    const fp = Components.classes['@mozilla.org/filepicker;1'].createInstance(Components.interfaces.nsIFilePicker)
+    /// taken from https://github.com/retorquere/zotero-better-bibtex/blob/fce3078f8c6806d21b95a658527f05e4879d6e7a/content/file-picker.ts
+    const fp = Components.classes['@mozilla.org/filepicker;1'].createInstance(Components.interfaces.nsIFilePicker);
 
-    if (suggestion) fp.defaultString = suggestion
+    if (suggestion) fp.defaultString = suggestion;
 
     mode = {
         open: Components.interfaces.nsIFilePicker.modeOpen,
         save: Components.interfaces.nsIFilePicker.modeSave,
         folder: Components.interfaces.nsIFilePicker.modeGetFolder,
-    } [mode]
+    } [mode];
 
-    fp.init(window, title, mode)
+    fp.init(window, title, mode);
 
     for (const [label, ext] of (filters || [])) {
-        fp.appendFilter(label, ext)
+        fp.appendFilter(label, ext);
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
@@ -42,49 +31,21 @@ async function pick(title, mode, filters, suggestion) {
             switch (userChoice) {
                 case Components.interfaces.nsIFilePicker.returnOK:
                 case Components.interfaces.nsIFilePicker.returnReplace:
-                    resolve(fp.file.path)
-                    break
+                    resolve(fp.file.path);
+                    break;
 
                 default: // aka returnCancel
-                    resolve('')
-                    break
+                    resolve('');
+                    break;
             }
-        })
-    })
-}
-
-
-
-function dialogWithCheckbox(dialogTitle, text) {
-    Components.utils.import('resource://gre/modules/Services.jsm')
-
-    const dontAskAgain = {
-        value: false
-    }
-    const ps = Services.prompt
-    const index = ps.confirmEx(
-        null, // parent
-        dialogTitle, // dialogTitle
-        text, // text
-
-        // button flags
-        ps.BUTTON_POS_0 * ps.BUTTON_TITLE_IS_STRING + ps.BUTTON_POS_0_DEFAULT +
-        ps.BUTTON_POS_1 * ps.BUTTON_TITLE_IS_STRING,
-
-        // button messages
-        'ccccc',
-        'bbbbb',
-        null,
-        'aaaaaa', // check message
-        dontAskAgain // check state
-    )
-    return index
+        });
+    });
 }
 
 function askToSaveErrors(dialogTitle, message) {
-    Components.utils.import('resource://gre/modules/Services.jsm')
+    Components.utils.import('resource://gre/modules/Services.jsm');
 
-    const ps = Services.prompt
+    const ps = Services.prompt;
     var buttonFlags = (ps.BUTTON_POS_0) * (ps.BUTTON_TITLE_IS_STRING) + ps.BUTTON_POS_0_DEFAULT +
         (ps.BUTTON_POS_1) * (ps.BUTTON_TITLE_IS_STRING);
     var index = ps.confirmEx(
@@ -99,15 +60,11 @@ function askToSaveErrors(dialogTitle, message) {
 }
 
 async function selectValueFolder() {
-
-    ///https://github.com/retorquere/zotero-better-bibtex/blob/fce3078f8c6806d21b95a658527f05e4879d6e7a/content/file-picker.ts
     const obsVaultFolder = await pick('Select Obsidian Vault Folder with citation notes begining with @', 'folder');
     return obsVaultFolder;
 }
 
 async function selectBBTjson() {
-
-    ///https://github.com/retorquere/zotero-better-bibtex/blob/fce3078f8c6806d21b95a658527f05e4879d6e7a/content/file-picker.ts
     const bbtjson = await pick('Select BBT JSON auto-updating library export', 'file', [
         ['JSON File (*.json)', '*.json']
     ]);
@@ -115,25 +72,10 @@ async function selectBBTjson() {
 }
 
 async function writeToFile(data, filenamesuggest) {
-    // var data = '\n\n------------------------\n\n';
-    // var path = '/Users/dae/Downloads/errs.txt';
-
-    // JSON.stringify(persistSettings);
-
-
-    // var fileName = Zotero.File.truncateFileName(this._getFileNameFromURL(url, contentType), 100);
-    // var tmpFile = OS.Path.join(tmpDir, fileName);
-
-
-    // https://github.com/retorquere/zotero-better-bibtex/blob/fce3078f8c6806d21b95a658527f05e4879d6e7a/content/file-picker.ts
     const filepath = await pick('Errors', 'save', [
         []
-    ], filenamesuggest)
+    ], filenamesuggest);
     if (filepath) await Zotero.File.putContentsAsync(filepath, data);
-
-    // var tmpDir = await getTempDirectory();
-    // var destFile = OS.Path.join(tmpDir, 'test');
-
 }
 
 function showNotification(header, body, success) {
@@ -150,7 +92,6 @@ function showNotification(header, body, success) {
 }
 
 async function scanVault(vaultpath, fetchMetadata) {
-    // const vaultpath = '/Users/dae/Documents/ObsVault/ReadingNotes';
     let dbs = [];
     let dbserrs = [];
     const re_title = new RegExp(/^@([^\s]+)/);
@@ -202,7 +143,6 @@ async function scanVault(vaultpath, fetchMetadata) {
 }
 
 async function mapCitekeys(bbtjson) {
-    // const bbtjson = '/Users/dae/Downloads/test.json';
     let citekeymap = {};
     let citekeymaperr = {};
 
@@ -224,14 +164,14 @@ async function mapCitekeys(bbtjson) {
         } catch (err) {
             citekeymaperr.push(item);
         }
-    })
+    });
 
 
     if (citekeymaperr.length > 0) {
         let nerr = citekeymaperr.length
         Zotero.debug(`${nerr} Read ObsVault Read Errors`);
         Zotero.debug(`${citekeymaperr[0]}`);
-        showNotification("mapCitekeys", "Error: " + nerr.toString() + ".", false)
+        showNotification("mapCitekeys", "Error: " + nerr.toString() + ".", false);
     }
     return citekeymap;
 }
@@ -255,14 +195,14 @@ async function sliceObj(obj, keys, promptSaveErrors) {
 
         if (promptSaveErrors) {
             const warningTitle = "Umatched citekeys";
-            const message = "There were " + nerr.toString() + " citekeys in your Obsidian Vault that could not be matched to items in your Zotero library. \n\nWould you like to save the names of these citekeys in a text file? \n\n(Matches for " + values.length.toString() + " citekeys were found successfully.)"
+            const message = "There were " + nerr.toString() + " citekeys in your Obsidian Vault that could not be matched to items in your Zotero library. \n\nWould you like to save the names of these citekeys in a text file? \n\n(Matches for " + values.length.toString() + " citekeys were found successfully.)";
             const saveResp = askToSaveErrors(warningTitle, message);
             if (saveResp === 0) {
                 const outtxt = "sliceObj Errors (" + nerr.toString() + "):\n\n" + valueerr.join("\n") + "\n\n";
                 writeToFile(outtxt, 'sliceObjErr.txt');
             }
         } else {
-            showNotification("sliceObj", "Error: " + nerr.toString() + ".", false)
+            showNotification("sliceObj", "Error: " + nerr.toString() + ".", false);
         }
 
     }
@@ -270,7 +210,7 @@ async function sliceObj(obj, keys, promptSaveErrors) {
 }
 
 
-async function removeTags(someinput) {
+async function removeTags() {
     let s = new Zotero.Search();
     s.libraryID = Zotero.Libraries.userLibraryID;
     s.addCondition('tag', 'is', 'ObsCite');
@@ -280,7 +220,7 @@ async function removeTags(someinput) {
     items_preexisting.forEach(function removeTag(item) {
         item.removeTag('ObsCite');
         item.saveTx();
-    })
+    });
     return true;
 }
 
@@ -303,30 +243,10 @@ async function checkRequirements(vaultpath, bbtjson) {
 }
 
 async function checkDependencies(vaultpath, bbtjson, metadatakeyword, promptSaveErrors) {
-    // clear 'ObsCite' tag from all items
-    // find citekeys from Obsidian Vault
-    // add 'ObsCite' to matching items
-
-    // https://forums.zotero.org/discussion/comment/355664#Comment_355664
-
-    // /Users/dae/Documents/ObsVault/ReadingNotes/@lemau2021natureactors Le Mau (Barrett) 2021 Nature Communications.md
-
-    // https://forums.zotero.org/discussion/85242/set-field-value-from-extra-subfield
-
-
-    /// Ask user to set obs vault folder
-    /// save to prefs
-    /// Ask user to make tag color
-    /// add run to menu rather than contex item
-
-    /// read into each md note to find citekey metadata
-
 
     let success = false;
 
     /// get cite keys from Obsidian vault ///
-    // const vaultpath = '/Users/dae/Documents/ObsVault/ReadingNotes';
-    // const fetchMetadata = 'citekey';
     let citekeysObs = await scanVault(vaultpath, metadatakeyword);
     if (citekeysObs.length == 0) {
         showNotification("No citekeys found in Obsidian Vault", "Set the path to your Obsidian Citations Notes in the ZotObsCite preferences.", false);
@@ -335,7 +255,6 @@ async function checkDependencies(vaultpath, bbtjson, metadatakeyword, promptSave
     }
 
     /// read in BBT json that maps citekeys to Zotero ids ///
-    // const bbtjson = '/Users/dae/Downloads/test.json';
     let citekeymap = await mapCitekeys(bbtjson);
     if (Object.keys(citekeymap).length == 0) {
         showNotification("BBT JSON Library Export Not Found", "Set the path to your auto-updating BBT JSON export in the ZotObsCite preferences.", false);
@@ -372,7 +291,7 @@ async function updateItems(citekeyids) {
         item.addTag('ObsCite');
         item.saveTx();
     });
-    /// todo set color :: https://github.com/zotero/zotero/blob/52932b6eb03f72b5fb5591ba52d8e0f4c2ef825f/chrome/content/zotero/tagColorChooser.js
+    ///TODO set color :: https://github.com/zotero/zotero/blob/52932b6eb03f72b5fb5591ba52d8e0f4c2ef825f/chrome/content/zotero/tagColorChooser.js
 
 
     showNotification("Finished", "Found " + items_found.length.toString() + " notes.", true);
@@ -413,8 +332,7 @@ Zotero.ObsCite.init = function () {
     const notifierID = Zotero.Notifier.registerObserver(
         Zotero.ObsCite.notifierCallback, ['item']);
 
-    // Unregister callback when the window closes (important to avoid
-    // a memory leak)
+    // Unregister callback when the window closes (important to avoid a memory leak)
     window.addEventListener('unload', function (e) {
         Zotero.Notifier.unregisterObserver(notifierID);
     }, false);
@@ -437,6 +355,7 @@ Zotero.ObsCite.initialDependencyCheck = async function initDepCheck() {
     const metadatakeyword = getPref('metadatakeyword');
 
     ///DEBUG
+    ///TODO make this a preference
     const syncOnStart = true;
     if (await checkRequirements(vaultpath, bbtjson)) {
         const citekeyids = await checkDependencies(vaultpath, bbtjson, metadatakeyword, false);
