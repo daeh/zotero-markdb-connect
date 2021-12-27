@@ -8,10 +8,9 @@ This is an add-on for [Zotero](https://www.zotero.org), a research
 source management tool. The add-on can auto-fetch citation counts for
 journal articles using various APIs, including
 
-Companion to Obsidian Citation
+This is a companion to the [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin) that tags Zotero items for which you have made external notes.
 
-Please report any bugs, questions, or feature requests in the Github
-repository.
+Please report any bugs, questions, or feature requests in the Github repository.
 
 Code for this extension is based on [Zotero Citationcounts](https://github.com/eschnett/zotero-citationcounts), which is based on [Zotero DOI
 Manager](https://github.com/bwiernik/zotero-shortdoi), which is based
