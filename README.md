@@ -21,7 +21,7 @@ Find reading notes in your Obsidian Vault and add a colored tag (`ObsCite`) to t
 - Run Zotero (version 5.x)
 - Go to `Tools -> Add-ons`
 - `Install Add-on From File`
-- Choose the file `zotero-obscite-0.2.xpi`
+- Choose the file `zotero-obsidian-citations-0.0.1.xpi`
 - Restart Zotero
 
 ## Setup

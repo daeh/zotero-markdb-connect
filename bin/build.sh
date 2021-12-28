@@ -1,9 +1,9 @@
 #!/bin/sh
 
-version='0.2'
+version='0.0.1'
 
-rm -f zotero-obscite-${version}.xpi
-zip -r zotero-obscite-${version}.xpi chrome/* defaults/* chrome.manifest install.rdf
+rm -f zotero-obsidian-citations-${version}.xpi
+zip -r zotero-obsidian-citations-${version}.xpi chrome/* defaults/* chrome.manifest install.rdf
 
 # To release a new version:
 # - increase version number in all files (not just here)

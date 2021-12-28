@@ -311,7 +311,7 @@ async function updateItemsOld(citekeyids) {
 async function updateItems(citekeyids) {
     let success = false;
 
-    /// find all item with already tagged
+    /// find all item already tagged
     let items_withtags = await findTaggedItems();
 
     /// find all items that should be tagged
