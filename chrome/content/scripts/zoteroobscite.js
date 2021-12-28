@@ -210,12 +210,17 @@ async function sliceObj(obj, keys, promptSaveErrors) {
 }
 
 
-async function removeTags() {
+async function findTaggedItems() {
     let s = new Zotero.Search();
     s.libraryID = Zotero.Libraries.userLibraryID;
     s.addCondition('tag', 'is', 'ObsCite');
     let itemIDs = await s.search();
     let items_preexisting = await Zotero.Items.getAsync(itemIDs);
+    return items_preexisting;
+}
+
+async function removeAllTags() {
+    let items_preexisting = await findTaggedItems();
     /// remove tag
     items_preexisting.forEach(function removeTag(item) {
         item.removeTag('ObsCite');
@@ -223,6 +228,8 @@ async function removeTags() {
     });
     return true;
 }
+
+
 
 async function checkRequirements(vaultpath, bbtjson) {
     let satisfied = true;
@@ -273,7 +280,7 @@ async function checkDependencies(vaultpath, bbtjson, metadatakeyword, promptSave
     return citekeyids;
 }
 
-async function updateItems(citekeyids) {
+async function updateItemsOld(citekeyids) {
     let success = false;
 
     /// find all item with tag
@@ -299,6 +306,49 @@ async function updateItems(citekeyids) {
     success = true;
     return success;
 }
+
+
+async function updateItems(citekeyids) {
+    let success = false;
+
+    /// find all item with already tagged
+    let items_withtags = await findTaggedItems();
+
+    /// find all items that should be tagged
+    let items_withnotes = await Zotero.Items.getAsync(citekeyids);
+
+    /// find items to be tagged
+    items_totag = items_withnotes.filter(x => !items_withtags.includes(x));
+
+    /// find items that should not be tagged
+    items_removetag = items_withtags.filter(x => !items_withnotes.includes(x));
+
+    /// find items that cannot be located in library
+    if (citekeyids.length != items_withnotes.length) {
+        const nitems_notlocatable = citekeyids.length - items_withnotes.length;
+        showNotification("BBT JSON mismatch", "" + nitems_notlocatable.toString() + " IDs in the BBT JSON could not be matched to items in the library", false);
+    }
+
+    /// remove tag from items that should not be tagged
+    items_removetag.forEach(function rmTag(item) {
+        item.removeTag('ObsCite');
+        item.saveTx();
+    });
+
+    /// add tag to items that should be tagged
+    items_totag.forEach(function addTag(item) {
+        item.addTag('ObsCite');
+        item.saveTx();
+    });
+    ///TODO set color :: https://github.com/zotero/zotero/blob/52932b6eb03f72b5fb5591ba52d8e0f4c2ef825f/chrome/content/zotero/tagColorChooser.js
+
+
+    showNotification("Finished", "Found " + items_withnotes.length.toString() + " notes. " + items_totag.length.toString() + " tags added, " + items_removetag.length.toString() + " tags removed.", true);
+
+    success = true;
+    return success;
+}
+
 
 async function runSyncWithObsidian(vaultpath, bbtjson, metadatakeyword, promptSaveErrors) {
 
@@ -338,6 +388,7 @@ Zotero.ObsCite.init = function () {
     }, false);
 };
 
+///DEBUG this needs update
 Zotero.ObsCite.notifierCallback = {
     notify: function (event, type, ids, extraData) {
         if (event == 'add') {

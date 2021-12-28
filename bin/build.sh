@@ -1,6 +1,6 @@
 #!/bin/sh
 
-version='0.1'
+version='0.2'
 
 rm -f zotero-obscite-${version}.xpi
 zip -r zotero-obscite-${version}.xpi chrome/* defaults/* chrome.manifest install.rdf
