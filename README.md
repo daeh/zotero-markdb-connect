@@ -6,7 +6,7 @@
 
 This is an add-on for [Zotero](https://www.zotero.org), a research source management tool. The add-on finds files marked with citekeys in an external folder and adds a colored tag to the corresponding Zotero items.
 
-This is a companion to the [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin) that tags Zotero items for which you have made external notes.
+This is a companion to the [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin), a plugin for [Obsidian](https://obsidian.md) markdown editor, but can work with a variety of databases used to store reading notes outside of Zotero.
 
 Please report any bugs, questions, or feature requests in the Github repository.
 
@@ -28,19 +28,19 @@ Find reading notes in your Obsidian Vault and add a colored tag (`ObsCite`) to t
 
 ## Setup
 
-If you're already using [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin), you've set up an auto-updating BetterBibTex explort of your library. You'll now need to make another BBT export that link the BBT citekeys to Zotero's item IDs.
+If you're already using [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin), you've set up an auto-updating BetterBibTex (BBT) export of your library. You'll now need to make another BBT export that contains both the BBT citekeys and the Zotero item IDs.
 - Export your library in the "BetterBibTex JSON" format (not "Better CSL JSON", which does not include the Zotero IDs). 
+  - Click `File -> Export library`.
   - Check the "Keep Updated" box in the export options.
-  - You can save this JSON anywhere, but it usually makes sense to save it next to the one that the BBT export that `obsidian-citation-plugin` uses.
-
+  - You can save this JSON anywhere, but it usually makes sense to save it next export that `obsidian-citation-plugin` uses.
+  
 - Under the `Tools` menu, open `ZoteroObsidianCitations Preferences...`
-- Specify the location of the new "BetterBibTex JSON" file.
-- Specify the location of the folder that contains your `obsidian-citation-plugin` reading notes.
-  - NB this plugin expects that these notes begin with `@citekey` where `citekey` is the BBT citekey.
-
+- Specify the location of the "BetterBibTex JSON" file you just exported.
+- Specify the location of the folder that contains your `obsidian-citation-plugin` reading notes (e.g. `/Users/me/Documents/ObsVault/ReadingNotes/`).
+  - NB this add-on expects that your reading notes files begin with `@citekey` (where `citekey` is the BBT citekey; e.g. `@shepard1987science Toward a universal law of generalization for psychological science.md`).
 - Optionally, you can have this plugin read the metadata of your markdown notes and extract the citekey from one of the fields. To enable this, specify the metadata ID (`citekey` is a common value).
 - Run the synchronization function from `Tools -> ZoteroObsidianCitations Sync Tags`.
-- This will add a `ObsCite` tag to every Zotero item for which there exists a markdown reading note in the Obsidian Vault folder you specify.
+- This will add a `ObsCite` tag to every Zotero item for which there exists a reading note in the Obsidian Vault folder you specify.
 - In the `Tags` plane of Zotero, right click on the `ObsCite` tag and assign it a color, which will mark the tagged items in the preview plane of Zotero.
 
 

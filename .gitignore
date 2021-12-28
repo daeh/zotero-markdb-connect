@@ -3,3 +3,4 @@
 .vscode
 *_gitignore
 *-gitignore
+node_modules
