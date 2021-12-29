@@ -12,7 +12,7 @@ Code for this extension is based on [Zotero Citationcounts](https://github.com/e
 
 ## Plugin Functions
 
-Find reading notes in your Obsidian Vault and add a colored tag (`ObsCite`) to the corresponding Zotero items.
+Add a colored tag to Zotero items for which there are associated reading notes in an external folder. Currently this add-on is primarily a minimal companion to the [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin), but it can be adapted to other workflows.
 
 ## Instalation
 
@@ -48,4 +48,4 @@ If you're already using [obsidian-citation-plugin](https://github.com/hans/obsid
 
 ## License
 
-Distributed under the Mozilla Public License (MPL) Version 2.0.
+Distributed under the MIT License.

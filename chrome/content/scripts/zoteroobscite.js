@@ -1,5 +1,8 @@
 Components.utils.import('resource://gre/modules/osfile.jsm');
 
+
+//TODO switch to object, https://github.com/jlegewie/zotfile/blob/c3951151c93926e600f5fd0d5dbffe3dbbe32721/chrome/content/zotfile/zotfile.js
+
 // Startup -- load Zotero and constants
 if (typeof Zotero === 'undefined') {
     Zotero = {};
@@ -280,33 +283,6 @@ async function checkDependencies(vaultpath, bbtjson, metadatakeyword, promptSave
     return citekeyids;
 }
 
-async function updateItemsOld(citekeyids) {
-    let success = false;
-
-    /// find all item with tag
-    let dbreset = await removeTags();
-
-    /// add tag to found items
-    let items_found = await Zotero.Items.getAsync(citekeyids);
-
-    if (citekeyids.length != items_found.length) {
-        const diff = citekeyids.length - items_found.length;
-        showNotification("BBT JSON mismatch", "" + diff.toString() + " IDs in the BBT JSON could not be matched to items in the library", false);
-    }
-
-    items_found.forEach(function addTag(item) {
-        item.addTag('ObsCite');
-        item.saveTx();
-    });
-    ///TODO set color :: https://github.com/zotero/zotero/blob/52932b6eb03f72b5fb5591ba52d8e0f4c2ef825f/chrome/content/zotero/tagColorChooser.js
-
-
-    showNotification("Finished", "Found " + items_found.length.toString() + " notes.", true);
-
-    success = true;
-    return success;
-}
-
 
 async function updateItems(citekeyids) {
     let success = false;
@@ -318,14 +294,14 @@ async function updateItems(citekeyids) {
     let items_withnotes = await Zotero.Items.getAsync(citekeyids);
 
     /// find items to be tagged
-    items_totag = items_withnotes.filter(x => !items_withtags.includes(x));
+    let items_totag = items_withnotes.filter(x => !items_withtags.includes(x));
 
     /// find items that should not be tagged
-    items_removetag = items_withtags.filter(x => !items_withnotes.includes(x));
+    let items_removetag = items_withtags.filter(x => !items_withnotes.includes(x));
 
     /// find items that cannot be located in library
+    const nitems_notlocatable = citekeyids.length - items_withnotes.length;
     if (citekeyids.length != items_withnotes.length) {
-        const nitems_notlocatable = citekeyids.length - items_withnotes.length;
         showNotification("BBT JSON mismatch", "" + nitems_notlocatable.toString() + " IDs in the BBT JSON could not be matched to items in the library", false);
     }
 
@@ -335,6 +311,7 @@ async function updateItems(citekeyids) {
         item.saveTx();
     });
 
+    ///DEBUG this doesn't run as soon as zotero is started, needs to wait for something to load
     /// add tag to items that should be tagged
     items_totag.forEach(function addTag(item) {
         item.addTag('ObsCite');
@@ -342,25 +319,40 @@ async function updateItems(citekeyids) {
     });
     ///TODO set color :: https://github.com/zotero/zotero/blob/52932b6eb03f72b5fb5591ba52d8e0f4c2ef825f/chrome/content/zotero/tagColorChooser.js
 
-
-    showNotification("Finished", "Found " + items_withnotes.length.toString() + " notes. " + items_totag.length.toString() + " tags added, " + items_removetag.length.toString() + " tags removed.", true);
+    let message = "Found " + items_withnotes.length.toString() + " notes.";
+    if (nitems_notlocatable != 0) {
+        message += " " + nitems_notlocatable.toString() + " IDs could not be matched to items in the library.";
+    }
+    if (items_totag.length > 0) {
+        message += " Added " + items_totag.length.toString() + " tags.";
+    }
+    if (items_removetag.length > 0) {
+        message += " Removed " + items_removetag.length.toString() + " tags.";
+    }
+    // showNotification("ZoteroObsidianCitations Synced", message, true);
 
     success = true;
-    return success;
+    return message;
 }
 
 
-async function runSyncWithObsidian(vaultpath, bbtjson, metadatakeyword, promptSaveErrors) {
+async function runSyncWithObsidian(promptSaveErrors, syncTags) {
+    const vaultpath = getPref('source_dir');
+    const bbtjson = getPref('bbtjson');
+    const metadatakeyword = getPref('metadatakeyword');
 
-    let success = false;
-
-    const citekeyids = await checkDependencies(vaultpath, bbtjson, metadatakeyword, promptSaveErrors);
-
-    if (citekeyids.length > 0) {
-        success = await updateItems(citekeyids);
+    let notifData = ["ZoteroObsidianCitations Syncing Error", "Some Error Occurred", false];
+    if (await checkRequirements(vaultpath, bbtjson)) {
+        const citekeyids = await checkDependencies(vaultpath, bbtjson, metadatakeyword, promptSaveErrors);
+        if (syncTags && citekeyids.length > 0) {
+            let message = await updateItems(citekeyids);
+            notifData = ["ZoteroObsidianCitations Synced", message, true];
+        } else {
+            let message = "Found " + citekeyids.length.toString() + " notes.";
+            notifData = ["ZoteroObsidianCitations Synced", message, true];
+        }
     }
-
-    return success;
+    return notifData;
 }
 
 // Preference managers
@@ -376,24 +368,32 @@ function setPref(pref, value) {
 // Startup - initialize plugin
 
 Zotero.ObsCite.init = function () {
-    Zotero.ObsCite.initialDependencyCheck();
+    ///DEBUG replace delay with load callback
+    ///DEBUG something about addTab() doesn't work right away, needs to wait for something to load
+    /// https://github.com/retorquere/zotero-better-bibtex/blob/1010c42e090062f1753bb15ddf6e232bb28dd894/content/better-bibtex.ts#L740
+    /// waitingForZotero
+    setTimeout(() => {
+        Zotero.ObsCite.initialDependencyCheck();
+    }, 2000);
 
+    ///DEBUG this needs update
     // Register the callback in Zotero as an item observer
     const notifierID = Zotero.Notifier.registerObserver(
         Zotero.ObsCite.notifierCallback, ['item']);
 
+    ///DEBUG this needs update
     // Unregister callback when the window closes (important to avoid a memory leak)
     window.addEventListener('unload', function (e) {
         Zotero.Notifier.unregisterObserver(notifierID);
     }, false);
 };
 
-///DEBUG this needs update
+///DEBUG this needs updated
 Zotero.ObsCite.notifierCallback = {
     notify: function (event, type, ids, extraData) {
         if (event == 'add') {
-            const operation = getPref("autoretrieve");
-            Zotero.ObsCite.updateItems(Zotero.Items.get(ids), operation);
+            // const operation = getPref("autoretrieve");
+            // Zotero.ObsCite.updateItems(Zotero.Items.get(ids), operation);
         }
     }
 };
@@ -401,43 +401,30 @@ Zotero.ObsCite.notifierCallback = {
 // Controls for Tools menu
 
 Zotero.ObsCite.initialDependencyCheck = async function initDepCheck() {
-    const vaultpath = getPref('source_dir');
-    const bbtjson = getPref('bbtjson');
-    const metadatakeyword = getPref('metadatakeyword');
-
-    ///DEBUG
+    const promptSaveErrors = false;
     ///TODO make this a preference
-    const syncOnStart = true;
-    if (await checkRequirements(vaultpath, bbtjson)) {
-        const citekeyids = await checkDependencies(vaultpath, bbtjson, metadatakeyword, false);
-        if (citekeyids.length > 0) {
-            showNotification("ZoteroObsidianCitations Initalized", "Found " + citekeyids.length.toString() + " notes.", true);
-            if (syncOnStart) {
-                let success = await updateItems(citekeyids);
-            }
-        }
-    }
+    const syncTags = true; // syncOnStart
+    const notifData = await runSyncWithObsidian(promptSaveErrors, syncTags);
+    showNotification(...notifData);
 };
 
 Zotero.ObsCite.syncWithObsidian = async function syncWithObsidianWrapper() {
-    const vaultpath = getPref('source_dir');
-    const bbtjson = getPref('bbtjson');
-    const metadatakeyword = getPref('metadatakeyword');
-    if (await checkRequirements(vaultpath, bbtjson)) {
-        let success = await runSyncWithObsidian(vaultpath, bbtjson, metadatakeyword, true);
-    }
+    const promptSaveErrors = true;
+    const syncTags = true;
+    const notifData = await runSyncWithObsidian(promptSaveErrors, syncTags);
+    showNotification(...notifData);
 };
 
 Zotero.ObsCite.chooseValueFolder = async function selectValueFolderWrapper() {
     const vaultpath = await selectValueFolder();
-    if (vaultpath != '') {
+    if (vaultpath != '' && vaultpath != undefined && vaultpath != null && await OS.File.exists(vaultpath)) {
         setPref('source_dir', vaultpath);
     }
 };
 
 Zotero.ObsCite.chooseBBTjson = async function selectBBTjsonWrapper() {
     const bbtjson = await selectBBTjson();
-    if (bbtjson != '') {
+    if (bbtjson != '' && bbtjson != undefined && bbtjson != null && await OS.File.exists(bbtjson)) {
         setPref('bbtjson', bbtjson);
     }
 };
