@@ -415,7 +415,7 @@ async function checkDependencies(zotidssource, vaultpath, bbtjson, zotkeyregex, 
         /// if using BBT JSON ///
 
         /// get cite keys from Obsidian vault ///
-        let citekeysObs = await scanVault(vaultpath, metadatakeyword);
+        const citekeysObs = await scanVault(vaultpath, metadatakeyword);
         if (citekeysObs.length == 0) {
             showNotification("No citekeys found in Obsidian Vault", "Set the path to your Obsidian Citations Notes in the ZotObsCite preferences.", false);
             success = false;
@@ -423,7 +423,7 @@ async function checkDependencies(zotidssource, vaultpath, bbtjson, zotkeyregex, 
         }
 
         /// read in BBT json that maps citekeys to Zotero ids ///
-        let citekeymap = await mapCitekeysBBTJSON(bbtjson); /// returns dict of citekeys to zoteroIDs
+        const citekeymap = await mapCitekeysBBTJSON(bbtjson); /// returns dict of citekeys to zoteroIDs
         if (Object.keys(citekeymap).length == 0) {
             showNotification("BBT JSON Library Export Not Found", "Set the path to your auto-updating BBT JSON export in the ZotObsCite preferences.", false);
             success = false;
@@ -431,7 +431,7 @@ async function checkDependencies(zotidssource, vaultpath, bbtjson, zotkeyregex, 
         }
 
         /// slice with obs keys
-        let citekeyids = await sliceObj(citekeymap, citekeysObs, promptSaveErrors);
+        const citekeyids = await sliceObj(citekeymap, citekeysObs, promptSaveErrors);
         if (citekeyids.length == 0) {
             showNotification("No Matching Entries", "None of the ObsCite citekeys match entries in the BBT JSON", false);
             success = false;
@@ -442,16 +442,14 @@ async function checkDependencies(zotidssource, vaultpath, bbtjson, zotkeyregex, 
     } else if (zotidssource === 'contentregex') {
         /// if using user-defined regex ///
 
-        // zotkeyregex = '^- local:: \\[local zotero]\\(zotero:\\/\\/select\\/items\\/(.*)\\)';
-        // vaultpath = '/Users/dae/Downloads/test';
-        let citekeysZotidsObs = await scanVaultCustomRegex(vaultpath, metadatakeyword, zotkeyregex); /// returns dict of citekeys to zoteroKeys
+        const citekeysZotidsObs = await scanVaultCustomRegex(vaultpath, metadatakeyword, zotkeyregex); /// returns dict of citekeys to zoteroKeys
         if (Object.keys(citekeysZotidsObs).length == 0) {
             showNotification("No citekeys found in Obsidian Vault", "Check the path to your Obsidian Vault and your RegEx.", false);
             success = false;
             return success;
         }
-        let zoterokeymap = await mapZoteroIDkeysInternalSearch(); /// returns dict of zoteroKeys to zoteroIDs
-        let citekeyidsCustomRegex = await sliceObjCustomRegex(zoterokeymap, citekeysZotidsObs, promptSaveErrors);
+        const zoterokeymap = await mapZoteroIDkeysInternalSearch(); /// returns dict of zoteroKeys to zoteroIDs
+        const citekeyidsCustomRegex = await sliceObjCustomRegex(zoterokeymap, citekeysZotidsObs, promptSaveErrors);
         if (citekeyidsCustomRegex.length == 0) {
             showNotification("No Matching Entries", "None of the ObsCite citekeys match entries in the BBT JSON", false);
             success = false;
@@ -459,8 +457,7 @@ async function checkDependencies(zotidssource, vaultpath, bbtjson, zotkeyregex, 
         }
 
         // showNotification("citekeyidsCustomRegex", citekeyidsCustomRegex[0], false);
-        // success = false;
-        // return success;
+        // return false;
         return citekeyidsCustomRegex;
 
     } else {
@@ -516,7 +513,6 @@ async function updateItems(citekeyids) {
     if (items_removetag.length > 0) {
         message += " Removed " + items_removetag.length.toString() + " tags.";
     }
-    // showNotification("ZoteroObsidianCitations Synced", message, true);
 
     success = true;
     return message;
@@ -573,27 +569,28 @@ Zotero.ObsCite.init = () => {
         Zotero.ObsCite.initialDependencyCheck();
     }, 3000);
 
-    ///DEBUG this needs update
     // Register the callback in Zotero as an item observer
-    const notifierID = Zotero.Notifier.registerObserver(
-        Zotero.ObsCite.notifierCallback, ['item']);
+    // const notifierID = Zotero.Notifier.registerObserver(
+    //     Zotero.ObsCite.notifierCallback, ['item']);
 
-    ///DEBUG this needs update
     // Unregister callback when the window closes (important to avoid a memory leak)
-    window.addEventListener('unload', (e) => {
-        Zotero.Notifier.unregisterObserver(notifierID);
-    }, false);
+    // window.addEventListener('unload', (e) => {
+    //     Zotero.Notifier.unregisterObserver(notifierID);
+    // }, false);
 };
 
-///DEBUG this needs updated
 Zotero.ObsCite.notifierCallback = {
     notify: (event, type, ids, extraData) => {
-        if (event == 'add') {
-            // const operation = getPref("autoretrieve");
-            // Zotero.ObsCite.updateItems(Zotero.Items.get(ids), operation);
-        }
+        // if (event == 'add') {
+        //     const operation = getPref("autoretrieve");
+        //     Zotero.ObsCite.updateItems(Zotero.Items.get(ids), operation);
+        // }
     }
 };
+
+Zotero.ObsCite.version = () => {
+    return "0.0.1";
+}
 
 // Controls for Tools menu
 
