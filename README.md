@@ -1,6 +1,6 @@
 # Zotero Obsidian Citations
 
-*Add colored tags to Zotero items that have associated MarkDown notes in an external folder.*
+_Add colored tags to Zotero items that have associated MarkDown notes in an external folder._
 
 ![ZoteroObsidianCitationsScreenshot](ZoteroObsidianCitationsScreenshot.png)
 
@@ -23,7 +23,7 @@ Adds a colored tag to Zotero items for which there are associated reading notes 
 - Run Zotero (version 5.x)
 - Go to `Tools -> Add-ons`
 - `Install Add-on From File`
-- Choose the file `zotero-obsidian-citations-0.0.2.xpi`
+- Choose the file `zotero-obsidian-citations-0.0.3.xpi`
 - Restart Zotero
 
 ## Setup
@@ -55,13 +55,13 @@ If you're already using [obsidian-citation-plugin](https://github.com/hans/obsid
 
 - Rather than exporting your library in the _BetterBibTex JSON_ format, specify a custom RegEx pattern in `ZoteroObsidianCitations Preferences...` to extract the Zotero Item Key from your MarkDown notes.
 
-  - E.g. if your note has the line 
-    
-     `- local:: [local zotero](zotero://select/library/items/GZ9DQ2AM)`
-     
-     you could extract the Zotero key (`GZ9DQ2AM`) using this RegEx pattern:
-     
-     `^- local:: \[local zotero]\(zotero:\/\/select\/library\/items\/(.*)\)`
+  - E.g. if your note has the line
+
+    `- local:: [local zotero](zotero://select/library/items/GZ9DQ2AM)`
+
+    you could extract the Zotero key (`GZ9DQ2AM`) using this RegEx pattern:
+
+    `^- local:: \[local zotero]\(zotero:\/\/select\/library\/items\/(.*)\)`
 
 - Follow the instructions above to specify the path to your MarkDown notes, the metadata ID (optional), and color the `ObsCite` tag.
 

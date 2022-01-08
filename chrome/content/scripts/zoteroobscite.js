@@ -54,9 +54,9 @@ function askToSaveErrors(dialogTitle, message) {
     Components.utils.import('resource://gre/modules/Services.jsm');
 
     const ps = Services.prompt;
-    var buttonFlags = (ps.BUTTON_POS_0) * (ps.BUTTON_TITLE_IS_STRING) + ps.BUTTON_POS_0_DEFAULT +
+    let buttonFlags = (ps.BUTTON_POS_0) * (ps.BUTTON_TITLE_IS_STRING) + ps.BUTTON_POS_0_DEFAULT +
         (ps.BUTTON_POS_1) * (ps.BUTTON_TITLE_IS_STRING);
-    var index = ps.confirmEx(
+    let index = ps.confirmEx(
         null, // parent
         dialogTitle, // dialogTitle
         message, // message
@@ -109,35 +109,36 @@ async function scanVault(vaultpath, fetchMetadataCitekey) {
         Zotero.debug(`${vaultpath} does not exist`);
         return dbs;
     }
-    await Zotero.File.iterateDirectory(vaultpath, async function (entry) {
+    await Zotero.File.iterateDirectory(vaultpath, async (entry) => {
         if (entry.name.startsWith('@')) {
-            let fnparts = entry.name.split('.');
-            let name = (fnparts[fnparts.length - 1].toLowerCase() === 'md') ? entry.name.split('.').slice(0, -1).join('.') : entry.name;
-            // let name = entry.name;
-            let path = entry.path;
+            const fnparts = entry.name.split('.');
+            const name = (fnparts[fnparts.length - 1].toLowerCase() === 'md') ? entry.name.split('.').slice(0, -1).join('.') : entry.name;
+            const path = entry.path;
+
             try {
+
                 if (fetchMetadataCitekey && fetchMetadataCitekey.length > 0) {
                     /// get citekey from metadata
                     try {
-                        let contents = await Zotero.File.getContentsAsync(path);
+                        const contents = await Zotero.File.getContentsAsync(path);
                         /// get metadata
-                        let metadata = contents.split('\n---')[0];
+                        const metadata = contents.split('\n---')[0];
                         if (metadata.startsWith('---')) {
-                            let citekey = metadata.match(re_metadata)[1].trim();
-                            dbs.push(citekey);
+                            /// get citekey from metadata
+                            dbs.push(metadata.match(re_metadata)[1].trim());
                         } else {
-                            let citekey = name.match(re_title)[1].trim();
-                            dbs.push(citekey);
+                            /// get citekey from filename
+                            dbs.push(name.match(re_title)[1].trim());
                         }
                     } catch (err) {
-                        let citekey = name.match(re_title)[1].trim();
-                        dbs.push(citekey);
+                        /// get citekey from filename
+                        dbs.push(name.match(re_title)[1].trim());
                     }
                 } else {
                     /// get citekey from filename
-                    let citekey = name.match(re_title)[1].trim();
-                    dbs.push(citekey);
+                    dbs.push(name.match(re_title)[1].trim());
                 }
+
             } catch (err) {
                 dbserrs.push(name);
             }
@@ -146,12 +147,13 @@ async function scanVault(vaultpath, fetchMetadataCitekey) {
     });
 
     if (dbserrs.length > 0) {
-        let nerr = dbserrs.length;
+        const nerr = dbserrs.length;
         Zotero.debug(`${nerr} Read ObsVault Read Errors`);
         showNotification("scanValut", "Error: " + nerr.toString() + ".", false);
     }
     return dbs;
 }
+
 
 async function scanVaultCustomRegex(vaultpath, fetchMetadataCitekey, fetchCustomFieldZotkey) {
     let dbs = {};
@@ -164,40 +166,38 @@ async function scanVaultCustomRegex(vaultpath, fetchMetadataCitekey, fetchCustom
         Zotero.debug(`${vaultpath} does not exist`);
         return dbs;
     }
-    await Zotero.File.iterateDirectory(vaultpath, async function (entry) {
+    await Zotero.File.iterateDirectory(vaultpath, async (entry) => {
         if (entry.name.startsWith('@')) {
-            let fnparts = entry.name.split('.');
-            let name = (fnparts[fnparts.length - 1].toLowerCase() === 'md') ? entry.name.split('.').slice(0, -1).join('.') : entry.name;
-            // let name = entry.name;
-            let path = entry.path;
+            const fnparts = entry.name.split('.');
+            const name = (fnparts[fnparts.length - 1].toLowerCase() === 'md') ? entry.name.split('.').slice(0, -1).join('.') : entry.name;
+            const path = entry.path;
 
             try {
-                let contents = await Zotero.File.getContentsAsync(path);
+                const contents = await Zotero.File.getContentsAsync(path);
 
                 /// find the ZoteroKey from the contents
-                let zotkey = contents.match(re_contents)[1].trim();
+                const zotkey = contents.match(re_contents)[1].trim();
 
                 /// find the citekey from the metadata
                 if (fetchMetadataCitekey && fetchMetadataCitekey.length > 0) {
                     /// get citekey from metadata
                     try {
                         /// get metadata
-                        let metadata = contents.split('\n---')[0];
+                        const metadata = contents.split('\n---')[0];
                         if (metadata.startsWith('---')) {
-                            let citekey = metadata.match(re_metadata)[1].trim();
-                            dbs[citekey] = zotkey;
+                            /// get citekey from metadata
+                            dbs[metadata.match(re_metadata)[1].trim()] = zotkey;
                         } else {
-                            let citekey = name.match(re_title)[1].trim();
-                            dbs[citekey] = zotkey;
+                            /// get citekey from filename
+                            dbs[name.match(re_title)[1].trim()] = zotkey;
                         }
                     } catch (err) {
-                        let citekey = name.match(re_title)[1].trim();
-                        dbs[citekey] = zotkey;
+                        /// get citekey from filename
+                        dbs[name.match(re_title)[1].trim()] = zotkey;
                     }
                 } else {
                     /// get citekey from filename
-                    let citekey = name.match(re_title)[1].trim();
-                    dbs[citekey] = zotkey;
+                    dbs[name.match(re_title)[1].trim()] = zotkey;
                 }
 
             } catch (err) {
@@ -208,7 +208,7 @@ async function scanVaultCustomRegex(vaultpath, fetchMetadataCitekey, fetchCustom
     });
 
     if (dbserrs.length > 0) {
-        let nerr = dbserrs.length;
+        const nerr = dbserrs.length;
         Zotero.debug(`${nerr} Read ObsVault Read Errors`);
         showNotification("scanValut", "Error: " + nerr.toString() + ".", false);
     }
@@ -227,7 +227,7 @@ async function mapCitekeysBBTJSON(bbtjson) {
     let contents = await Zotero.File.getContentsAsync(bbtjson);
     contents = JSON.parse(contents);
     let items = contents.items;
-    items.forEach(function mapper(item) {
+    items.forEach(item => {
         try {
             const citekey = item.citekey;
             const citationKey = item.citationKey;
@@ -241,7 +241,7 @@ async function mapCitekeysBBTJSON(bbtjson) {
 
 
     if (citekeymaperr.length > 0) {
-        let nerr = citekeymaperr.length;
+        const nerr = citekeymaperr.length;
         Zotero.debug(`${nerr} Read ObsVault Read Errors`);
         Zotero.debug(`${citekeymaperr[0]}`);
         showNotification("mapCitekeysBBTJSON", "Error: " + nerr.toString() + ".", false);
@@ -270,7 +270,7 @@ async function mapZoteroIDkeysInternalSearch() {
     });
 
     if (keymaperr.length > 0) {
-        let nerr = keymaperr.length;
+        const nerr = keymaperr.length;
         Zotero.debug(`${nerr} mapZoteroIDkeysInternalSearch Errors`);
         Zotero.debug(`${keymaperr[0]}`);
         showNotification("mapZoteroIDkeysInternalSearch", "Error: " + nerr.toString() + ".", false);
@@ -282,7 +282,7 @@ async function sliceObj(obj, keys, promptSaveErrors) {
     let values = [];
     let valueerr = [];
 
-    keys.forEach(function slice(key) {
+    keys.forEach(key => {
         if (key in obj) {
             values.push(obj[key]);
         } else {
@@ -291,7 +291,7 @@ async function sliceObj(obj, keys, promptSaveErrors) {
     });
 
     if (valueerr.length > 0) {
-        let nerr = valueerr.length;
+        const nerr = valueerr.length;
         Zotero.debug(`${nerr} ObsVault Read Errors`);
         Zotero.debug(`${valueerr[0]}`);
 
@@ -318,19 +318,16 @@ async function sliceObjCustomRegex(zoterokeymap, citekeysZotidsObs, promptSaveEr
     let zotids = [];
     let zotidserr = [];
 
-    for (let citekey in citekeysZotidsObs) {
-        if (citekeysZotidsObs.hasOwnProperty(citekey)) {
-            let zotkey = citekeysZotidsObs[citekey];
-            if (zotkey in zoterokeymap) {
-                zotids.push(zoterokeymap[zotkey]);
-            } else {
-                zotidserr.push(citekey + "\t" + zotkey);
-            }
+    for (const [citekey, zotkey] of Object.entries(citekeysZotidsObs)) {
+        if (zotkey in zoterokeymap) {
+            zotids.push(zoterokeymap[zotkey]);
+        } else {
+            zotidserr.push(citekey + "\t" + zotkey);
         }
     }
 
     if (zotidserr.length > 0) {
-        let nerr = zotidserr.length;
+        const nerr = zotidserr.length;
         Zotero.debug(`${nerr} ObsVault Read Errors`);
         Zotero.debug(`${zotidserr[0]}`);
 
@@ -339,7 +336,7 @@ async function sliceObjCustomRegex(zoterokeymap, citekeysZotidsObs, promptSaveEr
             const message = "There were " + nerr.toString() + " citekeys in your Obsidian Vault that could not be matched to items in your Zotero library. \n\nWould you like to save the names of these citekeys in a text file? \n\n(Matches for " + zotids.length.toString() + " citekeys were found successfully.)";
             const saveResp = askToSaveErrors(warningTitle, message);
             if (saveResp === 0) {
-                const outtxt = "sliceObj Errors (" + nerr.toString() + "):\n\ncitekey\tzoterokey" + zotidserr.join("\n") + "\n\n";
+                const outtxt = "sliceObjCustomRegex Errors (" + nerr.toString() + "):\n\ncitekey\tzoterokey\n\n" + zotidserr.join("\n") + "\n\n";
                 writeToFile(outtxt, 'ZoteroObsidianCitations_missing-entries.txt');
             }
         } else {
@@ -363,7 +360,7 @@ async function findTaggedItems() {
 async function removeAllTags() {
     let items_preexisting = await findTaggedItems();
     /// remove tag
-    items_preexisting.forEach(function removeTag(item) {
+    items_preexisting.forEach(item => {
         item.removeTag('ObsCite');
         item.saveTx();
     });
@@ -496,14 +493,14 @@ async function updateItems(citekeyids) {
     }
 
     /// remove tag from items that should not be tagged
-    items_removetag.forEach(function rmTag(item) {
+    items_removetag.forEach(item => {
         item.removeTag('ObsCite');
         item.saveTx();
     });
 
     ///DEBUG this doesn't run successfully as soon as zotero is started, needs to wait for something to load
     /// add tag to items that should be tagged
-    items_totag.forEach(function addTag(item) {
+    items_totag.forEach(item => {
         item.addTag('ObsCite');
         item.saveTx();
     });
@@ -559,7 +556,7 @@ function setPref(pref, value) {
 
 // Startup - initialize plugin
 
-Zotero.ObsCite.init = function () {
+Zotero.ObsCite.init = () => {
     ///DEBUG replace delay with load callback
     ///DEBUG something about addTag() doesn't work right away, needs to wait for something to load
     /// https://github.com/retorquere/zotero-better-bibtex/blob/1010c42e090062f1753bb15ddf6e232bb28dd894/content/better-bibtex.ts#L740
@@ -583,14 +580,14 @@ Zotero.ObsCite.init = function () {
 
     ///DEBUG this needs update
     // Unregister callback when the window closes (important to avoid a memory leak)
-    window.addEventListener('unload', function (e) {
+    window.addEventListener('unload', (e) => {
         Zotero.Notifier.unregisterObserver(notifierID);
     }, false);
 };
 
 ///DEBUG this needs updated
 Zotero.ObsCite.notifierCallback = {
-    notify: function (event, type, ids, extraData) {
+    notify: (event, type, ids, extraData) => {
         if (event == 'add') {
             // const operation = getPref("autoretrieve");
             // Zotero.ObsCite.updateItems(Zotero.Items.get(ids), operation);
@@ -600,7 +597,7 @@ Zotero.ObsCite.notifierCallback = {
 
 // Controls for Tools menu
 
-Zotero.ObsCite.initialDependencyCheck = async function initDepCheck() {
+Zotero.ObsCite.initialDependencyCheck = async () => {
     const promptSaveErrors = false;
     ///TODO make this a preference
     const syncTags = true; // syncOnStart
@@ -608,32 +605,32 @@ Zotero.ObsCite.initialDependencyCheck = async function initDepCheck() {
     showNotification(...notifData);
 };
 
-Zotero.ObsCite.syncWithObsidian = async function syncWithObsidianWrapper() {
+Zotero.ObsCite.syncWithObsidian = async () => {
     const promptSaveErrors = true;
     const syncTags = true;
     const notifData = await runSyncWithObsidian(promptSaveErrors, syncTags);
     showNotification(...notifData);
 };
 
-Zotero.ObsCite.chooseValueFolder = async function selectValueFolderWrapper() {
+Zotero.ObsCite.chooseValueFolder = async () => {
     const vaultpath = await selectValueFolder();
     if (vaultpath != '' && vaultpath != undefined && vaultpath != null && await OS.File.exists(vaultpath)) {
         setPref('source_dir', vaultpath);
     }
 };
 
-Zotero.ObsCite.chooseBBTjson = async function selectBBTjsonWrapper() {
+Zotero.ObsCite.chooseBBTjson = async () => {
     const bbtjson = await selectBBTjson();
     if (bbtjson != '' && bbtjson != undefined && bbtjson != null && await OS.File.exists(bbtjson)) {
         setPref('bbtjson', bbtjson);
     }
 };
 
-Zotero.ObsCite.checkMetadataFormat = function checkMetadataFormatWrapper() {
+Zotero.ObsCite.checkMetadataFormat = () => {
     const metadatakeyword = getPref('metadatakeyword');
     let found = [];
     const notallowed = ["'", '"', ":", "\n", "/", "\\", "?", "*", "|", ">", "<", ",", ";", "=", "`", "~", "!", "#", "$", "%", "^", "&", "(", ")", "[", "]", "{", "}", " "];
-    notallowed.forEach(function findchar(char) {
+    notallowed.forEach(char => {
         if (metadatakeyword.includes(char)) {
             found.push(char);
         }
@@ -649,7 +646,7 @@ Zotero.ObsCite.checkMetadataFormat = function checkMetadataFormatWrapper() {
 /**
  * Open obscite preference window
  */
-Zotero.ObsCite.openPreferenceWindow = function (paneID, action) {
+Zotero.ObsCite.openPreferenceWindow = (paneID, action) => {
     const io = {
         pane: paneID,
         action: action
@@ -665,7 +662,7 @@ Zotero.ObsCite.openPreferenceWindow = function (paneID, action) {
 
 
 if (typeof window !== 'undefined') {
-    window.addEventListener('load', function (e) {
+    window.addEventListener('load', (e) => {
         Zotero.ObsCite.init();
     }, false);
 }
