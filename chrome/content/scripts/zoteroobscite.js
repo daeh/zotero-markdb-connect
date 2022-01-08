@@ -556,7 +556,7 @@ function setPref(pref, value) {
 
 Zotero.ObsCite.init = function () {
     ///DEBUG replace delay with load callback
-    ///DEBUG something about addTab() doesn't work right away, needs to wait for something to load
+    ///DEBUG something about addTag() doesn't work right away, needs to wait for something to load
     /// https://github.com/retorquere/zotero-better-bibtex/blob/1010c42e090062f1753bb15ddf6e232bb28dd894/content/better-bibtex.ts#L740
     /// waitingForZotero
 
