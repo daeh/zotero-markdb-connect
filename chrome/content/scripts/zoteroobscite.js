@@ -94,11 +94,11 @@ function showNotification(header, body, success) {
     progressWindowMulti.startCloseTimer(8000);
 }
 
-async function scanVault(vaultpath, fetchMetadata) {
+async function scanVault(vaultpath, fetchMetadataCitekey) {
     let dbs = [];
     let dbserrs = [];
     const re_title = new RegExp(/^@([^\s]+)/);
-    const re_metadata = new RegExp("^" + fetchMetadata + "\: *([^s].+)", 'm');
+    const re_metadata = new RegExp("^" + fetchMetadataCitekey + "\: *([^s].+)", 'm');
 
     if (!await OS.File.exists(vaultpath)) {
         Zotero.debug(`${vaultpath} does not exist`);
@@ -106,10 +106,12 @@ async function scanVault(vaultpath, fetchMetadata) {
     }
     await Zotero.File.iterateDirectory(vaultpath, async function (entry) {
         if (entry.name.startsWith('@')) {
-            let name = entry.name;
+            let fnparts = entry.name.split('.');
+            let name = (fnparts[fnparts.length - 1].toLowerCase() === 'md') ? entry.name.split('.').slice(0, -1).join('.') : entry.name;
+            // let name = entry.name;
             let path = entry.path;
             try {
-                if (fetchMetadata && fetchMetadata.length > 0) {
+                if (fetchMetadataCitekey && fetchMetadataCitekey.length > 0) {
                     /// get citekey from metadata
                     try {
                         let contents = await Zotero.File.getContentsAsync(path);
@@ -137,6 +139,7 @@ async function scanVault(vaultpath, fetchMetadata) {
 
         }
     });
+
     if (dbserrs.length > 0) {
         let nerr = dbserrs.length;
         Zotero.debug(`${nerr} Read ObsVault Read Errors`);
@@ -145,7 +148,69 @@ async function scanVault(vaultpath, fetchMetadata) {
     return dbs;
 }
 
-async function mapCitekeys(bbtjson) {
+async function scanVaultCustomRegex(vaultpath, fetchMetadataCitekey, fetchCustomFieldZotkey) {
+    let dbs = {};
+    let dbserrs = [];
+    const re_title = new RegExp(/^@([^\s]+)/);
+    const re_metadata = new RegExp("^" + fetchMetadataCitekey + "\: *([^s].+)", 'm');
+    const re_contents = new RegExp(fetchCustomFieldZotkey, 'm');
+
+    if (!await OS.File.exists(vaultpath)) {
+        Zotero.debug(`${vaultpath} does not exist`);
+        return dbs;
+    }
+    await Zotero.File.iterateDirectory(vaultpath, async function (entry) {
+        if (entry.name.startsWith('@')) {
+            let fnparts = entry.name.split('.');
+            let name = (fnparts[fnparts.length - 1].toLowerCase() === 'md') ? entry.name.split('.').slice(0, -1).join('.') : entry.name;
+            // let name = entry.name;
+            let path = entry.path;
+
+            try {
+                let contents = await Zotero.File.getContentsAsync(path);
+
+                /// find the ZoteroKey from the contents
+                let zotkey = contents.match(re_contents)[1].trim();
+
+                /// find the citekey from the metadata
+                if (fetchMetadataCitekey && fetchMetadataCitekey.length > 0) {
+                    /// get citekey from metadata
+                    try {
+                        /// get metadata
+                        let metadata = contents.split('\n---')[0];
+                        if (metadata.startsWith('---')) {
+                            let citekey = metadata.match(re_metadata)[1].trim();
+                            dbs[citekey] = zotkey;
+                        } else {
+                            let citekey = name.match(re_title)[1].trim();
+                            dbs[citekey] = zotkey;
+                        }
+                    } catch (err) {
+                        let citekey = name.match(re_title)[1].trim();
+                        dbs[citekey] = zotkey;
+                    }
+                } else {
+                    /// get citekey from filename
+                    let citekey = name.match(re_title)[1].trim();
+                    dbs[citekey] = zotkey;
+                }
+
+            } catch (err) {
+                dbserrs.push(name);
+            }
+
+        }
+    });
+
+    if (dbserrs.length > 0) {
+        let nerr = dbserrs.length;
+        Zotero.debug(`${nerr} Read ObsVault Read Errors`);
+        showNotification("scanValut", "Error: " + nerr.toString() + ".", false);
+    }
+    return dbs;
+}
+
+async function mapCitekeysBBTJSON(bbtjson) {
     let citekeymap = {};
     let citekeymaperr = {};
 
@@ -171,12 +236,41 @@ async function mapCitekeys(bbtjson) {
 
 
     if (citekeymaperr.length > 0) {
-        let nerr = citekeymaperr.length
+        let nerr = citekeymaperr.length;
         Zotero.debug(`${nerr} Read ObsVault Read Errors`);
         Zotero.debug(`${citekeymaperr[0]}`);
-        showNotification("mapCitekeys", "Error: " + nerr.toString() + ".", false);
+        showNotification("mapCitekeysBBTJSON", "Error: " + nerr.toString() + ".", false);
     }
     return citekeymap;
+}
+
+async function mapZoteroIDkeysInternalSearch() {
+
+    let keymap = {};
+    let keymaperr = {};
+
+    /// get all items in library
+    let s = new Zotero.Search();
+    s.libraryID = Zotero.Libraries.userLibraryID;
+    s.addCondition('deleted', 'false');
+    let itemIDs = await s.search();
+    let items = await Zotero.Items.getAsync(itemIDs);
+
+    items.forEach(item => {
+        try {
+            keymap[item.key] = item.id;
+        } catch (err) {
+            keymaperr.push(item);
+        }
+    });
+
+    if (keymaperr.length > 0) {
+        let nerr = keymaperr.length
+        Zotero.debug(`${nerr} mapZoteroIDkeysInternalSearch Errors`);
+        Zotero.debug(`${keymaperr[0]}`);
+        showNotification("mapZoteroIDkeysInternalSearch", "Error: " + nerr.toString() + ".", false);
+    }
+    return keymap;
 }
 
 async function sliceObj(obj, keys, promptSaveErrors) {
@@ -202,14 +296,53 @@ async function sliceObj(obj, keys, promptSaveErrors) {
             const saveResp = askToSaveErrors(warningTitle, message);
             if (saveResp === 0) {
                 const outtxt = "sliceObj Errors (" + nerr.toString() + "):\n\n" + valueerr.join("\n") + "\n\n";
-                writeToFile(outtxt, 'sliceObjErr.txt');
+                writeToFile(outtxt, 'ZoteroObsidianCitations_missing-entries.txt');
             }
         } else {
-            showNotification("sliceObj", "Error: " + nerr.toString() + ".", false);
+            showNotification("ZoteroObsidianCitations", "sliceObj Error: " + nerr.toString() + ".", false);
         }
 
     }
     return values;
+}
+
+async function sliceObjCustomRegex(zoterokeymap, citekeysZotidsObs, promptSaveErrors) {
+    /// zoterokeymap :: dict of zoteroKeys to zoteroIDs
+    /// citekeysZotidsObs :: dict of citekeys to zoteroKeys
+
+    let zotids = [];
+    let zotidserr = [];
+
+    for (let citekey in citekeysZotidsObs) {
+        if (citekeysZotidsObs.hasOwnProperty(citekey)) {
+            let zotkey = citekeysZotidsObs[citekey];
+            if (zotkey in zoterokeymap) {
+                zotids.push(zoterokeymap[zotkey]);
+            } else {
+                zotidserr.push(citekey + "\t" + zotkey);
+            }
+        }
+    }
+
+    if (zotidserr.length > 0) {
+        let nerr = zotidserr.length;
+        Zotero.debug(`${nerr} ObsVault Read Errors`);
+        Zotero.debug(`${zotidserr[0]}`);
+
+        if (promptSaveErrors) {
+            const warningTitle = "Umatched citekeys";
+            const message = "There were " + nerr.toString() + " citekeys in your Obsidian Vault that could not be matched to items in your Zotero library. \n\nWould you like to save the names of these citekeys in a text file? \n\n(Matches for " + zotids.length.toString() + " citekeys were found successfully.)";
+            const saveResp = askToSaveErrors(warningTitle, message);
+            if (saveResp === 0) {
+                const outtxt = "sliceObj Errors (" + nerr.toString() + "):\n\ncitekey\tzoterokey" + zotidserr.join("\n") + "\n\n";
+                writeToFile(outtxt, 'ZoteroObsidianCitations_missing-entries.txt');
+            }
+        } else {
+            showNotification("ZoteroObsidianCitations", "sliceObjCustomRegex Error: " + nerr.toString() + ".", false);
+        }
+    }
+
+    return zotids;
 }
 
 
@@ -234,17 +367,37 @@ async function removeAllTags() {
 
 
 
-async function checkRequirements(vaultpath, bbtjson) {
+async function checkRequirements(zotidssource, vaultpath, bbtjson, zotkeyregex) {
     let satisfied = true;
 
-    if (vaultpath == '' || !await OS.File.exists(vaultpath)) {
+    if (vaultpath == '' || vaultpath == undefined || vaultpath == null || !await OS.File.exists(vaultpath)) {
         showNotification("Obsidian Vault Path Not Found", "Set the path to your Obsidian Citations Notes in the ZotObsCite preferences.", false);
         satisfied = false;
         return false;
     }
 
-    if (bbtjson == '' || !await OS.File.exists(bbtjson)) {
-        showNotification("BBT JSON Library Export Not Found", "Set the path to your auto-updating BBT JSON export in the ZotObsCite preferences.", false);
+    if (zotidssource === 'bbtjson') {
+        if (bbtjson == '' || bbtjson == undefined || bbtjson == null || !await OS.File.exists(bbtjson)) {
+            showNotification("BBT JSON Library Export Not Found", "Set the path to your auto-updating BBT JSON export in the ZotObsCite preferences.", false);
+            satisfied = false;
+            return false;
+        }
+    } else if (zotidssource === 'contentregex') {
+        if (zotkeyregex == '' || zotkeyregex == undefined || zotkeyregex == null || !(zotkeyregex.length > 0)) {
+            showNotification("User Defined RegEx Invalid", "The RegEx you specifed in the ZoteroObsidianCitations preferences cannot be empty.", false);
+            satisfied = false;
+            return false;
+        } else {
+            try {
+                new RegExp(zotkeyregex);
+            } catch (err) {
+                showNotification("User Defined RegEx Invalid", "The RegEx you specifed in the ZoteroObsidianCitations preferences is invalid: " + err, false);
+                satisfied = false;
+                return false;
+            }
+        }
+    } else {
+        showNotification("ZoteroObsidianCitations", 'Zotero IDs Source Not Specified: ' + zotidssource, false);
         satisfied = false;
         return false;
     }
@@ -252,35 +405,67 @@ async function checkRequirements(vaultpath, bbtjson) {
     return satisfied;
 }
 
-async function checkDependencies(vaultpath, bbtjson, metadatakeyword, promptSaveErrors) {
+async function checkDependencies(zotidssource, vaultpath, bbtjson, zotkeyregex, metadatakeyword, promptSaveErrors) {
 
     let success = false;
 
-    /// get cite keys from Obsidian vault ///
-    let citekeysObs = await scanVault(vaultpath, metadatakeyword);
-    if (citekeysObs.length == 0) {
-        showNotification("No citekeys found in Obsidian Vault", "Set the path to your Obsidian Citations Notes in the ZotObsCite preferences.", false);
+    if (zotidssource === 'bbtjson') {
+        /// if using BBT JSON ///
+
+        /// get cite keys from Obsidian vault ///
+        let citekeysObs = await scanVault(vaultpath, metadatakeyword);
+        if (citekeysObs.length == 0) {
+            showNotification("No citekeys found in Obsidian Vault", "Set the path to your Obsidian Citations Notes in the ZotObsCite preferences.", false);
+            success = false;
+            return success;
+        }
+
+        /// read in BBT json that maps citekeys to Zotero ids ///
+        let citekeymap = await mapCitekeysBBTJSON(bbtjson); /// returns dict of citekeys to zoteroIDs
+        if (Object.keys(citekeymap).length == 0) {
+            showNotification("BBT JSON Library Export Not Found", "Set the path to your auto-updating BBT JSON export in the ZotObsCite preferences.", false);
+            success = false;
+            return success;
+        }
+
+        /// slice with obs keys
+        let citekeyids = await sliceObj(citekeymap, citekeysObs, promptSaveErrors);
+        if (citekeyids.length == 0) {
+            showNotification("No Matching Entries", "None of the ObsCite citekeys match entries in the BBT JSON", false);
+            success = false;
+            return success;
+        }
+        return citekeyids;
+
+    } else if (zotidssource === 'contentregex') {
+        /// if using user-defined regex ///
+
+        // zotkeyregex = '^- local:: \\[local zotero]\\(zotero:\\/\\/select\\/items\\/(.*)\\)';
+        // vaultpath = '/Users/dae/Downloads/test';
+        let citekeysZotidsObs = await scanVaultCustomRegex(vaultpath, metadatakeyword, zotkeyregex); /// returns dict of citekeys to zoteroKeys
+        if (Object.keys(citekeysZotidsObs).length == 0) {
+            showNotification("No citekeys found in Obsidian Vault", "Check the path to your Obsidian Vault and your RegEx.", false);
+            success = false;
+            return success;
+        }
+        let zoterokeymap = await mapZoteroIDkeysInternalSearch(); /// returns dict of zoteroKeys to zoteroIDs
+        let citekeyidsCustomRegex = await sliceObjCustomRegex(zoterokeymap, citekeysZotidsObs, promptSaveErrors);
+        if (citekeyidsCustomRegex.length == 0) {
+            showNotification("No Matching Entries", "None of the ObsCite citekeys match entries in the BBT JSON", false);
+            success = false;
+            return success;
+        }
+
+        // showNotification("citekeyidsCustomRegex", citekeyidsCustomRegex[0], false);
+        // success = false;
+        // return success;
+        return citekeyidsCustomRegex;
+
+    } else {
+        showNotification("ZoteroObsidianCitations", 'Zotero IDs Source Not Specified (' + zotidssource + ').', false);
         success = false;
         return success;
     }
-
-    /// read in BBT json that maps citekeys to Zotero ids ///
-    let citekeymap = await mapCitekeys(bbtjson);
-    if (Object.keys(citekeymap).length == 0) {
-        showNotification("BBT JSON Library Export Not Found", "Set the path to your auto-updating BBT JSON export in the ZotObsCite preferences.", false);
-        success = false;
-        return success;
-    }
-
-    /// slice with obs keys
-    let citekeyids = await sliceObj(citekeymap, citekeysObs, promptSaveErrors);
-    if (citekeyids.length == 0) {
-        showNotification("No Matching Entries", "None of the ObsCite citekeys match entries in the BBT JSON", false);
-        success = false;
-        return success;
-    }
-
-    return citekeyids;
 }
 
 
@@ -311,7 +496,7 @@ async function updateItems(citekeyids) {
         item.saveTx();
     });
 
-    ///DEBUG this doesn't run as soon as zotero is started, needs to wait for something to load
+    ///DEBUG this doesn't run successfully as soon as zotero is started, needs to wait for something to load
     /// add tag to items that should be tagged
     items_totag.forEach(function addTag(item) {
         item.addTag('ObsCite');
@@ -338,12 +523,14 @@ async function updateItems(citekeyids) {
 
 async function runSyncWithObsidian(promptSaveErrors, syncTags) {
     const vaultpath = getPref('source_dir');
+    const zotidssource = getPref('zotidssource');
     const bbtjson = getPref('bbtjson');
+    const zotkeyregex = getPref('zotkeyregex');
     const metadatakeyword = getPref('metadatakeyword');
 
     let notifData = ["ZoteroObsidianCitations Syncing Error", "Some Error Occurred", false];
-    if (await checkRequirements(vaultpath, bbtjson)) {
-        const citekeyids = await checkDependencies(vaultpath, bbtjson, metadatakeyword, promptSaveErrors);
+    if (await checkRequirements(zotidssource, vaultpath, bbtjson, zotkeyregex)) {
+        const citekeyids = await checkDependencies(zotidssource, vaultpath, bbtjson, zotkeyregex, metadatakeyword, promptSaveErrors);
         if (syncTags && citekeyids.length > 0) {
             let message = await updateItems(citekeyids);
             notifData = ["ZoteroObsidianCitations Synced", message, true];
@@ -372,9 +559,17 @@ Zotero.ObsCite.init = function () {
     ///DEBUG something about addTab() doesn't work right away, needs to wait for something to load
     /// https://github.com/retorquere/zotero-better-bibtex/blob/1010c42e090062f1753bb15ddf6e232bb28dd894/content/better-bibtex.ts#L740
     /// waitingForZotero
+
+    setTimeout(() => {
+        const zotidssource = getPref('zotidssource');
+        if (!['bbtjson', 'contentregex'].includes(zotidssource)) {
+            setPref('zotidssource', 'bbtjson');
+        }
+    }, 2000);
+
     setTimeout(() => {
         Zotero.ObsCite.initialDependencyCheck();
-    }, 2000);
+    }, 3000);
 
     ///DEBUG this needs update
     // Register the callback in Zotero as an item observer

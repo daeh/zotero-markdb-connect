@@ -4,10 +4,17 @@
 <!ENTITY vault-source-folder "Obsidian Vault Folder with Reading Notes">
 <!ENTITY vault-source-folder-desc "The directory containing your Obsidian Citation markdown notes (notes should begin with @citekey).">
 
-<!ENTITY bbtjson-source-file "BBT JSON Export of Library">
-<!ENTITY bbtjson-source-file-desc "The BetterBibTex export of your library. Must include the fields 'citekey' and 'itemID'. Should be auto-updating.">
+<!ENTITY zotids-source-label "Source of Zotero Item IDs">
+<!ENTITY zotids-source-label-desc "Zotero Obsidian Citations needs to map the BBT citekeys from your MarkDown notes to the Zotero Item. The easiest way to do this is to specify the path to an auto-updating BBT JSON export of your library. Alternatively, if your MarkDown notes include the Zotero Item Key, you can specify a RegEx to extract the ZoteroKey from the note contents.">
+
+<!ENTITY bbtjson-source-file "BBT JSON Export of Library:">
+<!ENTITY obscite-bbtjson-desc "The BetterBibTex export of your library. Must include the fields 'citekey' and 'itemID'. Should be auto-updating.">
+
+<!ENTITY zotkey-regex "Zotero Key RegEx:">
+<!ENTITY zotkey-regex-desc "RegEx for the Zotero Item Key in the MarkDown note.">
+
 
 <!ENTITY metadata-keyword "Markdown Metadata Keyword">
-<!ENTITY metadata-keyword-desc "(Optional) If you want to extract the citekey from a MD note's metadata, indicate the keword here. A common value is: citekey. If no value is given, the citekey will be taken from the MD note's title.">
+<!ENTITY metadata-keyword-desc "(Optional) If you want to extract the citekey from a MD note's metadata, indicate the keyword here. A common value is: citekey. If no value is given, the citekey will be taken from the MD note's title.">
 
 <!ENTITY choose "Choose…">

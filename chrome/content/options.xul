@@ -12,7 +12,9 @@
   <prefpane label="&obscite-preferences;" id="obscite-prefpane">
     <preferences>
       <preference id="pref-obscite-source_dir" name="extensions.obscite.source_dir" type="string"/>
+      <preference id="pref-obscite-zotidssource" name="extensions.obscite.zotidssource" type="string"/>
       <preference id="pref-obscite-bbtjson" name="extensions.obscite.bbtjson" type="string"/>
+      <preference id="pref-obscite-zotkeyregex" name="extensions.obscite.zotkeyregex" type="string"/>
       <preference id="pref-obscite-metadatakeyword" name="extensions.obscite.metadatakeyword" type="string"/>
     </preferences>
 
@@ -29,13 +31,29 @@
     <separator/>
 
     <groupbox>
-      <caption label="&bbtjson-source-file;"/>
-      <description style="width: 420px">&bbtjson-source-file-desc;</description>
+      <caption label="&zotids-source-label;"/>
+      <description style="width: 420px">&zotids-source-label-desc;</description>
       <separator/>
-      <hbox  style="margin: 0"  align="center">
-        <textbox id="id-obscite-bbtjson" preference="pref-obscite-bbtjson" flex="1" />
-        <button id="id-obscite-bbtjson-button" label="&choose;" oncommand="Zotero.ObsCite.chooseBBTjson();"/>
-      </hbox>
+
+      <radiogroup id="id-obscite-zotidssource" preference="pref-obscite-zotidssource">
+
+        <hbox  style="margin: 0"  align="center">
+          <radio label="&bbtjson-source-file;" value="bbtjson" />
+          <textbox id="id-obscite-bbtjson" preference="pref-obscite-bbtjson" flex="1" />
+          <button id="id-obscite-bbtjson-button" label="&choose;" oncommand="Zotero.ObsCite.chooseBBTjson();"/>
+        </hbox>
+        <label id="id-obscite-bbtjson-desc" style="font-size: 10px" value="&obscite-bbtjson-desc;"/>
+
+        <separator/>
+        
+        <hbox  style="margin: 0"  align="center">
+          <radio label="&zotkey-regex;" value="contentregex" />
+          <textbox id="id-obscite-zotkeyregex" preference="pref-obscite-zotkeyregex" flex="1" />
+        </hbox>
+        <label id="id-zotkey-regex-desc" style="font-size: 10px" value="&zotkey-regex-desc;"/>
+
+      </radiogroup>
+
     </groupbox>
     <separator/>
 

@@ -11,6 +11,6 @@
         "plugin",
         "zotero obsidian citations"
     ],
-    "license": "Mozilla Public License 2.0",
+    "license": "MIT License",
     "upload_type": "software"
 }
