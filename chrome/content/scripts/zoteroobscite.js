@@ -1,3 +1,8 @@
+/**
+ZoteroObsidianCitations
+Dae Houlihan
+*/
+
 Components.utils.import('resource://gre/modules/osfile.jsm');
 
 
@@ -265,7 +270,7 @@ async function mapZoteroIDkeysInternalSearch() {
     });
 
     if (keymaperr.length > 0) {
-        let nerr = keymaperr.length
+        let nerr = keymaperr.length;
         Zotero.debug(`${nerr} mapZoteroIDkeysInternalSearch Errors`);
         Zotero.debug(`${keymaperr[0]}`);
         showNotification("mapZoteroIDkeysInternalSearch", "Error: " + nerr.toString() + ".", false);
@@ -286,7 +291,7 @@ async function sliceObj(obj, keys, promptSaveErrors) {
     });
 
     if (valueerr.length > 0) {
-        let nerr = valueerr.length
+        let nerr = valueerr.length;
         Zotero.debug(`${nerr} ObsVault Read Errors`);
         Zotero.debug(`${valueerr[0]}`);
 
@@ -383,7 +388,7 @@ async function checkRequirements(zotidssource, vaultpath, bbtjson, zotkeyregex) 
             return false;
         }
     } else if (zotidssource === 'contentregex') {
-        if (zotkeyregex == '' || zotkeyregex == undefined || zotkeyregex == null || !(zotkeyregex.length > 0)) {
+        if (zotkeyregex == '' || zotkeyregex == undefined || zotkeyregex == null) {
             showNotification("User Defined RegEx Invalid", "The RegEx you specifed in the ZoteroObsidianCitations preferences cannot be empty.", false);
             satisfied = false;
             return false;
@@ -546,11 +551,11 @@ async function runSyncWithObsidian(promptSaveErrors, syncTags) {
 
 function getPref(pref) {
     return Zotero.Prefs.get('extensions.obscite.' + pref, true);
-};
+}
 
 function setPref(pref, value) {
     return Zotero.Prefs.set('extensions.obscite.' + pref, value, true);
-};
+}
 
 // Startup - initialize plugin
 

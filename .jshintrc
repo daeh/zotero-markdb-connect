@@ -1,0 +1,13 @@
+{
+    "esversion": 8,
+    "undef": true,
+    "unused": false,
+    "globals": {
+      "Zotero": true,
+      "Components": false,
+      "window": false,
+      "Services": false,
+      "OS": false,
+      "setTimeout": false
+    }
+  }
