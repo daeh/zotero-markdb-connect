@@ -51,9 +51,10 @@ If you're already using [obsidian-citation-plugin](https://github.com/hans/obsid
 
 ### MarkDown RegEx Method
 
-- Rather than exporting your library in the _BetterBibTex JSON_ format, specify at custom RegEx pattern to extract the Zotero Item Key from your MarkDown notes.
-  - e.g. if your note has the line, `- local:: [local zotero](zotero://select/items/C69U2UUM)`, you could extract the Zotero key (`C69U2UUM`) using this RegEx pattern:
+- Rather than exporting your library in the _BetterBibTex JSON_ format, specify a custom RegEx pattern in `ZoteroObsidianCitations Preferences...` to extract the Zotero Item Key from your MarkDown notes.
+  - E.g. if your note has the line, `- local:: [local zotero](zotero://select/items/C69U2UUM)`, you could extract the Zotero key (`C69U2UUM`) using this RegEx pattern:
      `^- local:: \[local zotero]\(zotero:\/\/select\/items\/(.*)\)`
+- Follow the instructions above to specify the path to your MarkDown notes, the metadata ID (optional), and color the `ObsCite` tag.
 
 ## Notes
 
