@@ -1,5 +1,7 @@
 # Zotero Obsidian Citations
 
+*Add colored tags to Zotero items that have associated MarkDown notes in an external folder.*
+
 ![ZoteroObsidianCitationsScreenshot](ZoteroObsidianCitationsScreenshot.png)
 
 This is an add-on for [Zotero](https://www.zotero.org), a research source management tool. The ZoteroObsidianCitations add-on finds files marked with BibTeX keys in an external folder and adds a colored tag to the corresponding Zotero items.
@@ -54,7 +56,7 @@ If you're already using [obsidian-citation-plugin](https://github.com/hans/obsid
 - Rather than exporting your library in the _BetterBibTex JSON_ format, specify a custom RegEx pattern in `ZoteroObsidianCitations Preferences...` to extract the Zotero Item Key from your MarkDown notes.
 
   - E.g. if your note has the line 
-     
+    
      `- local:: [local zotero](zotero://select/library/items/GZ9DQ2AM)`
      
      you could extract the Zotero key (`GZ9DQ2AM`) using this RegEx pattern:
