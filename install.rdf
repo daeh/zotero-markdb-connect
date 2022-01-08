@@ -11,7 +11,8 @@
         em:type="2"
         em:creator="Dae Houlihan"
         em:description="Add a tag to Zotero items that have a external note."
-        em:homepageURL="https://github.com/daeh/zotero-obsidian-citations">
+        em:homepageURL="https://github.com/daeh/zotero-obsidian-citations"
+        em:updateURL="https://raw.githubusercontent.com/daeh/zotero-obsidian-citations/main/update.rdf">
         <em:type>2</em:type>
         <em:targetApplication>
             <Description>
