@@ -1,6 +1,6 @@
 # Zotero Obsidian Citations
 
-![ZoteroObsidianCitationsScreenshot](https://user-images.githubusercontent.com/12652166/147509331-eee0dad4-8a36-490b-9bb9-f11ca6caa7be.png)
+![ZoteroObsidianCitationsScreenshot](ZoteroObsidianCitationsScreenshot.png)
 
 This is an add-on for [Zotero](https://www.zotero.org), a research source management tool. The ZoteroObsidianCitations add-on finds files marked with BibTeX keys in an external folder and adds a colored tag to the corresponding Zotero items.
 
