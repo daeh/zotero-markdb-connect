@@ -7,7 +7,7 @@
         RDF:about="urn:mozilla:install-manifest"
         em:id="daeda@mit.edu"
         em:name="ZoteroObsidianCitations"
-        em:version="0.0.2"
+        em:version="0.0.3"
         em:type="2"
         em:creator="Dae Houlihan"
         em:description="Add a tag to Zotero items that have a external note."

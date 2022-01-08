@@ -1,6 +1,6 @@
 #!/bin/sh
 
-version='0.0.2'
+version='0.0.3'
 
 rm -f zotero-obsidian-citations-${version}.xpi
 zip -r zotero-obsidian-citations-${version}.xpi chrome/* defaults/* chrome.manifest install.rdf

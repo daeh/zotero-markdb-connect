@@ -3,11 +3,12 @@
     "undef": true,
     "unused": false,
     "globals": {
+      "require": false,
+      "setTimeout": false,
+      "window": false,
+      "OS": false,
       "Zotero": true,
       "Components": false,
-      "window": false,
-      "Services": false,
-      "OS": false,
-      "setTimeout": false
+      "Services": false
     }
   }
