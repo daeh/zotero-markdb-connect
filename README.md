@@ -28,7 +28,7 @@ Adds a colored tag to Zotero items for which there are associated reading notes 
 
 ## Setup
 
-ZoteroObsidianCitations needs to map BBT citekeys to the Zotero Item IDs. The easiest way to do this is to specify the path to an auto-updating BBT JSON export of your library. Alternatively, if your MarkDown notes include the Zotero Item Key, you can specify a RegEx pattern to extract the ZoteroKey from the note content.
+ZoteroObsidianCitations needs to map your BetterBibTex (BBT) citekeys to the corresponding Zotero Item IDs. The easiest way to do this is to specify the path to an auto-updating BBT JSON export of your library. Alternatively, if your MarkDown notes include the Zotero Item Key, you can specify a RegEx pattern to extract the ZoteroKey from the note content.
 
 ### _BetterBibTex JSON_ Export Method
 
