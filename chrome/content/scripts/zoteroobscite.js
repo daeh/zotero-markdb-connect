@@ -12,7 +12,7 @@ if (typeof Zotero === 'undefined') {
 }
 
 Zotero.ObsCite = {
-    version: '0.0.3',
+    version: '0.0.4',
     folderSep: null,
     // this.messages_warning = [];
     // this.messages_report = [];
@@ -122,10 +122,11 @@ Zotero.ObsCite = {
         return fp.file;
     },
 
-    chooseValueFolder: async function () {
+    chooseVaultFolder: async function () {
         const dialogTitle = 'Select Obsidian Vault Folder containing citation notes begining with @';
         const vaultpath = await this.chooseDirectory(dialogTitle);
-        if (vaultpath != '' && vaultpath != undefined && vaultpath != null && await OS.File.exists(vaultpath)) {
+        const vaultpathObj = new FileUtils.File(OS.Path.normalize(vaultpath));
+        if (vaultpath != '' && vaultpath != undefined && vaultpath != null && vaultpathObj.exists() && vaultpathObj.isDirectory()) {
             this.setPref('source_dir', vaultpath);
         }
     },
@@ -136,7 +137,8 @@ Zotero.ObsCite = {
             ['JSON File (*.json)', '*.json']
         ];
         const bbtjson = await this.chooseFile(dialogTitle, filter);
-        if (bbtjson != '' && bbtjson != undefined && bbtjson != null && await OS.File.exists(bbtjson)) {
+        const bbtjsonObj = new FileUtils.File(OS.Path.normalize(bbtjson));
+        if (bbtjson != '' && bbtjson != undefined && bbtjson != null && bbtjsonObj.exists() && bbtjsonObj.isFile()) {
             this.setPref('bbtjson', bbtjson);
         }
     },
@@ -191,52 +193,109 @@ Zotero.ObsCite = {
 
     ///////////////
 
+    /*
+     * Utility functions
+     */
+
+
+    listDirContents: async function (dirpath) {
+        let entries = [];
+        await Zotero.File.iterateDirectory(dirpath, async function (entry) {
+            if (!entry.name.startsWith('.')) {
+                entries.push(entry);
+            }
+        });
+        return entries;
+    },
+
+    listFilesRecursively: async function* (dirpath) {
+
+        const entries = await this.listDirContents(dirpath);
+
+        for (let entry of entries) {
+            if (entry.isDir) {
+                yield* this.listFilesRecursively(entry.path);
+            } else if (!entry.isSymLink) {
+                yield entry;
+            }
+        }
+    },
+
+    getFilesRecursively: async function (dirpath) {
+        let files = [];
+
+        const basedir = new FileUtils.File(OS.Path.normalize(dirpath));
+        // let nsIFile = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsIFile);
+        // nsIFile.persistentDescriptor = "/Users/dae/Downloads/bootstrap-stat-master/pytest.ini";
+        // nsIFile.path
+
+        if (!basedir.exists() || !basedir.isDirectory()) {
+            Zotero.debug(`${basedir} does not exist or is file`);
+            return files;
+        }
+
+        for await (const filepath of this.listFilesRecursively(basedir.path)) {
+            files.push(filepath);
+        }
+        return files;
+    },
+
+    ///////////////
+
     scanVault: async function (vaultpath, fetchMetadataCitekey) {
         let dbs = [];
         let dbserrs = [];
-        const re_title = new RegExp(/^@([^\s]+)/);
+
+        /// pattern to match MD files
+        const re_file = new RegExp("^@.+\.md$", 'i');
+        /// pattern to match citekey in MD file name
+        const re_title = new RegExp("^@([^\\s]+)");
+        /// pattern to match citekey in MD file metadata
         const re_metadata = new RegExp("^" + fetchMetadataCitekey + "\: *([^s].+)", 'm');
 
-        if (!await OS.File.exists(vaultpath)) {
-            Zotero.debug(`${vaultpath} does not exist`);
+
+        const vaultpathObj = new FileUtils.File(OS.Path.normalize(vaultpath));
+        if (!vaultpathObj.exists() || !vaultpathObj.isDirectory()) {
+            Zotero.debug(`${vaultpath} does not exist or is file`);
             return dbs;
         }
-        await Zotero.File.iterateDirectory(vaultpath, async (entry) => {
-            if (entry.name.startsWith('@')) {
-                const fnparts = entry.name.split('.');
-                const name = (fnparts[fnparts.length - 1].toLowerCase() === 'md') ? entry.name.split('.').slice(0, -1).join('.') : entry.name;
-                const path = entry.path;
 
-                try {
+        const allFiles = await this.getFilesRecursively(vaultpathObj.path);
+        const mdFiles = allFiles.filter(file => re_file.test(file.name));
 
-                    if (fetchMetadataCitekey && fetchMetadataCitekey.length > 0) {
-                        /// get citekey from metadata
-                        try {
-                            const contents = await Zotero.File.getContentsAsync(path);
-                            /// get metadata
-                            const metadata = contents.split('\n---')[0];
-                            if (metadata.startsWith('---')) {
-                                /// get citekey from metadata
-                                dbs.push(metadata.match(re_metadata)[1].trim());
-                            } else {
-                                /// get citekey from filename
-                                dbs.push(name.match(re_title)[1].trim());
-                            }
-                        } catch (err) {
+        await Zotero.Promise.all(mdFiles.map(async (entry) => {
+            const name = entry.name.split('.').slice(0, -1).join('.');
+            const path = entry.path;
+
+            try {
+
+                if (fetchMetadataCitekey && fetchMetadataCitekey.length > 0) {
+                    /// get citekey from metadata
+                    try {
+                        const contents = await Zotero.File.getContentsAsync(path);
+                        /// get metadata
+                        const metadata = contents.split('\n---')[0];
+                        if (metadata.startsWith('---')) {
+                            /// get citekey from metadata
+                            dbs.push(metadata.match(re_metadata)[1].trim());
+                        } else {
                             /// get citekey from filename
                             dbs.push(name.match(re_title)[1].trim());
                         }
-                    } else {
+                    } catch (err) {
                         /// get citekey from filename
                         dbs.push(name.match(re_title)[1].trim());
                     }
-
-                } catch (err) {
-                    dbserrs.push(name);
+                } else {
+                    /// get citekey from filename
+                    dbs.push(name.match(re_title)[1].trim());
                 }
 
+            } catch (err) {
+                dbserrs.push(name);
             }
-        });
+
+        }));
 
         if (dbserrs.length > 0) {
             const nerr = dbserrs.length;
@@ -250,54 +309,62 @@ Zotero.ObsCite = {
     scanVaultCustomRegex: async function (vaultpath, fetchMetadataCitekey, fetchCustomFieldZotkey) {
         let dbs = {};
         let dbserrs = [];
-        const re_title = new RegExp(/^@([^\s]+)/);
+
+        /// pattern to match MD files
+        const re_file = new RegExp("^@.+\.md$", 'i');
+        /// pattern to match citekey in MD file name
+        const re_title = new RegExp("^@([^\\s]+)");
+        /// pattern to match citekey in MD file metadata
         const re_metadata = new RegExp("^" + fetchMetadataCitekey + "\: *([^s].+)", 'm');
+        /// pattern to match ZoteroKey in MD file contents
         const re_contents = new RegExp(fetchCustomFieldZotkey, 'm');
 
-        if (!await OS.File.exists(vaultpath)) {
-            Zotero.debug(`${vaultpath} does not exist`);
+        const vaultpathObj = new FileUtils.File(OS.Path.normalize(vaultpath));
+        if (!vaultpathObj.exists() || !vaultpathObj.isDirectory()) {
+            Zotero.debug(`${vaultpath} does not exist or is file`);
             return dbs;
         }
-        await Zotero.File.iterateDirectory(vaultpath, async (entry) => {
-            if (entry.name.startsWith('@')) {
-                const fnparts = entry.name.split('.');
-                const name = (fnparts[fnparts.length - 1].toLowerCase() === 'md') ? entry.name.split('.').slice(0, -1).join('.') : entry.name;
-                const path = entry.path;
 
-                try {
-                    const contents = await Zotero.File.getContentsAsync(path);
+        const allFiles = await this.getFilesRecursively(vaultpathObj.path);
+        const mdFiles = allFiles.filter(file => re_file.test(file.name));
 
-                    /// find the ZoteroKey from the contents
-                    const zotkey = contents.match(re_contents)[1].trim();
+        await Zotero.Promise.all(mdFiles.map(async (entry) => {
+            const name = entry.name.split('.').slice(0, -1).join('.');
+            const path = entry.path;
 
-                    /// find the citekey from the metadata
-                    if (fetchMetadataCitekey && fetchMetadataCitekey.length > 0) {
-                        /// get citekey from metadata
-                        try {
-                            /// get metadata
-                            const metadata = contents.split('\n---')[0];
-                            if (metadata.startsWith('---')) {
-                                /// get citekey from metadata
-                                dbs[metadata.match(re_metadata)[1].trim()] = zotkey;
-                            } else {
-                                /// get citekey from filename
-                                dbs[name.match(re_title)[1].trim()] = zotkey;
-                            }
-                        } catch (err) {
+            try {
+                const contents = await Zotero.File.getContentsAsync(path);
+
+                /// find the ZoteroKey from the contents
+                const zotkey = contents.match(re_contents)[1].trim();
+
+                /// find the citekey from the metadata
+                if (fetchMetadataCitekey && fetchMetadataCitekey.length > 0) {
+                    /// get citekey from metadata
+                    try {
+                        /// get metadata
+                        const metadata = contents.split('\n---')[0];
+                        if (metadata.startsWith('---')) {
+                            /// get citekey from metadata
+                            dbs[metadata.match(re_metadata)[1].trim()] = zotkey;
+                        } else {
                             /// get citekey from filename
                             dbs[name.match(re_title)[1].trim()] = zotkey;
                         }
-                    } else {
+                    } catch (err) {
                         /// get citekey from filename
                         dbs[name.match(re_title)[1].trim()] = zotkey;
                     }
-
-                } catch (err) {
-                    dbserrs.push(name);
+                } else {
+                    /// get citekey from filename
+                    dbs[name.match(re_title)[1].trim()] = zotkey;
                 }
 
+            } catch (err) {
+                dbserrs.push(name);
             }
-        });
+
+        }));
 
         if (dbserrs.length > 0) {
             const nerr = dbserrs.length;
@@ -312,12 +379,13 @@ Zotero.ObsCite = {
         let citekeymap = {};
         let citekeymaperr = {};
 
-        if (!await OS.File.exists(bbtjson)) {
-            Zotero.debug(`${bbtjson} does not exist`);
+        const bbtjsonObj = new FileUtils.File(OS.Path.normalize(bbtjson));
+        if (!bbtjsonObj.exists() || !bbtjsonObj.isFile()) {
+            Zotero.debug(`${bbtjson} does not exist or is dir`);
             return citekeymap;
         }
 
-        const contents = JSON.parse(await Zotero.File.getContentsAsync(bbtjson));
+        const contents = JSON.parse(await Zotero.File.getContentsAsync(bbtjsonObj.path));
         const items = contents.items;
         items.forEach(item => {
             try {
@@ -509,14 +577,16 @@ Zotero.ObsCite = {
     checkSettings: async function (zotidssource, vaultpath, bbtjson, zotkeyregex) {
         let satisfied = true;
 
-        if (vaultpath == '' || vaultpath == undefined || vaultpath == null || !await OS.File.exists(vaultpath)) {
+        const vaultpathObj = new FileUtils.File(OS.Path.normalize(vaultpath));
+        if (vaultpath == '' || vaultpath == undefined || vaultpath == null || !vaultpathObj.exists() || !vaultpathObj.isDirectory()) {
             this.showNotification("Obsidian Vault Path Not Found", "Set the path to your Obsidian Citations Notes in the ZotObsCite preferences.", false);
             satisfied = false;
             return false;
         }
 
         if (zotidssource === 'bbtjson') {
-            if (bbtjson == '' || bbtjson == undefined || bbtjson == null || !await OS.File.exists(bbtjson)) {
+            const bbtjsonObj = new FileUtils.File(OS.Path.normalize(bbtjson));
+            if (bbtjson == '' || bbtjson == undefined || bbtjson == null || !bbtjsonObj.exists() || !bbtjsonObj.isFile()) {
                 this.showNotification("BBT JSON Library Export Not Found", "Set the path to your auto-updating BBT JSON export in the ZotObsCite preferences.", false);
                 satisfied = false;
                 return false;
@@ -606,9 +676,9 @@ Zotero.ObsCite = {
     },
 
     runSyncWithObsidian: async function (promptSaveErrors, syncTags) {
-        const vaultpath = this.getPref('source_dir');
+        const vaultpath = OS.Path.normalize(this.getPref('source_dir'));
         const zotidssource = this.getPref('zotidssource');
-        const bbtjson = this.getPref('bbtjson');
+        const bbtjson = OS.Path.normalize(this.getPref('bbtjson'));
         const zotkeyregex = this.getPref('zotkeyregex');
         const metadatakeyword = this.getPref('metadatakeyword');
 
@@ -630,7 +700,6 @@ Zotero.ObsCite = {
 
     startupDependencyCheck: async function () {
         const promptSaveErrors = false;
-        ///TODO make this a preference
         const syncTags = true; // syncOnStart
         const notifData = await this.runSyncWithObsidian(promptSaveErrors, syncTags);
         this.showNotification(...notifData);

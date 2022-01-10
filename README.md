@@ -10,8 +10,6 @@ This is a companion to the [obsidian-citation-plugin](https://github.com/hans/ob
 
 Please report any bugs, questions, or feature requests in the Github repository.
 
-Code for this extension is based on [Zotero Citationcounts](https://github.com/eschnett/zotero-citationcounts), which is based on [Zotero DOI Manager](https://github.com/bwiernik/zotero-shortdoi), which is based in part on [Zotero Google Scholar Citations](https://github.com/beloglazov/zotero-scholar-citations) by Anton Beloglazov.
-
 ## Plugin Functions
 
 Adds a colored tag to Zotero items for which there are associated reading notes in an external folder. Currently this add-on is primarily a minimal companion to the [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin), but it can be adapted to other workflows.
@@ -23,7 +21,7 @@ Adds a colored tag to Zotero items for which there are associated reading notes 
 - Run Zotero (version 5.x)
 - Go to `Tools -> Add-ons`
 - `Install Add-on From File`
-- Choose the file `zotero-obsidian-citations-0.0.3.xpi`
+- Choose the file `zotero-obsidian-citations-0.0.4.xpi`
 - Restart Zotero
 
 ## Setup
@@ -61,13 +59,15 @@ If you're already using [obsidian-citation-plugin](https://github.com/hans/obsid
 
     you could extract the Zotero key (`GZ9DQ2AM`) using this RegEx pattern:
 
-    `^- local:: \[local zotero]\(zotero:\/\/select\/library\/items\/(.*)\)`
+    `^- local:: \[local zotero]\(zotero:\/\/select\/library\/items\/(.+)\)`
 
 - Follow the instructions above to specify the path to your MarkDown notes, the metadata ID (optional), and color the `ObsCite` tag.
 
 ## Notes
 
 [GitHub](https://github.com/daeh/zotero-obsidian-citations): Source code repository
+
+Code for this extension is based on [ZotFile](https://github.com/jlegewie/zotfile) and [Zotero Citationcounts](https://github.com/eschnett/zotero-citationcounts) (which is based on [Zotero DOI Manager](https://github.com/bwiernik/zotero-shortdoi), which is based in part on [Zotero Google Scholar Citations](https://github.com/beloglazov/zotero-scholar-citations) by Anton Beloglazov).
 
 ## License
 

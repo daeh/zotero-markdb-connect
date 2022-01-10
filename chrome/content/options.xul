@@ -25,7 +25,7 @@
       <separator/>
       <hbox  style="margin: 0"  align="center">
         <textbox id="id-obscite-source_dir" preference="pref-obscite-source_dir" flex="1" />
-        <button id="id-obscite-source_dir-button" label="&choose;" oncommand="Zotero.ObsCite.chooseValueFolder();"/>
+        <button id="id-obscite-source_dir-button" label="&choose;" oncommand="Zotero.ObsCite.chooseVaultFolder();"/>
       </hbox>
     </groupbox>
     <separator/>
