@@ -193,6 +193,7 @@ Zotero.ObsCite = {
             if (this._getParam_zotkeyregex() == null) return false;
         } else {
             this.showNotification("ZoteroObsidianCitations", 'Zotero IDs Source Not Specified: ' + zotidssource, false);
+            return false;
         }
 
         return true;
@@ -571,19 +572,10 @@ Zotero.ObsCite = {
 
     sliceObj: async function (res, citekeymap, promptSaveErrors) {
         /* 
-         * citekeys :: array of BBT citekeys
+         * res :: array of item data
          * citekeymap :: dict of BBT citekeys to Zotero itemIDs
          * promptSaveErrors
          */
-        // let entry_res = {
-        //     citekey: null,
-        //     citekey_metadata: null,
-        //     citekey_title: null,
-        //     zotkey: null,
-        //     zotid: null,
-        //     name: name,
-        //     path: path
-        // };
         let reserr = [];
 
         res.forEach(entry_res => {
@@ -623,7 +615,7 @@ Zotero.ObsCite = {
 
     sliceObjCustomRegex: async function (res, zoterokeymap, promptSaveErrors) {
         /* 
-         * citekeysZotidsObs :: dict of citekeys to zoteroKeys
+         * res :: array of item data
          * zoterokeymap :: dict of Zotero itemKeys to Zotero itemIDs
          * promptSaveErrors
          */
@@ -749,7 +741,6 @@ Zotero.ObsCite = {
     /////////
 
     updateItems: async function (citekeyids) {
-        let success = false;
 
         /// find all item already tagged
         let items_withtags = await this.findTaggedItems();
@@ -794,7 +785,6 @@ Zotero.ObsCite = {
             message += " Removed " + items_removetag.length.toString() + " tags.";
         }
 
-        success = true;
         return message;
     },
 

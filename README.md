@@ -59,7 +59,7 @@ If you're already using [obsidian-citation-plugin](https://github.com/hans/obsid
 
     you could extract the Zotero key (`GZ9DQ2AM`) using this RegEx pattern:
 
-    `^- local:: \[local zotero\]\(zotero:\/\/select\/library\/items\/(.+)\)`
+    `^- local::.+\/items\/(\w+)\)`
 
 - Follow the instructions above to specify the path to your MarkDown notes, the metadata ID (optional), and color the `ObsCite` tag.
 

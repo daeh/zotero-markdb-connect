@@ -1,25 +1,24 @@
-<?xml version="1.0"?>
-<RDF:RDF
-    xmlns:em="http://www.mozilla.org/2004/em-rdf#"
-    xmlns:NC="http://home.netscape.com/NC-rdf#"
-    xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-    <RDF:Description
-        RDF:about="urn:mozilla:install-manifest"
-        em:id="daeda@mit.edu"
-        em:name="ZoteroObsidianCitations"
-        em:version="0.0.7"
-        em:type="2"
-        em:creator="Dae Houlihan"
-        em:description="Add a tag to Zotero items that have a external note."
-        em:homepageURL="https://github.com/daeh/zotero-obsidian-citations"
-        em:updateURL="https://raw.githubusercontent.com/daeh/zotero-obsidian-citations/main/update.rdf">
-        <em:type>2</em:type>
-        <em:targetApplication>
-            <Description>
-                <em:id>zotero@chnm.gmu.edu</em:id>
-                <em:minVersion>5.0</em:minVersion>
-                <em:maxVersion>5.*</em:maxVersion>
-            </Description>
-        </em:targetApplication>
-    </RDF:Description>
-</RDF:RDF>
+<?xml version="1.0" encoding="utf-8"?>
+<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:em="http://www.mozilla.org/2004/em-rdf#">
+
+  <Description about="urn:mozilla:install-manifest">
+    <em:id>daeda@mit.edu</em:id>
+    <em:name>ZoteroObsidianCitations</em:name>
+    <em:version>0.0.7</em:version>
+    <em:type>2</em:type>
+    <em:creator>Dae Houlihan</em:creator>
+    <em:description>Add a tag to Zotero items that have a external note.</em:description>
+    <em:homepageURL>https://github.com/daeh/zotero-obsidian-citations</em:homepageURL>
+    <em:updateURL>https://raw.githubusercontent.com/daeh/zotero-obsidian-citations/main/update.rdf</em:updateURL>
+
+    <em:targetApplication>
+      <Description>
+        <em:id>zotero@chnm.gmu.edu</em:id>
+        <em:minVersion>5.0.0</em:minVersion>
+        <em:maxVersion>5.*</em:maxVersion>
+      </Description>
+    </em:targetApplication>
+
+  </Description>
+</RDF>
