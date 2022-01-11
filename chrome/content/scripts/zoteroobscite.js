@@ -12,7 +12,7 @@ if (typeof Zotero === 'undefined') {
 }
 
 Zotero.ObsCite = {
-    version: '0.0.4',
+    version: '0.0.5',
     folderSep: null,
     // this.messages_warning = [];
     // this.messages_report = [];
@@ -209,9 +209,7 @@ Zotero.ObsCite = {
     },
 
     listFilesRecursively: async function* (dirpath) {
-
         const entries = await this.listDirContents(dirpath);
-
         for (let entry of entries) {
             if (entry.isDir) {
                 yield* this.listFilesRecursively(entry.path);
@@ -242,25 +240,28 @@ Zotero.ObsCite = {
 
     ///////////////
 
-    scanVault: async function (vaultpath, fetchMetadataCitekey) {
+    scanVault: async function () {
         let dbs = [];
         let dbserrs = [];
+
+        const vaultpath = this._getParam_vaultpath();
+        const metadatakeyword = this._getParam_metadatakeyword();
 
         /// pattern to match MD files
         const re_file = new RegExp("^@.+\.md$", 'i');
         /// pattern to match citekey in MD file name
         const re_title = new RegExp("^@([^\\s]+)");
         /// pattern to match citekey in MD file metadata
-        const re_metadata = new RegExp("^" + fetchMetadataCitekey + "\: *([^s].+)", 'm');
+        const re_metadata = new RegExp("^" + metadatakeyword + "\: *([^s].+)", 'm');
 
 
-        const vaultpathObj = new FileUtils.File(OS.Path.normalize(vaultpath));
-        if (!vaultpathObj.exists() || !vaultpathObj.isDirectory()) {
-            Zotero.debug(`${vaultpath} does not exist or is file`);
-            return dbs;
-        }
+        // const vaultpathObj = new FileUtils.File(OS.Path.normalize(vaultpath));
+        // if (!vaultpathObj.exists() || !vaultpathObj.isDirectory()) {
+        //     Zotero.debug(`${vaultpath} does not exist or is file`);
+        //     return dbs;
+        // }
 
-        const allFiles = await this.getFilesRecursively(vaultpathObj.path);
+        const allFiles = await this.getFilesRecursively(vaultpath);
         const mdFiles = allFiles.filter(file => re_file.test(file.name));
 
         await Zotero.Promise.all(mdFiles.map(async (entry) => {
@@ -269,7 +270,7 @@ Zotero.ObsCite = {
 
             try {
 
-                if (fetchMetadataCitekey && fetchMetadataCitekey.length > 0) {
+                if (metadatakeyword.length > 0) {
                     /// get citekey from metadata
                     try {
                         const contents = await Zotero.File.getContentsAsync(path);
@@ -306,26 +307,30 @@ Zotero.ObsCite = {
     },
 
 
-    scanVaultCustomRegex: async function (vaultpath, fetchMetadataCitekey, fetchCustomFieldZotkey) {
+    scanVaultCustomRegex: async function () {
         let dbs = {};
         let dbserrs = [];
+
+        const vaultpath = this._getParam_vaultpath();
+        const zotkeyregex = this._getParam_metadatakeyword();
+        const metadatakeyword = this._getParam_zotkeyregex();
 
         /// pattern to match MD files
         const re_file = new RegExp("^@.+\.md$", 'i');
         /// pattern to match citekey in MD file name
         const re_title = new RegExp("^@([^\\s]+)");
         /// pattern to match citekey in MD file metadata
-        const re_metadata = new RegExp("^" + fetchMetadataCitekey + "\: *([^s].+)", 'm');
+        const re_metadata = new RegExp("^" + metadatakeyword + "\: *([^s].+)", 'm');
         /// pattern to match ZoteroKey in MD file contents
-        const re_contents = new RegExp(fetchCustomFieldZotkey, 'm');
+        const re_contents = new RegExp(zotkeyregex, 'm');
 
-        const vaultpathObj = new FileUtils.File(OS.Path.normalize(vaultpath));
-        if (!vaultpathObj.exists() || !vaultpathObj.isDirectory()) {
-            Zotero.debug(`${vaultpath} does not exist or is file`);
-            return dbs;
-        }
+        // const vaultpathObj = new FileUtils.File(OS.Path.normalize(vaultpath));
+        // if (!vaultpathObj.exists() || !vaultpathObj.isDirectory()) {
+        //     Zotero.debug(`${vaultpath} does not exist or is file`);
+        //     return dbs;
+        // }
 
-        const allFiles = await this.getFilesRecursively(vaultpathObj.path);
+        const allFiles = await this.getFilesRecursively(vaultpath);
         const mdFiles = allFiles.filter(file => re_file.test(file.name));
 
         await Zotero.Promise.all(mdFiles.map(async (entry) => {
@@ -339,7 +344,7 @@ Zotero.ObsCite = {
                 const zotkey = contents.match(re_contents)[1].trim();
 
                 /// find the citekey from the metadata
-                if (fetchMetadataCitekey && fetchMetadataCitekey.length > 0) {
+                if (metadatakeyword.length > 0) {
                     /// get citekey from metadata
                     try {
                         /// get metadata
@@ -375,17 +380,19 @@ Zotero.ObsCite = {
     },
 
 
-    mapCitekeysBBTJSON: async function (bbtjson) {
+    mapCitekeysBBTJSON: async function () {
         let citekeymap = {};
         let citekeymaperr = {};
 
-        const bbtjsonObj = new FileUtils.File(OS.Path.normalize(bbtjson));
-        if (!bbtjsonObj.exists() || !bbtjsonObj.isFile()) {
-            Zotero.debug(`${bbtjson} does not exist or is dir`);
-            return citekeymap;
-        }
+        // const bbtjsonObj = new FileUtils.File(OS.Path.normalize(bbtjson));
+        // if (!bbtjsonObj.exists() || !bbtjsonObj.isFile()) {
+        //     Zotero.debug(`${bbtjson} does not exist or is dir`);
+        //     return citekeymap;
+        // }
 
-        const contents = JSON.parse(await Zotero.File.getContentsAsync(bbtjsonObj.path));
+        const bbtjson = this._getParam_bbtjson();
+
+        const contents = JSON.parse(await Zotero.File.getContentsAsync(bbtjson));
         const items = contents.items;
         items.forEach(item => {
             try {
@@ -559,132 +566,191 @@ Zotero.ObsCite = {
 
     checkMetadataFormat: function () {
         const metadatakeyword = this.getPref('metadatakeyword');
-        let found = [];
-        const notallowed = ["'", '"', ":", "\n", "/", "\\", "?", "*", "|", ">", "<", ",", ";", "=", "`", "~", "!", "#", "$", "%", "^", "&", "(", ")", "[", "]", "{", "}", " "];
-        notallowed.forEach(char => {
-            if (metadatakeyword.includes(char)) {
-                found.push(char);
+        if (typeof metadatakeyword === 'string' && metadatakeyword.length > 0) {
+            let found = [];
+            const notallowed = ["'", '"', ":", "\n", "/", "\\", "?", "*", "|", ">", "<", ",", ";", "=", "`", "~", "!", "#", "$", "%", "^", "&", "(", ")", "[", "]", "{", "}", " "];
+            notallowed.forEach(char => {
+                if (metadatakeyword.includes(char)) {
+                    found.push(char);
+                }
+            });
+            if (found.length > 0) {
+                this.showNotification("Invalid citekey metadata", "metadata id cannot contain: " + found.join(" or ") + ".", false);
+                return false;
+            } else {
+                return true;
             }
-        });
-        if (found.length > 0) {
-            this.showNotification("Invalid citekey metadata", "metadata id cannot contain: " + found.join(" or ") + ".", false);
-            return false;
         } else {
             return true;
         }
     },
 
-    checkSettings: async function (zotidssource, vaultpath, bbtjson, zotkeyregex) {
-        let satisfied = true;
-
-        const vaultpathObj = new FileUtils.File(OS.Path.normalize(vaultpath));
-        if (vaultpath == '' || vaultpath == undefined || vaultpath == null || !vaultpathObj.exists() || !vaultpathObj.isDirectory()) {
-            this.showNotification("Obsidian Vault Path Not Found", "Set the path to your Obsidian Citations Notes in the ZotObsCite preferences.", false);
-            satisfied = false;
-            return false;
+    _getParam_zotidssource: function () {
+        const zotidssource = this.getPref('zotidssource');
+        if (['bbtjson', 'contentregex'].includes(zotidssource)) {
+            return zotidssource;
+        } else {
+            this.setPref('zotidssource', 'bbtjson');
+            return 'bbtjson';
         }
+    },
 
-        if (zotidssource === 'bbtjson') {
-            const bbtjsonObj = new FileUtils.File(OS.Path.normalize(bbtjson));
-            if (bbtjson == '' || bbtjson == undefined || bbtjson == null || !bbtjsonObj.exists() || !bbtjsonObj.isFile()) {
-                this.showNotification("BBT JSON Library Export Not Found", "Set the path to your auto-updating BBT JSON export in the ZotObsCite preferences.", false);
-                satisfied = false;
-                return false;
-            }
-        } else if (zotidssource === 'contentregex') {
-            if (zotkeyregex == '' || zotkeyregex == undefined || zotkeyregex == null) {
-                this.showNotification("User Defined RegEx Invalid", "The RegEx you specifed in the ZoteroObsidianCitations preferences cannot be empty.", false);
-                satisfied = false;
-                return false;
+    _getParam_vaultpath: function () {
+        try {
+            const vaultpath = this.getPref('source_dir');
+            const vaultpathObj = new FileUtils.File(OS.Path.normalize(vaultpath));
+            if (typeof vaultpath === 'string' && vaultpath.length > 0 && vaultpathObj.exists() && vaultpathObj.isDirectory()) {
+                return vaultpathObj.path;
             } else {
-                try {
-                    new RegExp(zotkeyregex);
-                } catch (err) {
-                    this.showNotification("User Defined RegEx Invalid", "The RegEx you specifed in the ZoteroObsidianCitations preferences is invalid: " + err, false);
-                    satisfied = false;
-                    return false;
-                }
+                throw new Error("vaultpath is not set or does not exist.");
+            }
+        } catch (e) {
+            this.showNotification("Obsidian Vault Path Not Found", "Set the path to your Obsidian Citations Notes in the ZotObsCite preferences.", false);
+            Zotero.debug(`ObsVault Error: ${e}`);
+            return null;
+        }
+    },
+
+    _getParam_bbtjson: function () {
+        try {
+            const bbtjson = this.getPref('bbtjson');
+            const bbtjsonObj = new FileUtils.File(OS.Path.normalize(bbtjson));
+            if (typeof bbtjson === 'string' && bbtjson.length > 0 && bbtjsonObj.exists() && bbtjsonObj.isFile()) {
+                return bbtjsonObj.path;
+            } else {
+                throw new Error("bbtjson is not set or does not exist.");
+            }
+        } catch (e) {
+            this.showNotification("BBT JSON Library Export Not Found", "Set the path to your auto-updating BBT JSON export in the ZotObsCite preferences.", false);
+            Zotero.debug(`ObsVault Error: ${e}`);
+            return null;
+        }
+    },
+
+    _getParam_zotkeyregex: function () {
+        try {
+            const zotkeyregex = this.getPref('zotkeyregex');
+            if (typeof zotkeyregex === 'string' || zotkeyregex.length > 0) {
+                new RegExp(zotkeyregex);
+                return zotkeyregex;
+            } else {
+                throw new Error("bbtjson is not set or does not exist.");
+            }
+        } catch (e) {
+            this.showNotification("User Defined RegEx Invalid", "The RegEx you specifed in the ZoteroObsidianCitations preferences is invalid: " + e, false);
+            Zotero.debug(`ObsVault Error: ${e}`);
+            return null;
+        }
+    },
+
+    _getParam_metadatakeyword: function () {
+        const metadatakeyword = this.getPref('metadatakeyword');
+        if (typeof metadatakeyword === 'string' && metadatakeyword.length > 0) {
+            if (this.checkMetadataFormat()) {
+                return metadatakeyword;
+            } else {
+                return null;
+                /// checkMetadataFormat() will show a notification
             }
         } else {
-            this.showNotification("ZoteroObsidianCitations", 'Zotero IDs Source Not Specified: ' + zotidssource, false);
-            satisfied = false;
-            return false;
+            this.setPref('metadatakeyword', '');
+            return '';
         }
+    },
 
-        return satisfied;
+    getParam: async function () {
+
+        let param;
+        const zotidssource = this._getParam_zotidssource();
+
+        if (zotidssource === 'bbtjson') {
+            param = {
+                zotidssource: zotidssource,
+                vaultpath: this._getParam_vaultpath(),
+                bbtjson: this._getParam_bbtjson(),
+                // zotkeyregex: null,
+                metadatakeyword: this._getParam_metadatakeyword(),
+                satisfied: false,
+            };
+        } else if (zotidssource === 'contentregex') {
+            param = {
+                zotidssource: zotidssource,
+                vaultpath: this._getParam_vaultpath(),
+                // bbtjson: null,
+                zotkeyregex: this._getParam_zotkeyregex(),
+                metadatakeyword: this._getParam_metadatakeyword(),
+                satisfied: false,
+            };
+        } else {
+            this.showNotification("ZoteroObsidianCitations", 'Zotero IDs Source Not Specified: ' + param.zotidssource, false);
+            return {
+                satisfied: false
+            };
+        }
+        if (!Object.values(param).includes(null)) {
+            param.satisfied = true;
+        }
+        return param;
     },
 
 
-    checkDependencies: async function (zotidssource, vaultpath, bbtjson, zotkeyregex, metadatakeyword, promptSaveErrors) {
+    processDependencies: async function (promptSaveErrors) {
 
-        let success = false;
+        const zotidssource = this._getParam_zotidssource();
 
         if (zotidssource === 'bbtjson') {
             /// if using BBT JSON ///
 
             /// get cite keys from Obsidian vault ///
-            const citekeysObs = await this.scanVault(vaultpath, metadatakeyword);
-            if (citekeysObs.length == 0) {
+            const citekeysObs = await this.scanVault();
+            if (citekeysObs.length === 0) {
                 this.showNotification("No citekeys found in Obsidian Vault", "Set the path to your Obsidian Citations Notes in the ZotObsCite preferences.", false);
-                success = false;
-                return success;
+                return [];
             }
 
             /// read in BBT json that maps citekeys to Zotero ids ///
-            const citekeymap = await this.mapCitekeysBBTJSON(bbtjson); /// returns dict of citekeys to zoteroIDs
-            if (Object.keys(citekeymap).length == 0) {
+            const citekeymap = await this.mapCitekeysBBTJSON(); /// returns dict of citekeys to zoteroIDs
+            if (Object.keys(citekeymap).length === 0) {
                 this.showNotification("BBT JSON Library Export Not Found", "Set the path to your auto-updating BBT JSON export in the ZotObsCite preferences.", false);
-                success = false;
-                return success;
+                return [];
             }
 
             /// slice with obs keys
             const citekeyids = await this.sliceObj(citekeymap, citekeysObs, promptSaveErrors);
-            if (citekeyids.length == 0) {
+            if (citekeyids.length === 0) {
                 this.showNotification("No Matching Entries", "None of the ObsCite citekeys match entries in the BBT JSON", false);
-                success = false;
-                return success;
+                return [];
             }
             return citekeyids;
 
         } else if (zotidssource === 'contentregex') {
             /// if using user-defined regex ///
 
-            const citekeysZotidsObs = await this.scanVaultCustomRegex(vaultpath, metadatakeyword, zotkeyregex); /// returns dict of citekeys to zoteroKeys
+            const citekeysZotidsObs = await this.scanVaultCustomRegex(); /// returns dict of citekeys to zoteroKeys
             if (Object.keys(citekeysZotidsObs).length == 0) {
                 this.showNotification("No citekeys found in Obsidian Vault", "Check the path to your Obsidian Vault and your RegEx.", false);
-                success = false;
-                return success;
+                return [];
             }
             const zoterokeymap = await this.mapZoteroIDkeysInternalSearch(); /// returns dict of zoteroKeys to zoteroIDs
             const citekeyidsCustomRegex = await this.sliceObjCustomRegex(zoterokeymap, citekeysZotidsObs, promptSaveErrors);
-            if (citekeyidsCustomRegex.length == 0) {
+            if (citekeyidsCustomRegex.length === 0) {
                 this.showNotification("No Matching Entries", "None of the ObsCite citekeys match entries in the BBT JSON", false);
-                success = false;
-                return success;
+                return [];
             }
-
-            // showNotification("citekeyidsCustomRegex", citekeyidsCustomRegex[0], false);
-            // return false;
             return citekeyidsCustomRegex;
 
         } else {
             this.showNotification("ZoteroObsidianCitations", 'Zotero IDs Source Not Specified (' + zotidssource + ').', false);
-            success = false;
-            return success;
+            return [];
         }
     },
 
     runSyncWithObsidian: async function (promptSaveErrors, syncTags) {
-        const vaultpath = OS.Path.normalize(this.getPref('source_dir'));
-        const zotidssource = this.getPref('zotidssource');
-        const bbtjson = OS.Path.normalize(this.getPref('bbtjson'));
-        const zotkeyregex = this.getPref('zotkeyregex');
-        const metadatakeyword = this.getPref('metadatakeyword');
 
         let notifData = ["ZoteroObsidianCitations Syncing Error", "Some Error Occurred", false];
-        if (await this.checkSettings(zotidssource, vaultpath, bbtjson, zotkeyregex)) {
-            const citekeyids = await this.checkDependencies(zotidssource, vaultpath, bbtjson, zotkeyregex, metadatakeyword, promptSaveErrors);
+        let param = await this.getParam();
+        if (param.satisfied) {
+            const citekeyids = await this.processDependencies(promptSaveErrors);
             if (syncTags && citekeyids.length > 0) {
                 let message = await this.updateItems(citekeyids);
                 notifData = ["ZoteroObsidianCitations Synced", message, true];
