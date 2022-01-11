@@ -12,7 +12,7 @@ if (typeof Zotero === 'undefined') {
 }
 
 Zotero.ObsCite = {
-    version: '0.0.5',
+    version: '0.0.6',
     folderSep: null,
     // this.messages_warning = [];
     // this.messages_report = [];
@@ -301,7 +301,8 @@ Zotero.ObsCite = {
         if (dbserrs.length > 0) {
             const nerr = dbserrs.length;
             Zotero.debug(`${nerr} Read ObsVault Read Errors`);
-            this.showNotification("scanValut", "Error: " + nerr.toString() + ".", false);
+
+            this.showNotification("scanValut", "Unable to parse " + nerr.toString() + " of " + mdFiles.length.toString() + " notes.", false);
         }
         return dbs;
     },
@@ -312,8 +313,8 @@ Zotero.ObsCite = {
         let dbserrs = [];
 
         const vaultpath = this._getParam_vaultpath();
-        const zotkeyregex = this._getParam_metadatakeyword();
-        const metadatakeyword = this._getParam_zotkeyregex();
+        const zotkeyregex = this._getParam_zotkeyregex();
+        const metadatakeyword = this._getParam_metadatakeyword();
 
         /// pattern to match MD files
         const re_file = new RegExp("^@.+\.md$", 'i');
@@ -374,7 +375,7 @@ Zotero.ObsCite = {
         if (dbserrs.length > 0) {
             const nerr = dbserrs.length;
             Zotero.debug(`${nerr} Read ObsVault Read Errors`);
-            this.showNotification("scanValut", "Error: " + nerr.toString() + ".", false);
+            this.showNotification("scanVaultCustomRegex", "Unable to parse " + nerr.toString() + " of " + mdFiles.length.toString() + " notes.", false);
         }
         return dbs;
     },
@@ -658,43 +659,26 @@ Zotero.ObsCite = {
         }
     },
 
-    getParam: async function () {
+    checkSettings: async function () {
 
-        let param;
         const zotidssource = this._getParam_zotidssource();
+        if (zotidssource == null) return false;
+        if (this._getParam_vaultpath() == null) return false;
+        if (this._getParam_metadatakeyword() == null) return false;
 
         if (zotidssource === 'bbtjson') {
-            param = {
-                zotidssource: zotidssource,
-                vaultpath: this._getParam_vaultpath(),
-                bbtjson: this._getParam_bbtjson(),
-                // zotkeyregex: null,
-                metadatakeyword: this._getParam_metadatakeyword(),
-                satisfied: false,
-            };
+            if (this._getParam_bbtjson() == null) return false;
         } else if (zotidssource === 'contentregex') {
-            param = {
-                zotidssource: zotidssource,
-                vaultpath: this._getParam_vaultpath(),
-                // bbtjson: null,
-                zotkeyregex: this._getParam_zotkeyregex(),
-                metadatakeyword: this._getParam_metadatakeyword(),
-                satisfied: false,
-            };
+            if (this._getParam_zotkeyregex() == null) return false;
         } else {
             this.showNotification("ZoteroObsidianCitations", 'Zotero IDs Source Not Specified: ' + param.zotidssource, false);
-            return {
-                satisfied: false
-            };
         }
-        if (!Object.values(param).includes(null)) {
-            param.satisfied = true;
-        }
-        return param;
+
+        return true;
     },
 
 
-    processDependencies: async function (promptSaveErrors) {
+    processData: async function (promptSaveErrors) {
 
         const zotidssource = this._getParam_zotidssource();
 
@@ -718,7 +702,7 @@ Zotero.ObsCite = {
             /// slice with obs keys
             const citekeyids = await this.sliceObj(citekeymap, citekeysObs, promptSaveErrors);
             if (citekeyids.length === 0) {
-                this.showNotification("No Matching Entries", "None of the ObsCite citekeys match entries in the BBT JSON", false);
+                this.showNotification("No Matching Entries", "None of the " + citekeysObs.length.toString() + " citekeys found in your MD notes match entries in the BBT JSON.", false);
                 return [];
             }
             return citekeyids;
@@ -726,15 +710,16 @@ Zotero.ObsCite = {
         } else if (zotidssource === 'contentregex') {
             /// if using user-defined regex ///
 
+            /// TODO this doesn't need to scan for citekeys, just get the zoteroIDs from the content of the note
             const citekeysZotidsObs = await this.scanVaultCustomRegex(); /// returns dict of citekeys to zoteroKeys
             if (Object.keys(citekeysZotidsObs).length == 0) {
-                this.showNotification("No citekeys found in Obsidian Vault", "Check the path to your Obsidian Vault and your RegEx.", false);
+                this.showNotification("No ZoteroKeys found in Obsidian Vault", "Check the path to your Obsidian Vault and your ZoteroKey RegEx.", false);
                 return [];
             }
             const zoterokeymap = await this.mapZoteroIDkeysInternalSearch(); /// returns dict of zoteroKeys to zoteroIDs
             const citekeyidsCustomRegex = await this.sliceObjCustomRegex(zoterokeymap, citekeysZotidsObs, promptSaveErrors);
             if (citekeyidsCustomRegex.length === 0) {
-                this.showNotification("No Matching Entries", "None of the ObsCite citekeys match entries in the BBT JSON", false);
+                this.showNotification("No Matching Entries", "None of the " + Object.keys(citekeysZotidsObs).length.toString() + " ZoteroKeys found in your MD notes match entries in Zotero Library.", false);
                 return [];
             }
             return citekeyidsCustomRegex;
@@ -746,17 +731,22 @@ Zotero.ObsCite = {
     },
 
     runSyncWithObsidian: async function (promptSaveErrors, syncTags) {
-
+        /// TODO better error notification handeling. Collect errors and show them at the end.
+        /// TODO validate settings on preference window close.
         let notifData = ["ZoteroObsidianCitations Syncing Error", "Some Error Occurred", false];
-        let param = await this.getParam();
-        if (param.satisfied) {
-            const citekeyids = await this.processDependencies(promptSaveErrors);
-            if (syncTags && citekeyids.length > 0) {
-                let message = await this.updateItems(citekeyids);
+        if (await this.checkSettings()) {
+            const citekeyids = await this.processData(promptSaveErrors);
+            let message;
+            if (citekeyids.length > 0) {
+                if (syncTags) {
+                    message = await this.updateItems(citekeyids);
+                } else {
+                    message = "Found " + citekeyids.length.toString() + " notes.";
+                }
                 notifData = ["ZoteroObsidianCitations Synced", message, true];
             } else {
-                let message = "Found " + citekeyids.length.toString() + " notes.";
-                notifData = ["ZoteroObsidianCitations Synced", message, true];
+                message = "Found " + citekeyids.length.toString() + " notes.";
+                notifData = ["ZoteroObsidianCitations", message, false];
             }
         }
         return notifData;

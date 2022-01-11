@@ -5,13 +5,13 @@
       <rdf:Seq>
         <rdf:li>
           <rdf:Description>
-            <em:version>0.0.5</em:version>
+            <em:version>0.0.6</em:version>
             <em:targetApplication>
               <rdf:Description>
                 <em:id>zotero@chnm.gmu.edu</em:id>
                 <em:minVersion>5.0</em:minVersion>
                 <em:maxVersion>5.*</em:maxVersion>
-                <em:updateLink>https://github.com/daeh/zotero-obsidian-citations/releases/download/v0.0.5/zotero-obsidian-citations-0.0.5.xpi</em:updateLink>
+                <em:updateLink>https://github.com/daeh/zotero-obsidian-citations/releases/download/v0.0.6/zotero-obsidian-citations-0.0.6.xpi</em:updateLink>
               </rdf:Description>
             </em:targetApplication>
           </rdf:Description>
