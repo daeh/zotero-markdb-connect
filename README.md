@@ -21,7 +21,7 @@ Adds a colored tag to Zotero items for which there are associated reading notes 
 - Run Zotero (version 5.x)
 - Go to `Tools -> Add-ons`
 - `Install Add-on From File`
-- Choose the file `zotero-obsidian-citations-0.0.6.xpi`
+- Choose the file `zotero-obsidian-citations-0.0.7.xpi`
 - Restart Zotero
 
 ## Setup
