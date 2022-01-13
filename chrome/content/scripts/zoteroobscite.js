@@ -12,7 +12,7 @@ if (typeof Zotero === 'undefined') {
 }
 
 Zotero.ObsCite = {
-    version: '0.0.7',
+    version: '0.0.8',
     folderSep: null,
     cleanrun: true,
     // this.messages_warning = [];
@@ -35,8 +35,8 @@ Zotero.ObsCite = {
         if (!this._initialized) {
 
             setTimeout(() => {
-                if (!['bbtjson', 'contentregex'].includes(this.getPref('zotidssource'))) {
-                    this.setPref('zotidssource', 'bbtjson');
+                if (!['pinnedcitekeys', 'bbtjson', 'contentregex'].includes(this.getPref('zotidssource'))) {
+                    this.setPref('zotidssource', 'pinnedcitekeys');
                 }
             }, 2000);
 
@@ -109,11 +109,11 @@ Zotero.ObsCite = {
 
     _getParam_zotidssource: function () {
         const zotidssource = this.getPref('zotidssource');
-        if (['bbtjson', 'contentregex'].includes(zotidssource)) {
+        if (['pinnedcitekeys', 'bbtjson', 'contentregex'].includes(zotidssource)) {
             return zotidssource;
         } else {
-            this.setPref('zotidssource', 'bbtjson');
-            return 'bbtjson';
+            this.setPref('zotidssource', 'pinnedcitekeys');
+            return 'pinnedcitekeys';
         }
     },
 
@@ -187,7 +187,9 @@ Zotero.ObsCite = {
         if (this._getParam_vaultpath() == null) return false;
         if (this._getParam_metadatakeyword() == null) return false;
 
-        if (zotidssource === 'bbtjson') {
+        if (zotidssource === 'pinnedcitekeys') {
+            /// pass
+        } else if (zotidssource === 'bbtjson') {
             if (this._getParam_bbtjson() == null) return false;
         } else if (zotidssource === 'contentregex') {
             if (this._getParam_zotkeyregex() == null) return false;
@@ -287,6 +289,39 @@ Zotero.ObsCite = {
 
     ///////////////
 
+
+    /*
+     * Zotero utility functions
+     */
+
+    findTaggedItems: async function () {
+        let s = new Zotero.Search();
+        s.libraryID = Zotero.Libraries.userLibraryID;
+        s.addCondition('tag', 'is', 'ObsCite');
+        let itemIDs = await s.search();
+        let items_preexisting = await Zotero.Items.getAsync(itemIDs);
+        return items_preexisting;
+    },
+
+    removeAllTags: async function () {
+        let items_preexisting = await this.findTaggedItems();
+        /// remove tag
+        items_preexisting.forEach(item => {
+            item.removeTag('ObsCite');
+            item.saveTx();
+        });
+        return true;
+    },
+
+    findPinnedCitekeyItems: async function () {
+        let s = new Zotero.Search();
+        s.libraryID = Zotero.Libraries.userLibraryID;
+        s.addCondition('extra', 'contains', 'Citation Key:');
+        let itemIDs = await s.search();
+        let items_preexisting = await Zotero.Items.getAsync(itemIDs);
+        return items_preexisting;
+    },
+
     /*
      * Utility functions
      */
@@ -364,7 +399,7 @@ Zotero.ObsCite = {
             /// get citekey from filename
             try {
                 /// pattern to match citekey in MD file name
-                const re_title = new RegExp("^@([^\\s]+)");
+                const re_title = new RegExp(/^@([^\s]+)/);
                 entry_res.citekey_title = name.match(re_title)[1].trim();
             } catch (e) {
                 Zotero.debug("Error in scanVault: " + e);
@@ -570,6 +605,36 @@ Zotero.ObsCite = {
         return keymap;
     },
 
+    mapCitekeysInternalSearch: async function () {
+        /* 
+         * make dict of BBTcitekey:zoteroID for every item where the BBTcitekey in pinned
+         */
+        let citekeymap = {};
+        let citekeymaperr = {};
+
+        const items = await this.findPinnedCitekeyItems();
+
+        const re_extra = new RegExp(/^Citation Key: *(\S+)/m);
+        items.forEach(item => {
+            try {
+                const extra = item.getField('extra');
+                const citekey = extra.match(re_extra)[1].trim();
+                citekeymap[citekey] = item.itemID;
+            } catch (e) {
+                citekeymaperr.push(item);
+            }
+        });
+
+        if (citekeymaperr.length > 0) {
+            this.cleanrun = false;
+            const nerr = citekeymaperr.length;
+            Zotero.debug(`${nerr} Read ObsVault Read Errors`);
+            Zotero.debug(`${citekeymaperr[0]}`);
+            this.showNotification("mapCitekeysInternalSearch", "Error: " + nerr.toString() + ".", false);
+        }
+        return citekeymap;
+    },
+
     sliceObj: async function (res, citekeymap, promptSaveErrors) {
         /* 
          * res :: array of item data
@@ -659,40 +724,65 @@ Zotero.ObsCite = {
 
         const zotidssource = this._getParam_zotidssource();
 
-        if (zotidssource === 'bbtjson') {
-            /// if using BBT JSON ///
+        if (zotidssource === "pinnedcitekeys") {
 
-            /// get cite keys from Obsidian vault ///
-            res = await this.scanVault(promptSaveErrors);
+            /// get BBT citekeys from markdown files ///
+            res = await this.scanVault(promptSaveErrors); /// returns data array containing BBT citekeys
             if (res.length === 0) {
                 this.showNotification("No Markdown files found", "Set the path to your Markdown notes in the ZotObsCite preferences.", false);
                 return zoteroids;
             }
 
-            /// read in BBT json that maps citekeys to Zotero ids ///
-            const citekeymap = await this.mapCitekeysBBTJSON(); /// returns dict of citekeys to zoteroIDs
+            /// get zoteroKeys and zoteroIDs for every item in Zotero library
+            const citekeymap = await this.mapCitekeysInternalSearch(); /// returns dict mapping zoteroKeys to zoteroIDs
+
+            /// map BBT citekeys from markdown files with zoteroIDs
+            res = await this.sliceObj(res, citekeymap, promptSaveErrors);
+
+            /// filter located zoteroIDs from data array
+            res.forEach(entry_res => {
+                if (entry_res.zotid) zoteroids.push(entry_res.zotid);
+            });
+
+        } else if (zotidssource === 'bbtjson') { /// if using BBT JSON ///
+
+            /// get BBT citekeys from markdown files ///
+            res = await this.scanVault(promptSaveErrors); /// returns data array containing BBT citekeys
+            if (res.length === 0) {
+                this.showNotification("No Markdown files found", "Set the path to your Markdown notes in the ZotObsCite preferences.", false);
+                return zoteroids;
+            }
+
+            /// read in BBT json that maps BBT citekeys to zoteroIDs ///
+            const citekeymap = await this.mapCitekeysBBTJSON(); /// returns dict mapping citekeys to zoteroIDs
             if (Object.keys(citekeymap).length === 0) {
                 this.showNotification("BBT JSON Library Export Not Found", "Set the path to your auto-updating BBT JSON export in the ZotObsCite preferences.", false);
                 return zoteroids;
             }
 
-            /// slice with obs keys
+            /// map BBT citekeys from markdown files with zoteroIDs
             res = await this.sliceObj(res, citekeymap, promptSaveErrors);
 
+            /// filter located zoteroIDs from data array
             res.forEach(entry_res => {
                 if (entry_res.zotid) zoteroids.push(entry_res.zotid);
             });
 
-        } else if (zotidssource === 'contentregex') {
-            /// if using user-defined regex ///
+        } else if (zotidssource === 'contentregex') { /// if using user-defined regex ///
 
-            res = await this.scanVaultCustomRegex(promptSaveErrors); /// returns dict of citekeys to zoteroKeys
+            /// get zoterokeys from markdown files ///
+            res = await this.scanVaultCustomRegex(promptSaveErrors); /// returns data array containing zoteroKeys
             if (res.length === 0) {
                 this.showNotification("No Markdown files found", "Set the path to your Markdown notes in the ZotObsCite preferences.", false);
             }
 
-            const zoterokeymap = await this.mapZoteroIDkeysInternalSearch(); /// returns dict of zoteroKeys to zoteroIDs
+            /// get zoteroKeys and zoteroIDs for every item in Zotero library
+            const zoterokeymap = await this.mapZoteroIDkeysInternalSearch(); /// returns dict mapping zoteroKeys to zoteroIDs
+
+            /// map zoteroKeys from markdown files with zoteroIDs
             res = await this.sliceObjCustomRegex(res, zoterokeymap, promptSaveErrors);
+
+            /// filter located zoteroIDs from data array
             res.forEach(entry_res => {
                 if (entry_res.zotid) zoteroids.push(entry_res.zotid);
             });
@@ -712,30 +802,6 @@ Zotero.ObsCite = {
         }
 
         return zoteroids;
-    },
-
-
-    /*
-     * Zotero utility functions
-     */
-
-    findTaggedItems: async function () {
-        let s = new Zotero.Search();
-        s.libraryID = Zotero.Libraries.userLibraryID;
-        s.addCondition('tag', 'is', 'ObsCite');
-        let itemIDs = await s.search();
-        let items_preexisting = await Zotero.Items.getAsync(itemIDs);
-        return items_preexisting;
-    },
-
-    removeAllTags: async function () {
-        let items_preexisting = await this.findTaggedItems();
-        /// remove tag
-        items_preexisting.forEach(item => {
-            item.removeTag('ObsCite');
-            item.saveTx();
-        });
-        return true;
     },
 
     /////////
@@ -789,7 +855,7 @@ Zotero.ObsCite = {
     },
 
 
-    runSyncWithObsidian: async function (promptSaveErrors, syncTags) {
+    runSync: async function (promptSaveErrors, syncTags) {
         /// TODO better error notification handeling. Collect errors and show them at the end.
         /// TODO validate settings on preference window close.
         this.cleanrun = true;
@@ -817,16 +883,16 @@ Zotero.ObsCite = {
     startupDependencyCheck: async function () {
         const promptSaveErrors = false;
         const syncTags = true; // syncOnStart
-        const notifData = await this.runSyncWithObsidian(promptSaveErrors, syncTags);
+        const notifData = await this.runSync(promptSaveErrors, syncTags);
         this.showNotification(...notifData);
     },
 
     //// Controls for Tools menu
 
-    syncWithObsidian: async function () {
+    syncWithMarkdown: async function () {
         const promptSaveErrors = true;
         const syncTags = true;
-        const notifData = await this.runSyncWithObsidian(promptSaveErrors, syncTags);
+        const notifData = await this.runSync(promptSaveErrors, syncTags);
         this.showNotification(...notifData);
     },
 

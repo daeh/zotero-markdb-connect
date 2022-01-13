@@ -37,6 +37,13 @@
 
       <radiogroup id="id-obscite-zotidssource" preference="pref-obscite-zotidssource">
 
+        <label id="id-pinned-citekeys-title" value="&pinned-citekeys-title;"/>
+        <radio label="&pinned-citekeys;" value="pinnedcitekeys" />
+        <label id="id-pinned-citekeys-desc" style="font-size: 10px" value="&pinned-citekeys-desc;"/>
+
+        <separator/>
+
+        <label id="id-obscite-bbtjson-title" value="&obscite-bbtjson-title;"/>
         <hbox  style="margin: 0"  align="center">
           <radio label="&bbtjson-source-file;" value="bbtjson" />
           <textbox id="id-obscite-bbtjson" preference="pref-obscite-bbtjson" flex="1" />
@@ -45,7 +52,8 @@
         <label id="id-obscite-bbtjson-desc" style="font-size: 10px" value="&obscite-bbtjson-desc;"/>
 
         <separator/>
-        
+
+        <label id="id-obscite-zotkeyregex-title" value="&obscite-zotkeyregex-title;"/>
         <hbox  style="margin: 0"  align="center">
           <radio label="&zotkey-regex;" value="contentregex" />
           <textbox id="id-obscite-zotkeyregex" preference="pref-obscite-zotkeyregex" flex="1" />

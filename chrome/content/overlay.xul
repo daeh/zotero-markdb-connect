@@ -16,7 +16,7 @@
     </stringbundleset>
     
     <menupopup id="menu_ToolsPopup">
-      <menuitem id="obscite-options" label="&obscite-syncdb-label;" oncommand="Zotero.ObsCite.syncWithObsidian()"/>
+      <menuitem id="obscite-options" label="&obscite-syncdb-label;" oncommand="Zotero.ObsCite.syncWithMarkdown()"/>
       <menuitem id="menu_Tools-obscite-preferences" label="&obscite-preferences-label;" oncommand="Zotero.ObsCite.openPreferenceWindow();"/>
     </menupopup>
 
