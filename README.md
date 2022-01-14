@@ -14,6 +14,10 @@ Please report any bugs, questions, or feature requests in the Github repository.
 
 Adds a colored tag to Zotero items for which there are associated reading notes in an external folder. Currently this add-on is primarily a minimal companion to the [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin), but it can be adapted to other workflows.
 
+Open an existing Markdown note in [Obsidian](https://obsidian.md) from the contextual menu of a Zotero item.
+
+![ZoteroObsidianCitationsMenu](ZoteroObsidianCitationsMenu.png)
+
 ## Instalation
 
 - Download the add-on (the .xpi file) from the latest release: https://github.com/daeh/zotero-obsidian-citations/releases
@@ -21,7 +25,7 @@ Adds a colored tag to Zotero items for which there are associated reading notes 
 - Run Zotero (version 5.x)
 - Go to `Tools -> Add-ons`
 - `Install Add-on From File`
-- Choose the file `zotero-obsidian-citations-0.0.8.xpi`
+- Choose the file `zotero-obsidian-citations-0.0.9.xpi`
 - Restart Zotero
 
 ## Setup

@@ -12,9 +12,12 @@ if (typeof Zotero === 'undefined') {
 }
 
 Zotero.ObsCite = {
-    version: '0.0.8',
+    version: '0.0.9',
     folderSep: null,
     cleanrun: true,
+    suppressNotifications: false,
+    debuglog: {},
+    data: {},
     // this.messages_warning = [];
     // this.messages_report = [];
     // this.messages_error = [];
@@ -379,12 +382,15 @@ Zotero.ObsCite = {
 
         /// pattern to match MD files
         const re_file = new RegExp("^@.+\.md$", 'i');
+        /// pattern to trim extension from filename
+        const re_suffix = /\.md$/i;
 
         const allFiles = await this.getFilesRecursively(vaultpath);
         const mdFiles = allFiles.filter(file => re_file.test(file.name));
 
         await Zotero.Promise.all(mdFiles.map(async (entry) => {
-            const name = entry.name.split('.').slice(0, -1).join('.');
+            // const name = entry.name.split('.').slice(0, -1).join('.');
+            const name = entry.name.replace(re_suffix, '');
             const path = entry.path;
             let entry_res = {
                 citekey: null,
@@ -459,6 +465,8 @@ Zotero.ObsCite = {
 
         /// pattern to match MD files
         const re_file = new RegExp("^@.+\.md$", 'i');
+        /// pattern to trim extension from filename
+        const re_suffix = /\.md$/i;
         /// pattern to match ZoteroKey in MD file contents
         const re_contents = new RegExp(zotkeyregex, 'm');
 
@@ -466,7 +474,8 @@ Zotero.ObsCite = {
         const mdFiles = allFiles.filter(file => re_file.test(file.name));
 
         await Zotero.Promise.all(mdFiles.map(async (entry) => {
-            const name = entry.name.split('.').slice(0, -1).join('.');
+            // const name = entry.name.split('.').slice(0, -1).join('.');
+            const name = entry.name.replace(re_suffix, '');
             const path = entry.path;
             let entry_res = {
                 citekey: null,
@@ -482,7 +491,7 @@ Zotero.ObsCite = {
             /// get citekey from filename
             try {
                 /// pattern to match citekey in MD file name
-                const re_title = new RegExp("^@([^\\s]+)");
+                const re_title = new RegExp(/^@([^\s]+)/);
                 entry_res.citekey_title = name.match(re_title)[1].trim();
             } catch (e) {
                 Zotero.debug("Error in scanVaultCustomRegex: " + e);
@@ -801,6 +810,13 @@ Zotero.ObsCite = {
             await this.offerToSaveErrors(dataErrors, warningTitle, warningMessage, saveDialogTitle, filenamesuggest);
         }
 
+        this.data = {};
+        res.forEach(entry_res => {
+            if (typeof entry_res.zotid === 'number') {
+                this.data[entry_res.zotid] = entry_res;
+            }
+        });
+
         return zoteroids;
     },
 
@@ -859,6 +875,7 @@ Zotero.ObsCite = {
         /// TODO better error notification handeling. Collect errors and show them at the end.
         /// TODO validate settings on preference window close.
         this.cleanrun = true;
+        this.suppressNotifications = false;
         let notifData = ["ZoteroObsidianCitations Syncing Error", "Some Error Occurred", false];
         if (await this.checkSettings()) {
             const citekeyids = await this.processData(promptSaveErrors);
@@ -876,6 +893,31 @@ Zotero.ObsCite = {
             }
         }
         return notifData;
+    },
+
+    addDebugLog: function (key, value) {
+        this.debuglog[key] = value;
+    },
+
+    runDebug: async function () {
+        const promptSaveErrors = false;
+        this.debuglog = {};
+        this.suppressNotifications = true;
+        this.addDebugLog('prefs', {
+            zotidssource: this.getPref('zotidssource'),
+            source_dir: this.getPref('source_dir'),
+            bbtjson: this.getPref('bbtjson'),
+            zotkeyregex: this.getPref('zotkeyregex'),
+            metadatakeyword: this.getPref('metadatakeyword'),
+        });
+        this.addDebugLog('config', {
+            zotidssource: this._getParam_zotidssource(),
+            vaultpath: this._getParam_vaultpath(),
+            bbtjson: this._getParam_bbtjson(),
+            zotkeyregex: this._getParam_zotkeyregex(),
+            metadatakeyword: this._getParam_metadatakeyword(),
+            checkSettings: await this.checkSettings(),
+        });
     },
 
     ////////////
@@ -907,6 +949,23 @@ Zotero.ObsCite = {
             'chrome,titlebar,toolbar,centerscreen' + Zotero.Prefs.get('browser.preferences.instantApply', true) ? 'dialog=no' : 'modal',
             io
         );
+    },
+
+    //// Controls for Item menu
+
+    openMDforSelectedItems: function () {
+        const entries = ZoteroPane.getSelectedItems();
+        const vaultName = ""; ///TODO add preference to specify vault
+        const vaultKey = (vaultName.length > 0) ? 'vault=' + vaultName + '&' : '';
+
+        entries.forEach(item => {
+            if (Object.keys(this.data).includes(item.id.toString())) {
+                /// NB skipping the subfolder path and hoping that obsidian can resolve the note based on the file name
+                const entry_res = this.data[item.id];
+                const uriEncoded = encodeURIComponent(entry_res.name);
+                Zotero.launchURL("obsidian://open?" + vaultKey + "file=" + uriEncoded);
+            }
+        });
     },
 
 };

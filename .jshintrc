@@ -10,6 +10,7 @@
       "Zotero": true,
       "Components": false,
       "FileUtils": false,
+      "ZoteroPane": false,
       "Services": false
     }
   }
