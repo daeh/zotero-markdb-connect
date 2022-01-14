@@ -8,15 +8,17 @@ This is an add-on for [Zotero](https://www.zotero.org), a research source manage
 
 This is a companion to the [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin), a plugin for [Obsidian](https://obsidian.md) Markdown editor, but can work with a variety of databases used to store reading notes outside of Zotero.
 
-Please report any bugs, questions, or feature requests in the Github repository.
+Please post any bugs, questions, or feature requests in the Github repository.
 
 ## Plugin Functions
 
-Adds a colored tag to Zotero items for which there are associated reading notes in an external folder. Currently this add-on is primarily a minimal companion to the [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin), but it can be adapted to other workflows.
+Adds a colored tag to Zotero items for which there are associated reading notes in an external folder. 
 
-Open an existing Markdown note in [Obsidian](https://obsidian.md) from the contextual menu of a Zotero item.
+Opens an existing Markdown note in [Obsidian](https://obsidian.md) from the contextual menu of a Zotero item.
 
 ![ZoteroObsidianCitationsMenu](ZoteroObsidianCitationsMenu.png)
+
+Currently this add-on is primarily a minimal companion to the [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin), but it can be adapted to other workflows.
 
 ## Instalation
 
@@ -51,7 +53,7 @@ This is the easiest option but you can only use it if the BBT citekeys in your M
 
   - Specify the location of the folder that contains your Markdown reading notes (e.g. `/Users/me/Documents/ObsVault/ReadingNotes/`). The ZoteroObsidianCitation add-on will recursively search this path for Markdown files beginning with `@`.
 
-    - NB this add-on expects that your reading note files begin with `@citekey` (e.g. a reading note might have the file name `@shepard1987science Toward a universal law of generalization for psychological science.md`, where `shepard1987science` is the BBT citekey).
+    - NB this add-on expects that your reading note files begin with `@mycitekey` (e.g. a reading note might have the file name `@shepard1987science Toward a universal law of generalization for psychological science.md`, where `shepard1987science` is the BBT citekey).
 
   - Optionally, you can have ZoteroObsidianCitations read the metadata of your Markdown notes and extract the citekey from one of the fields. To enable this, specify the metadata ID (`citekey` is a common value).
 
