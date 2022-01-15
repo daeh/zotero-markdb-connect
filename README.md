@@ -33,21 +33,21 @@ Opens an existing Markdown note in [Obsidian](https://obsidian.md) from the cont
 *ZoteroObsidianCitations* needs to map your [BetterBibTex](https://retorque.re/zotero-better-bibtex/) (BBT) citekeys to the corresponding Zotero Item IDs. There are 3 ways to do this:
 
 1. Pinned BBT citekeys
-   - This is the easiest option but you can only use it if the BBT citekeys in your MD notes are pinned in Zotero (e.g. because you manually assigned citekeys to the Zotero items or because you configured BBT to pin the automatically generated citekeys via the [autoPinDelay](https://retorque.re/zotero-better-bibtex/installation/preferences/hidden-preferences/#autopindelay) setting).
+   - This is the easiest option but requires that the BBT citekeys used in your Markdown notes are pinned in Zotero. Having the citekey pinned for items with associated MD notes is a good practice, otherwise the citekeys in Zotero might change when other items in your library are added/removed.
 2. _BetterBibTex JSON_ Export
    - If the BBT citekeys in your Markdown notes are not pinned in Zotero, you can specify the path to an auto-updating BBT JSON export of your library.
 3. Markdown notes contain the Zotero Item Keys
-   - If your Markdown notes contain the Zotero Item Keys (Zotero automatically generates these under the hood, they take the form of `ABCD1234`, as in `zotero://select/library/items/ABCD1234`), you can specify a RegEx pattern to extract the ZoteroKey from the note content.
+   - If your Markdown notes contain the Zotero Item Keys, you can specify a RegEx pattern to extract the ZoteroKey from the note content. (Zotero automatically generates these under the hood; they take the form of `ABCD1234`, as in `zotero://select/library/items/ABCD1234`). 
 
 ### Pinned BBT citekey Method (default)
 
-This is the easiest option but requires that the BBT citekeys used in your Markdown notes are pinned in Zotero, which is usually a good practice. The BBT citekeys will be pinned if you manually assigned citekeys to the Zotero items or configured BBT to pin the automatically generated citekeys via the [autoPinDelay](https://retorque.re/zotero-better-bibtex/installation/preferences/hidden-preferences/#autopindelay) setting.
+This is the easiest option but requires that the BBT citekeys used in your Markdown notes are pinned in Zotero. Having the citekey pinned for items with associated MD notes is a good practice, otherwise the citekeys in Zotero might change when other items in your library are added/removed. The BBT citekeys will be pinned if you manually assigned citekeys to the Zotero items or configured BBT to pin the automatically generated citekeys via the [autoPinDelay](https://retorque.re/zotero-better-bibtex/installation/preferences/hidden-preferences/#autopindelay) setting.
 
 - In `ZoteroObsidianCitations Preferences...` (under the `Tools` menu),
 
   - Leave the `Find the BBT citekey in the Extra field` option selected.
 
-    (*ZoteroObsidianCitations* finds the items based on the `Citation Key: mycitekey` entry that BBT generates in the `Extra` field of items with pinned citekeys.)
+    (*ZoteroObsidianCitations* finds the items based on the `Citation Key: mycitekey` entry that BBT adds to the `Extra` fields of items with pinned citekeys.)
 
   - Specify the location of the folder that contains your Markdown reading notes (e.g. `/Users/me/Documents/ObsVault/ReadingNotes/`). The ZoteroObsidianCitation add-on will recursively search this path for Markdown files beginning with `@`.
 
@@ -63,7 +63,7 @@ This is the easiest option but requires that the BBT citekeys used in your Markd
 
 ### _BetterBibTex JSON_ Export Method
 
-If you're already using [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin), you've set up an auto-updating BetterBibTex (BBT) export of your library. You'll now make another BBT export that contains both the BBT citekeys and the Zotero item IDs.
+If the BBT citekeys in your Markdown notes are not pinned in Zotero, you can specify the path to an auto-updating BBT JSON export of your library. If you're already using [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin), you've set up an auto-updating BetterBibTex (BBT) export of your library. You'll now make another BBT export in a format the includes both the BBT citekeys and the Zotero item IDs.
 
 - Export your library in the "**_BetterBibTex JSON_**" format (not "_Better CSL JSON_", which does not include the Zotero IDs).
   - Click `File -> Export library`.
@@ -77,7 +77,7 @@ If you're already using [obsidian-citation-plugin](https://github.com/hans/obsid
 
 ### Markdown RegEx Method
 
-If your Markdown notes contain the Zotero Item Keys (Zotero automatically generates these under the hood, they take the form of `ABCD1234`), you can specify a RegEx pattern to extract the ZoteroKey from the note content. NB this is not the same as the BBT citekey you assigned an item (e.g. `mycitekey` in `zotero://select/items/@mycitekey`).
+If your Markdown notes contain the Zotero Item Keys, you can specify a RegEx pattern to extract the ZoteroKey from the note content. (Zotero automatically generates these under the hood; they take the form of `ABCD1234`, as in `zotero://select/library/items/ABCD1234`).  NB this is not the same as the BBT citekey you assigned an item (e.g. `mycitekey` in `zotero://select/items/@mycitekey`).
 
 - In `ZoteroObsidianCitations Preferences...`
 
