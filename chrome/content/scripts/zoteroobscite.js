@@ -33,6 +33,7 @@ Zotero.ObsCite = {
     },
 
     init: async function () {
+        ///TODO display waiting for schema message https://github.com/retorquere/zotero-better-bibtex/blob/26a48f6a85705eeb18f31d87269d34906b1d1a94/test/fixtures/schema-logger/bootstrapped/bootstrap.js
         await Zotero.Schema.schemaUpdatePromise;
 
         // only do this stuff for the first run
