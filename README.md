@@ -25,7 +25,7 @@ Opens an existing Markdown note in [Obsidian](https://obsidian.md) from the cont
 - Run Zotero (version 5.x)
 - Go to `Tools -> Add-ons`
 - `Install Add-on From File`
-- Choose the file `zotero-obsidian-citations-0.0.9.xpi`
+- Choose the file `zotero-obsidian-citations-0.0.10.xpi`
 - Restart Zotero
 
 ## Setup

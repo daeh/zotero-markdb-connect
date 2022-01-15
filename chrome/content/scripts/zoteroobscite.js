@@ -13,7 +13,7 @@ if (typeof Zotero === 'undefined') {
 }
 
 Zotero.ObsCite = {
-    version: '0.0.9',
+    version: '0.0.10',
     folderSep: null,
     cleanrun: true,
     suppressNotifications: false,
@@ -971,7 +971,6 @@ Zotero.ObsCite = {
         const items = Services.wm.getMostRecentWindow("navigator:browser").ZoteroPane.getSelectedItems();
         for (const item of items) {
             if (this.dataKeys.includes(item.id)) {
-                /// NB skipping the subfolder path and hoping that obsidian can resolve the note based on the file name
                 const entry_res = this.data[item.id.toString()];
                 let file = new FileUtils.File(OS.Path.normalize(entry_res.path));
                 if (file.exists()) {
