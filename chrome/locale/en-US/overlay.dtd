@@ -1,4 +1,4 @@
-<!ENTITY obscite-syncdb-label "ZoteroObsidianCitations Sync Tags">
-<!ENTITY obscite-preferences-label "ZoteroObsidianCitations Preferences…">
+<!ENTITY obscite.tools-menu.syncdb-label "ZoteroObsidianCitations Sync Tags">
+<!ENTITY obscite.tools-menu.preferences-label "ZoteroObsidianCitations Preferences…">
 
-<!ENTITY obscite-openmd-label "Open ObsidianMD note">
+<!ENTITY obscite.item-menu.open-obsidian-label "Open ObsidianMD note">

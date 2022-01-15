@@ -18,6 +18,7 @@ Zotero.ObsCite = {
     suppressNotifications: false,
     debuglog: {},
     data: {},
+    dataKeys: [],
     // this.messages_warning = [];
     // this.messages_report = [];
     // this.messages_error = [];
@@ -811,9 +812,11 @@ Zotero.ObsCite = {
         }
 
         this.data = {};
+        this.dataKeys = [];
         res.forEach(entry_res => {
             if (typeof entry_res.zotid === 'number') {
-                this.data[entry_res.zotid] = entry_res;
+                this.data[entry_res.zotid.toString()] = entry_res;
+                this.dataKeys.push(entry_res.zotid);
             }
         });
 
@@ -953,15 +956,29 @@ Zotero.ObsCite = {
 
     //// Controls for Item menu
 
-    openMDforSelectedItems: function () {
-        const entries = ZoteroPane.getSelectedItems();
-        const vaultName = ""; ///TODO add preference to specify vault
+    buildItemContextMenu: function () {
+        let show = false;
+        const pane = Services.wm.getMostRecentWindow("navigator:browser").ZoteroPane;
+        const doc = pane.document;
+        const items = pane.getSelectedItems();
+        for (const item of items) {
+            if (this.dataKeys.includes(item.id)) {
+                show = true;
+                break;
+            }
+        }
+        doc.getElementById("id-obscite-itemmenu-open-obsidian").hidden = !show;
+    },
+
+    openSelectedItemsObsidian: function () {
+        const items = Services.wm.getMostRecentWindow("navigator:browser").ZoteroPane.getSelectedItems();
+        const vaultName = ''; ///TODO add preference to specify vault
         const vaultKey = (vaultName.length > 0) ? 'vault=' + vaultName + '&' : '';
 
-        entries.forEach(item => {
-            if (Object.keys(this.data).includes(item.id.toString())) {
+        items.forEach(item => {
+            if (this.dataKeys.includes(item.id)) {
                 /// NB skipping the subfolder path and hoping that obsidian can resolve the note based on the file name
-                const entry_res = this.data[item.id];
+                const entry_res = this.data[item.id.toString()];
                 const uriEncoded = encodeURIComponent(entry_res.name);
                 Zotero.launchURL("obsidian://open?" + vaultKey + "file=" + uriEncoded);
             }

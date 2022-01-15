@@ -16,12 +16,12 @@
     </stringbundleset>
     
     <menupopup id="menu_ToolsPopup">
-      <menuitem id="id-obscite-menu-sync" label="&obscite-syncdb-label;" oncommand="Zotero.ObsCite.syncWithMarkdown()"/>
-      <menuitem id="id-obscite-menu-preferences" label="&obscite-preferences-label;" oncommand="Zotero.ObsCite.openPreferenceWindow();"/>
+      <menuitem id="id-obscite-menu-sync" label="&obscite.tools-menu.syncdb-label;" oncommand="Zotero.ObsCite.syncWithMarkdown()"/>
+      <menuitem id="id-obscite-menu-preferences" label="&obscite.tools-menu.preferences-label;" oncommand="Zotero.ObsCite.openPreferenceWindow();"/>
     </menupopup>
 
-  <menupopup id="zotero-itemmenu">
-    <menuitem id="id-obscite-openmd" label="&obscite-openmd-label;" oncommand="Zotero.ObsCite.openMDforSelectedItems()"/>
+  <menupopup id="zotero-itemmenu" onpopupshowing="Zotero.ObsCite.buildItemContextMenu();">
+    <menuitem id="id-obscite-itemmenu-open-obsidian" label="&obscite.item-menu.open-obsidian-label;" hidden="false" oncommand="Zotero.ObsCite.openSelectedItemsObsidian()"/>
   </menupopup>
 
 

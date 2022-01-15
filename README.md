@@ -43,7 +43,7 @@ ZoteroObsidianCitations needs to map your BetterBibTex (BBT) citekeys to the cor
 
 ### Pinned BBT citekey Method (default)
 
-This is the easiest option but you can only use it if the BBT citekeys in your MD notes are pinned in Zotero (e.g. because you manually assigned citekeys to the Zotero items or because you configured BBT to pin the automatically generated citekeys via the [autoPinDelay](https://retorque.re/zotero-better-bibtex/installation/preferences/hidden-preferences/#autopindelay) setting).
+This is the easiest option but requires that the BBT citekeys used in your Markdown notes are pinned in Zotero.  (e.g. because you manually assigned citekeys to the Zotero items or because you configured BBT to pin the automatically generated citekeys via the [autoPinDelay](https://retorque.re/zotero-better-bibtex/installation/preferences/hidden-preferences/#autopindelay) setting).
 
 - In `ZoteroObsidianCitations Preferences...` (under the `Tools` menu),
 
