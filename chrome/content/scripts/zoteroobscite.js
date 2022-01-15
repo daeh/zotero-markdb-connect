@@ -5,6 +5,7 @@ Dae Houlihan
 
 Components.utils.import('resource://gre/modules/osfile.jsm');
 Components.utils.import('resource://gre/modules/Services.jsm');
+Components.utils.import("resource://gre/modules/FileUtils.jsm");
 
 // Startup -- load Zotero and constants
 if (typeof Zotero === 'undefined') {
@@ -852,7 +853,7 @@ Zotero.ObsCite = {
             item.saveTx();
         });
 
-        ///DEBUG this doesn't run successfully as soon as zotero is started, needs to wait for something to load
+        ///NB this doesn't run successfully as soon as zotero is started, needs to wait for schema to load
         /// add tag to items that should be tagged
         items_totag.forEach(item => {
             item.addTag('ObsCite');
@@ -933,6 +934,62 @@ Zotero.ObsCite = {
         this.showNotification(...notifData);
     },
 
+    //// Controls for Item menu
+
+    buildItemContextMenu: function () {
+        let show = false;
+        const pane = Services.wm.getMostRecentWindow("navigator:browser").ZoteroPane;
+        const doc = pane.document;
+        const items = pane.getSelectedItems();
+        for (const item of items) {
+            if (this.dataKeys.includes(item.id)) {
+                show = true;
+                break;
+            }
+        }
+        doc.getElementById("id-obscite-itemmenu-open-obsidian").hidden = !show;
+        doc.getElementById("id-obscite-itemmenu-show-md").hidden = !show;
+    },
+
+    openSelectedItemsObsidian: function () {
+        const items = Services.wm.getMostRecentWindow("navigator:browser").ZoteroPane.getSelectedItems();
+        const vaultName = ''; ///TODO add preference to specify vault
+        const vaultKey = (vaultName.length > 0) ? 'vault=' + vaultName + '&' : '';
+        for (const item of items) {
+            if (this.dataKeys.includes(item.id)) {
+                /// NB skipping the subfolder path and hoping that obsidian can resolve the note based on the file name
+                const entry_res = this.data[item.id.toString()];
+                const uriEncoded = encodeURIComponent(entry_res.name);
+                Zotero.launchURL("obsidian://open?" + vaultKey + "file=" + uriEncoded);
+                /// only open first item note
+                break;
+            }
+        }
+    },
+
+    showSelectedItemMarkdownInFilesystem: function () {
+        const items = Services.wm.getMostRecentWindow("navigator:browser").ZoteroPane.getSelectedItems();
+        for (const item of items) {
+            if (this.dataKeys.includes(item.id)) {
+                /// NB skipping the subfolder path and hoping that obsidian can resolve the note based on the file name
+                const entry_res = this.data[item.id.toString()];
+                let file = new FileUtils.File(OS.Path.normalize(entry_res.path));
+                if (file.exists()) {
+                    try {
+                        Zotero.debug("Revealing " + file.path);
+                        file.reveal();
+                    } catch (e) {
+                        // On platforms that don't support nsIFile.reveal() (e.g. Linux),
+                        // launch the parent directory
+                        Zotero.launchFile(file.parent);
+                    }
+                }
+                /// only open first item note
+                break;
+            }
+        }
+    },
+
     //// Controls for Tools menu
 
     syncWithMarkdown: async function () {
@@ -954,38 +1011,6 @@ Zotero.ObsCite = {
             io
         );
     },
-
-    //// Controls for Item menu
-
-    buildItemContextMenu: function () {
-        let show = false;
-        const pane = Services.wm.getMostRecentWindow("navigator:browser").ZoteroPane;
-        const doc = pane.document;
-        const items = pane.getSelectedItems();
-        for (const item of items) {
-            if (this.dataKeys.includes(item.id)) {
-                show = true;
-                break;
-            }
-        }
-        doc.getElementById("id-obscite-itemmenu-open-obsidian").hidden = !show;
-    },
-
-    openSelectedItemsObsidian: function () {
-        const items = Services.wm.getMostRecentWindow("navigator:browser").ZoteroPane.getSelectedItems();
-        const vaultName = ''; ///TODO add preference to specify vault
-        const vaultKey = (vaultName.length > 0) ? 'vault=' + vaultName + '&' : '';
-
-        items.forEach(item => {
-            if (this.dataKeys.includes(item.id)) {
-                /// NB skipping the subfolder path and hoping that obsidian can resolve the note based on the file name
-                const entry_res = this.data[item.id.toString()];
-                const uriEncoded = encodeURIComponent(entry_res.name);
-                Zotero.launchURL("obsidian://open?" + vaultKey + "file=" + uriEncoded);
-            }
-        });
-    },
-
 };
 
 

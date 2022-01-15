@@ -22,6 +22,7 @@
 
   <menupopup id="zotero-itemmenu" onpopupshowing="Zotero.ObsCite.buildItemContextMenu();">
     <menuitem id="id-obscite-itemmenu-open-obsidian" label="&obscite.item-menu.open-obsidian-label;" hidden="false" oncommand="Zotero.ObsCite.openSelectedItemsObsidian()"/>
+    <menuitem id="id-obscite-itemmenu-show-md" label="&obscite.item-menu.show-md-label;" hidden="false" oncommand="Zotero.ObsCite.showSelectedItemMarkdownInFilesystem()"/>
   </menupopup>
 
 

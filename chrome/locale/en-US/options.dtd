@@ -1,26 +1,26 @@
 <!ENTITY obscite.name "Zotero Obsidian Citations">
 <!ENTITY obscite.preferences "Zotero Obsidian Citations Preferences">
 
-<!ENTITY obscite.preferences.vault-source-folder "Obsidian Vault Folder with Reading Notes">
-<!ENTITY obscite.preferences.vault-source-folder-desc "The directory containing your Obsidian Citation Markdown notes (notes should begin with @citekey).">
+<!ENTITY obscite.preferences.vault-source-folder "Obsidian Vault Folder containing Reading Notes">
+<!ENTITY obscite.preferences.vault-source-folder-desc "The directory containing your Markdown notes (notes should begin with @citekey).">
 
 <!ENTITY obscite.preferences.zotids-source-label "Source of Zotero Item IDs">
-<!ENTITY obscite.preferences.zotids-source-desc "How Should ZoteroObsidianCitations map the BBT citekeys from your Markdown notes to the Zotero Item?">
+<!ENTITY obscite.preferences.zotids-source-desc "How Should ZoteroObsidianCitations map the BetterBibTex citekeys from your Markdown notes to the Zotero Item?">
 
-<!ENTITY obscite.preferences.pinned-citekeys-title "All of the BBT citekeys in the Markdown notes are pinned in Zotero">
-<!ENTITY obscite.preferences.pinned-citekeys-label "Find the BBT citekey in the Extra field">
-<!ENTITY obscite.preferences.pinned-citekeys-desc "If you have pinned the BBT citekeys in Zotero for the items in your Markdown notes.">
+<!ENTITY obscite.preferences.pinned-citekeys-title "All of the BetterBibTex citekeys in the Markdown notes are pinned in Zotero">
+<!ENTITY obscite.preferences.pinned-citekeys-label "Find the BetterBibTex citekey in the Extra field">
+<!ENTITY obscite.preferences.pinned-citekeys-desc "If you have pinned the BetterBibTex citekeys in Zotero for the items in your Markdown notes.">
 
-<!ENTITY obscite.preferences.bbtjson-title "Use an BBT JSON library export">
-<!ENTITY obscite.preferences.bbtjson-source-file "BBT JSON Export of Library:">
-<!ENTITY obscite.preferences.bbtjson-desc "The BetterBibTex export of your library. Must include the fields 'citekey' and 'itemID'. Should be auto-updating.">
+<!ENTITY obscite.preferences.bbtjson-title "Use a BetterBibTex JSON library export">
+<!ENTITY obscite.preferences.bbtjson-source-file "BetterBibTex-JSON file:">
+<!ENTITY obscite.preferences.bbtjson-desc "The BetterBibTex JSON export of your library. Must include the fields 'citekey' and 'itemID'. Should be auto-updating.">
 
-<!ENTITY obscite.preferences.zotkeyregex-title "The Markdown notes contain the Zotero Item Key (e.g. ABCD1234 in zotero://select/library/items/ABCD1234).">
+<!ENTITY obscite.preferences.zotkeyregex-title "Markdown notes contain the Zotero Item Key (e.g. ABCD1234 in zotero://select/library/items/ABCD1234).">
 <!ENTITY obscite.preferences.zotkey-regex-label "Zotero Key RegEx:">
-<!ENTITY obscite.preferences.zotkey-regex-desc "NB this is not the same as the BBT citekey you assigned an item (e.g. mycitekey in zotero://select/items/@mycitekey)">
+<!ENTITY obscite.preferences.zotkey-regex-desc "N.B. this is not the same as the BetterBibTex citekey you assigned an item (e.g. mycitekey in zotero://select/items/@mycitekey)">
 
 
 <!ENTITY obscite.preferences.metadata-keyword-label "Markdown Metadata Keyword">
-<!ENTITY obscite.preferences.metadata-keyword-desc "(Optional) If you want to extract the citekey from a MD note's metadata, indicate the keyword here. A common value is: citekey. If no value is given, the citekey will be taken from the MD note's title.">
+<!ENTITY obscite.preferences.metadata-keyword-desc "(Optional) If you want to extract the citekey from a Markdown note's metadata, indicate the keyword here. A common value is: citekey. If no value is given, the citekey will be taken from the note's title.">
 
 <!ENTITY obscite.preferences.choose-button-label "Choose…">
