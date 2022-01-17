@@ -1,6 +1,7 @@
 # Zotero Obsidian Citations
 
-**_Add colored tags to Zotero items that have associated Markdown notes in an external folder._**
+- **_Adds colored tags to Zotero items that have associated Markdown notes in an external folder._**
+- **_Open an associated Markdown note from the contextual menu of a Zotero item._**
 
 ![ZoteroObsidianCitationsScreenshot](ZoteroObsidianCitationsScreenshot.png)
 
