@@ -34,7 +34,7 @@ Opens an existing Markdown note in [Obsidian](https://obsidian.md) from the cont
 _ZoteroObsidianCitations_ needs to map your [Better BibTex](https://retorque.re/zotero-better-bibtex/) (BBT) citekeys to the corresponding Zotero Item IDs. There are 3 ways to do this:
 
 1. Pinned BBT citekeys
-   - This is the easiest option but requires that the BBT citekeys used in your Markdown notes are pinned in Zotero. Having the citekey pinned for items with associated Markdown notes is a good practice, otherwise the citekeys in Zotero might change when other items in your library are added/removed.
+   - This is the easiest option but requires that the BBT citekeys used in your Markdown notes are pinned in Zotero. (It is a good practice to pin the citekeys of items with associated Markdown notes, otherwise the citekeys in Zotero might change when other items in your library are added/removed.)
 2. _BetterBibTex JSON_ Export
    - If the BBT citekeys in your Markdown notes are not pinned in Zotero, you can specify the path to an auto-updating BBT JSON export of your library.
 3. Markdown notes contain the Zotero Item Keys
@@ -42,7 +42,7 @@ _ZoteroObsidianCitations_ needs to map your [Better BibTex](https://retorque.re/
 
 ### Pinned BBT citekey Method (default)
 
-This is the easiest option but requires that the BBT citekeys used in your Markdown notes are pinned in Zotero. Having the citekey pinned for items with associated Markdown notes is a good practice, otherwise the citekeys in Zotero might change when other items in your library are added/removed. The BBT citekeys will be pinned if you manually assigned citekeys to the Zotero items or configured BBT to pin the automatically generated citekeys via the [autoPinDelay](https://retorque.re/zotero-better-bibtex/installation/preferences/hidden-preferences/#autopindelay) setting.
+This is the easiest option but requires that the BBT citekeys used in your Markdown notes are pinned in Zotero. It is a good practice to pin the citekeys of items with associated Markdown notes, otherwise the citekeys in Zotero might change when other items in your library are added/removed. The BBT citekeys will be pinned if you manually assigned citekeys to the Zotero items or configured BBT to pin the automatically generated citekeys via the [autoPinDelay](https://retorque.re/zotero-better-bibtex/installation/preferences/hidden-preferences/#autopindelay) setting.
 
 - In `ZoteroObsidianCitations Preferences...` (under the `Tools` menu),
 
@@ -50,7 +50,7 @@ This is the easiest option but requires that the BBT citekeys used in your Markd
 
     (_ZoteroObsidianCitations_ finds the items based on the `Citation Key: mycitekey` entry that BBT adds to the `Extra` fields of items with pinned citekeys.)
 
-  - Specify the location of the folder that contains your Markdown reading notes (e.g. `/Users/me/Documents/ObsVault/ReadingNotes/`). The ZoteroObsidianCitation add-on will recursively search this path for Markdown files beginning with `@`.
+  - Specify the location of the folder that contains your Markdown reading notes (e.g. `/Users/me/Documents/ObsVault/ReadingNotes/`). The _ZoteroObsidianCitations_ add-on will recursively search this path for Markdown files beginning with `@`.
 
     - NB this add-on expects that your reading note files begin with `@mycitekey` but can include extra information after it (e.g. a reading note might have the file name `@shepard1987science.md` or `@shepard1987science Toward a universal law of generalization for psychological science.md`, where `shepard1987science` is the BBT citekey).
 
