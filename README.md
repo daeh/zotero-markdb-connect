@@ -1,6 +1,6 @@
 # Zotero Obsidian Citations
 
-- **_Adds colored tags to Zotero items that have associated Markdown notes in an external folder._**
+- **_Adds colored tags to Zotero items that have associated Markdown notes stored in an external folder._**
 - **_Open an associated Markdown note from the contextual menu of a Zotero item._**
 
 ![ZoteroObsidianCitationsScreenshot](ZoteroObsidianCitationsScreenshot.png)
@@ -38,7 +38,7 @@ _ZoteroObsidianCitations_ needs to map your [Better BibTex](https://retorque.re/
 2. _BetterBibTex JSON_ Export
    - If the BBT citekeys in your Markdown notes are not pinned in Zotero, you can specify the path to an auto-updating BBT JSON export of your library.
 3. Markdown notes contain the Zotero Item Keys
-   - If your Markdown notes contain the Zotero Item Keys, you can specify a RegEx pattern to extract the ZoteroKey from the note content. (Zotero automatically generates these under the hood; they take the form of `ABCD1234`, as in `zotero://select/library/items/ABCD1234`).
+   - If your Markdown notes contain the Zotero Item Keys, you can specify a RegEx pattern to extract the ZoteroKey from the note content. (Zotero automatically generates Item Keys; they take the form of `ABCD1234`, as in `zotero://select/library/items/ABCD1234`).
 
 ### Pinned BBT citekey Method (default)
 
@@ -78,7 +78,7 @@ If the Better BibTex (BBT) citekeys in your Markdown notes are not pinned in Zot
 
 ### Markdown RegEx Method
 
-If your Markdown notes contain the Zotero Item Keys, you can specify a RegEx pattern to extract the ZoteroKey from the note content. (Zotero automatically generates these under the hood; they take the form of `ABCD1234`, as in `zotero://select/library/items/ABCD1234`). NB this is not the same as the BBT citekey you assigned an item (e.g. `mycitekey` in `zotero://select/items/@mycitekey`).
+If your Markdown notes contain the Zotero Item Keys, you can specify a RegEx pattern to extract the ZoteroKey from the note content. (Zotero automatically generates Item Keys under the hood; they take the form of `ABCD1234`, as in `zotero://select/library/items/ABCD1234`). NB this is not the same as the BBT citekey you assigned an item (e.g. `mycitekey` in `zotero://select/items/@mycitekey`).
 
 - In `ZoteroObsidianCitations Preferences...`
 
@@ -98,7 +98,7 @@ If your Markdown notes contain the Zotero Item Keys, you can specify a RegEx pat
 
 [GitHub](https://github.com/daeh/zotero-obsidian-citations): Source code repository
 
-Code for this extension is based on [ZotFile](https://github.com/jlegewie/zotfile) and [Zotero Citationcounts](https://github.com/eschnett/zotero-citationcounts) (which is based on [Zotero DOI Manager](https://github.com/bwiernik/zotero-shortdoi), which is based in part on [Zotero Google Scholar Citations](https://github.com/beloglazov/zotero-scholar-citations) by Anton Beloglazov).
+Code for this extension is based on [ZotFile](https://github.com/jlegewie/zotfile) and [Zotero Citationcounts](https://github.com/eschnett/zotero-citationcounts) (which is based on [Zotero DOI Manager](https://github.com/bwiernik/zotero-shortdoi), which is based in part on [Zotero Google Scholar Citations](https://github.com/beloglazov/zotero-scholar-citations)).
 
 ## License
 
