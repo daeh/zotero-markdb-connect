@@ -78,8 +78,6 @@ If your Markdown notes contain the Zotero-Item-Keys, you can specify a RegEx pat
 - In `ZoteroObsidianCitations Preferences...` (under the `Tools` menu),
 
   - Specify the location of the folder that contains your Markdown reading notes (e.g. `/Users/me/Documents/ObsVault/ReadingNotes/`). The _ZoteroObsidianCitations_ add-on will recursively search this path for Markdown files beginning with `@`.
-
-    - _ZoteroObsidianCitations_ expects that the filenames of your Markdown reading note files begin with `@`.
     
   - Select the `Match notes based on Zotero-Item-Key` option.
     
