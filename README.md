@@ -26,63 +26,52 @@ Opens an existing Markdown note in [Obsidian](https://obsidian.md) from the cont
 - Run Zotero (version 5.x)
 - Go to `Tools -> Add-ons`
 - `Install Add-on From File`
-- Choose the file `zotero-obsidian-citations-0.0.10.xpi`
+- Choose the file `zotero-obsidian-citations-0.0.11.xpi`
 - Restart Zotero
 
 ## Setup
 
-_ZoteroObsidianCitations_ needs to map your [Better BibTex](https://retorque.re/zotero-better-bibtex/) (BBT) citekeys to the corresponding Zotero Item IDs. There are 3 ways to do this:
+_ZoteroObsidianCitations_ can map Markdown notes to Zotero items in two ways:
 
-1. Pinned BBT citekeys
-   - This is the easiest option but requires that the BBT citekeys used in your Markdown notes are pinned in Zotero. (It is a good practice to pin the citekeys of items with associated Markdown notes, otherwise the citekeys in Zotero might change when other items in your library are added/removed.)
-2. _BetterBibTex JSON_ Export
-   - If the BBT citekeys in your Markdown notes are not pinned in Zotero, you can specify the path to an auto-updating BBT JSON export of your library.
-3. Markdown notes contain the Zotero Item Keys
-   - If your Markdown notes contain the Zotero Item Keys, you can specify a RegEx pattern to extract the ZoteroKey from the note content. (Zotero automatically generates Item Keys; they take the form of `ABCD1234`, as in `zotero://select/library/items/ABCD1234`).
+1. Using **[Better BibTex](https://retorque.re/zotero-better-bibtex/) citekeys**.
 
-### Pinned BBT citekey Method (default)
+- This is recommended if you created the Markdown notes using [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin).
 
-This is the easiest option but requires that the BBT citekeys used in your Markdown notes are pinned in Zotero. It is a good practice to pin the citekeys of items with associated Markdown notes, otherwise the citekeys in Zotero might change when other items in your library are added/removed. The BBT citekeys will be pinned if you manually assigned citekeys to the Zotero items or configured BBT to pin the automatically generated citekeys via the [autoPinDelay](https://retorque.re/zotero-better-bibtex/installation/preferences/hidden-preferences/#autopindelay) setting.
+- The Markdown file names should start with `@mycitekey` but can include extra information after it (e.g. a reading note might have the file name `@shepard1987science.md` or `@shepard1987science Toward a universal law of generalization for psychological science.md`, where `shepard1987science` is the BetterBibTex citekey).
+
+2. Using **Zotero Item Keys**.
+
+   - This is recommended if you created the Markdown notes using the `Export Note` feature of Zotero.
+   - The Markdown file names should start with `@` and the file contents should include the Zotero-Item-Key in a consistent format
+     (Zotero automatically generates Item Keys; they take the form of `ABCD1234`, as in `zotero://select/library/items/ABCD1234`).
+
+### Using BetterBibTex citekeys
 
 - In `ZoteroObsidianCitations Preferences...` (under the `Tools` menu),
 
-  - Leave the `Find the BetterBibTex citekey in the Extra field` option selected.
-
-    (_ZoteroObsidianCitations_ finds the items based on the `Citation Key: mycitekey` entry that BBT adds to the `Extra` fields of items with pinned citekeys.)
-
   - Specify the location of the folder that contains your Markdown reading notes (e.g. `/Users/me/Documents/ObsVault/ReadingNotes/`). The _ZoteroObsidianCitations_ add-on will recursively search this path for Markdown files beginning with `@`.
+  - Select the `Match notes based on BetterBibTex citekey` option.
 
-    - NB this add-on expects that your reading note files begin with `@mycitekey` but can include extra information after it (e.g. a reading note might have the file name `@shepard1987science.md` or `@shepard1987science Toward a universal law of generalization for psychological science.md`, where `shepard1987science` is the BBT citekey).
+    - _ZoteroObsidianCitations_ expects that the filenames of your Markdown reading note files begin with `@mycitekey` but can include extra information after it (e.g. a reading note might have the file name `@shepard1987science.md` or `@shepard1987science Toward a universal law of generalization for psychological science.md`, where `shepard1987science` is the BBT citekey).
 
   - Optionally, you can have _ZoteroObsidianCitations_ read the metadata of your Markdown notes and extract the citekey from one of the fields. To enable this, specify the metadata ID (`citekey` is a common value).
+    - This is necessary if the file names do not begin with the correct citekey, which may happen if the citekeys include special characters (e.g. if a citekey contains `:`, it will probably need to be taken from the yaml metadata rather than the filename).
 
 - Run the synchronization function from `Tools -> ZoteroObsidianCitations Sync Tags`.
-
 - This will add a tag (`ObsCite`) to every Zotero item for which there exists a reading note in the external folder you specified.
-
 - In the `Tags` plane of Zotero, right-click on the `ObsCite` tag and assign it a color, which will mark the tagged items in the preview plane of Zotero.
 
-### _BetterBibTex JSON_ Export Method
+### Using Zotero Item Keys
 
-If the Better BibTex (BBT) citekeys in your Markdown notes are not pinned in Zotero, you can specify the path to an auto-updating export of your library. If you're already using [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin), you've set up an auto-updating BBT export of your library. You'll now make another BBT export in a format the includes both the BBT citekeys and the Zotero item IDs.
+If your Markdown notes contain the Zotero-Item-Keys, you can specify a RegEx pattern to extract the key from the file contents. Zotero automatically generates Item Keys under the hood; they take the form of `ABCD1234`, as in `zotero://select/library/items/ABCD1234`. NB this is not the same as the BBT citekey you assigned an item (e.g. `mycitekey` in `zotero://select/items/@mycitekey`).
 
-- Export your library in the "**_BetterBibTex JSON_**" format (not "_Better CSL JSON_", which does not include the Zotero IDs).
-  - Click `File -> Export library`.
-  - Check the "Keep Updated" box in the export options.
-  - You can save this JSON anywhere, but it usually makes sense to save it next to the BBT export that `obsidian-citation-plugin` uses.
-- In `ZoteroObsidianCitations Preferences...`
+- In `ZoteroObsidianCitations Preferences...` (under the `Tools` menu),
 
-  - Select the `Use an BetterBibTex JSON library export` option and specify the location of the "_BetterBibTex JSON_" formatted file you just exported.
+  - Select the `Match notes based on Zotero-Item-Key` option.
 
-- Follow the instructions in the **Pinned BBT citekey Method** to specify the path to your Markdown notes, the metadata ID (optional), and color the `ObsCite` tag.
+    - _ZoteroObsidianCitations_ expects that the filenames of your Markdown reading note files begin with `@`.
 
-### Markdown RegEx Method
-
-If your Markdown notes contain the Zotero Item Keys, you can specify a RegEx pattern to extract the ZoteroKey from the note content. (Zotero automatically generates Item Keys under the hood; they take the form of `ABCD1234`, as in `zotero://select/library/items/ABCD1234`). NB this is not the same as the BBT citekey you assigned an item (e.g. `mycitekey` in `zotero://select/items/@mycitekey`).
-
-- In `ZoteroObsidianCitations Preferences...`
-
-  - Select the `Zotero Key RegEx` option and specify a custom RegEx pattern to extract the Zotero Item Key from your Markdown notes.
+  - Specify a RegEx pattern to extract the Zotero-Item-Key from the Markdown contents.
 
   - E.g. if your note has the line
 
@@ -92,7 +81,11 @@ If your Markdown notes contain the Zotero Item Keys, you can specify a RegEx pat
 
     `^- local::.+\/items\/(\w+)\)`
 
-- Follow the instructions in the **Pinned BBT citekey Method** to specify the path to your Markdown notes, the metadata ID (optional), and color the `ObsCite` tag.
+- Run the synchronization function from `Tools -> ZoteroObsidianCitations Sync Tags`.
+
+- This will add a tag (`ObsCite`) to every Zotero item for which there exists a reading note in the external folder you specified.
+
+- In the `Tags` plane of Zotero, right-click on the `ObsCite` tag and assign it a color, which will mark the tagged items in the preview plane of Zotero.
 
 ## Notes
 

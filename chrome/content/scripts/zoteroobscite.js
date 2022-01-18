@@ -13,7 +13,7 @@ if (typeof Zotero === 'undefined') {
 }
 
 Zotero.ObsCite = {
-    version: '0.0.10',
+    version: '0.0.11',
     folderSep: null,
     cleanrun: true,
     suppressNotifications: false,
@@ -645,6 +645,51 @@ Zotero.ObsCite = {
         return citekeymap;
     },
 
+    _getBBTkeyData: async function () {
+        Components.utils.import('resource://gre/modules/AddonManager.jsm');
+        return new Promise(function (resolve) {
+            AddonManager.getAddonByID("better-bibtex@iris-advies.com", async function (addon) {
+                if (addon === null || !addon.isActive) {
+                    return;
+                }
+
+                let win = Services.wm.getMostRecentWindow("navigator:browser");
+                resolve(win.Zotero.BetterBibTeX.ready.then(function () {
+                    return win.Zotero.BetterBibTeX.KeyManager.keys.data;
+                }));
+            });
+        });
+    },
+
+    mapCitekeysBBTquery: async function () {
+        /* 
+         * make dict of BBTcitekey:zoteroID for every item
+         */
+        let citekeymap = {};
+
+        /// get all items in library
+        let s = new Zotero.Search();
+        s.libraryID = Zotero.Libraries.userLibraryID;
+        s.addCondition('deleted', 'false');
+        let itemIDs = await s.search();
+
+        const items = await this._getBBTkeyData();
+
+        items.forEach(item => {
+            /// check if zotid is in main library
+            if (itemIDs.includes(item.itemID)) {
+                /// allow for duplicate citekeys; add zotero item id to list if BBT citekey exists
+                if (Object.keys(citekeymap).includes(item.citekey)) {
+                    citekeymap[item.citekey].push(item.itemID);
+                } else { /// otherwise make array with zotero item id
+                    citekeymap[item.citekey] = [item.itemID];
+                }
+            }
+        });
+
+        return citekeymap;
+    },
+
     sliceObj: async function (res, citekeymap, promptSaveErrors) {
         /* 
          * res :: array of item data
@@ -813,7 +858,7 @@ Zotero.ObsCite = {
         if (!this.cleanrun && promptSaveErrors) {
             const dataErrors = JSON.stringify(res, null, 1);
             const warningTitle = "ZoteroObsidianCitations Warning";
-            const warningMessage = "There an issue matching some of your Markdown notes (" + zoteroids.length.toString() + " notes were matched successfully).\n\nWould you like to save the data extracted from the notes to a json file?";
+            const warningMessage = "There an issue matching some of your Markdown notes (" + this.dataKeys.length.toString() + " notes were matched successfully).\n\nWould you like to save the data extracted from the notes to a json file?";
             const saveDialogTitle = "Save ZoteroObsidianCitations Data To...";
             const filenamesuggest = 'ZoteroObsidianCitations-all-data.json';
             await this.offerToSaveErrors(dataErrors, warningTitle, warningMessage, saveDialogTitle, filenamesuggest);
@@ -1007,52 +1052,6 @@ Zotero.ObsCite = {
             'chrome,titlebar,toolbar,centerscreen' + Zotero.Prefs.get('browser.preferences.instantApply', true) ? 'dialog=no' : 'modal',
             io
         );
-    },
-
-    _getBBTkeyData: async function () {
-        Components.utils.import('resource://gre/modules/AddonManager.jsm');
-        return new Promise(function (resolve) {
-            AddonManager.getAddonByID("better-bibtex@iris-advies.com", async function (addon) {
-                if (addon === null || !addon.isActive) {
-                    return;
-                }
-
-                let win = Services.wm.getMostRecentWindow("navigator:browser");
-                resolve(win.Zotero.BetterBibTeX.ready.then(function () {
-                    return win.Zotero.BetterBibTeX.KeyManager.keys.data;
-                }));
-            });
-        });
-    },
-
-
-    mapCitekeysBBTquery: async function () {
-        /* 
-         * make dict of BBTcitekey:zoteroID for every item
-         */
-        let citekeymap = {};
-
-        /// get all items in library
-        let s = new Zotero.Search();
-        s.libraryID = Zotero.Libraries.userLibraryID;
-        s.addCondition('deleted', 'false');
-        let itemIDs = await s.search();
-
-        const items = await this._getBBTkeyData();
-
-        items.forEach(item => {
-            /// check if zotid is in main library
-            if (itemIDs.includes(item.itemID)) {
-                /// allow for duplicate citekeys; add zotero item id to list if BBT citekey exists
-                if (Object.keys(citekeymap).includes(item.citekey)) {
-                    citekeymap[item.citekey].push(item.itemID);
-                } else { /// otherwise make array with zotero item id
-                    citekeymap[item.citekey] = [item.itemID];
-                }
-            }
-        });
-
-        return citekeymap;
     },
 
 };
