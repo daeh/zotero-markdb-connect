@@ -52,8 +52,10 @@ If your Markdown notes contain the Better BibTex citekeys, _ZoteroObsidianCitati
 
 - In `ZoteroObsidianCitations Preferences...` (under the `Tools` menu),
   - Specify the location of the folder that contains your Markdown reading notes (e.g. `/Users/me/Documents/ObsVault/ReadingNotes/`). The _ZoteroObsidianCitations_ add-on will recursively search this path for Markdown files beginning with `@`.
+  
   - Select the `Match notes based on BetterBibTex citekey` option.
     - _ZoteroObsidianCitations_ expects that the filenames of your Markdown reading note files begin with `@mycitekey` but can include extra information after it (e.g. a reading note might have the file name `@shepard1987science.md` or `@shepard1987science Toward a universal law of generalization for psychological science.md`, where `shepard1987science` is the BetterBibTex citekey).
+    
   - Optionally, you can have _ZoteroObsidianCitations_ read the metadata of your Markdown notes and extract the citekey from one of the fields. To enable this, specify the metadata ID (`citekey` is a common value).
     - This is necessary if the file names do not begin with the correct citekey, which may happen if the citekeys include special characters (e.g. if a citekey contains `:`, it will probably need to be taken from the yaml metadata rather than the filename).
 
@@ -69,6 +71,7 @@ If your Markdown notes contain the Zotero-Item-Keys, you can specify a RegEx pat
 - In `ZoteroObsidianCitations Preferences...` (under the `Tools` menu),
   - Select the `Match notes based on Zotero-Item-Key` option.
     - _ZoteroObsidianCitations_ expects that the filenames of your Markdown reading note files begin with `@`.
+    
   - Specify a RegEx pattern to extract the Zotero-Item-Key from the Markdown contents.
   - E.g. if your note has the line
     `- local:: [local zotero](zotero://select/library/items/GZ9DQ2AM)`
