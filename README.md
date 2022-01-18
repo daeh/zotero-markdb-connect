@@ -35,9 +35,11 @@ _ZoteroObsidianCitations_ can map Markdown notes to Zotero items in two ways:
 
 1. Using **[Better BibTex](https://retorque.re/zotero-better-bibtex/) citekeys**.
 
-- This is recommended if you created the Markdown notes using [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin).
+   - This is recommended if you created the Markdown notes using [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin).
 
-- The Markdown file names should start with `@mycitekey` but can include extra information after it (e.g. a reading note might have the file name `@shepard1987science.md` or `@shepard1987science Toward a universal law of generalization for psychological science.md`, where `shepard1987science` is the BetterBibTex citekey).
+
+   - The Markdown file names should start with `@mycitekey` but can include extra information after it (e.g. a reading note might have the file name `@shepard1987science.md` or `@shepard1987science Toward a universal law of generalization for psychological science.md`, where `shepard1987science` is the BetterBibTex citekey).
+
 
 2. Using **Zotero Item Keys**.
 
