@@ -12,8 +12,7 @@
   <prefpane id="id-obscite-prefpane" label="&obscite.preferences;">
     <preferences>
       <preference id="pref-obscite-source_dir" name="extensions.obscite.source_dir" type="string"/>
-      <preference id="pref-obscite-zotidssource" name="extensions.obscite.zotidssource" type="string"/>
-      <preference id="pref-obscite-bbtjson" name="extensions.obscite.bbtjson" type="string"/>
+      <preference id="pref-obscite-matchstrategy" name="extensions.obscite.matchstrategy" type="string"/>
       <preference id="pref-obscite-zotkeyregex" name="extensions.obscite.zotkeyregex" type="string"/>
       <preference id="pref-obscite-metadatakeyword" name="extensions.obscite.metadatakeyword" type="string"/>
     </preferences>
@@ -27,50 +26,50 @@
         <textbox id="id-obscite-source_dir" preference="pref-obscite-source_dir" flex="1" />
         <button id="id-obscite-source_dir-button" label="&obscite.preferences.choose-button-label;" oncommand="Zotero.ObsCite.chooseVaultFolder();"/>
       </hbox>
+      <label id="id-obscite-source_dir-subdesc" style="font-size: 10px" value="&obscite.preferences.vault-source-folder-subdesc;"/>
     </groupbox>
     <separator/>
 
-    <groupbox>
-      <caption label="&obscite.preferences.zotids-source-label;"/>
-      <description style="width: 420px">&obscite.preferences.zotids-source-desc;</description>
-      <separator/>
 
-      <radiogroup id="id-obscite-zotidssource" preference="pref-obscite-zotidssource">
 
-        <label id="id-obscite-preferences-pinned-citekeys-title" value="&obscite.preferences.pinned-citekeys-title;"/>
-        <radio label="&obscite.preferences.pinned-citekeys-label;" value="pinnedcitekeys" />
-        <label id="id-obscite-preferences-pinned-citekeys-desc" style="font-size: 10px" value="&obscite.preferences.pinned-citekeys-desc;"/>
+    <radiogroup id="id-obscite-matchstrategy" preference="pref-obscite-matchstrategy">
+
+      <groupbox>
+        <caption label="&obscite.preferences.matchstrategy-bbtcitekey-label;"/>
+        <radio label="&obscite.preferences.matchstrategy-bbtcitekey-label;" value="bbtcitekey" />
+        <description style="width: 420px">&obscite.preferences.matchstrategy-bbtcitekey-desc;</description>
 
         <separator/>
 
-        <label id="id-obscite.preferences.bbtjson-title" value="&obscite.preferences.bbtjson-title;"/>
-        <hbox  style="margin: 0"  align="center">
-          <radio label="&obscite.preferences.bbtjson-source-file;" value="bbtjson" />
-          <textbox id="id-obscite-bbtjson" preference="pref-obscite-bbtjson" flex="1" />
-          <button id="id-obscite-bbtjson-button" label="&obscite.preferences.choose-button-label;" oncommand="Zotero.ObsCite.chooseBBTjson();"/>
+        <label id="id-obscite-metadatakeyword-title" value="&obscite.preferences.metadata-keyword-title;"/>
+        <hbox style="margin: 0"  align="center">
+          <label id="id-obscite-metadatakeyword-label" value="&obscite.preferences.metadata-keyword-label;"/>
+          <textbox id="id-obscite-metadatakeyword" preference="pref-obscite-metadatakeyword" onchange="Zotero.ObsCite.checkMetadataFormat();"/>
         </hbox>
-        <label id="id-obscite.preferences.bbtjson-desc" style="font-size: 10px" value="&obscite.preferences.bbtjson-desc;"/>
+        <label id="id-obscite-metadatakeyword-desc" style="font-size: 10px" value="&obscite.preferences.metadata-keyword-desc;"/>
+        <label id="id-obscite-metadatakeyword-subdesc" style="font-size: 10px" value="&obscite.preferences.metadata-keyword-subdesc;"/>
+
+      </groupbox>
+
+
+      <groupbox>
+        <caption label="&obscite.preferences.matchstrategy-zotitemkey-label;"/>
+        <radio label="&obscite.preferences.matchstrategy-zotitemkey-label;" value="zotitemkey" />
+        <description style="width: 420px">&obscite.preferences.matchstrategy-zotitemkey-desc;</description>
 
         <separator/>
 
         <label id="id-obscite.preferences.zotkeyregex-title" value="&obscite.preferences.zotkeyregex-title;"/>
-        <hbox  style="margin: 0"  align="center">
-          <radio label="&obscite.preferences.zotkey-regex-label;" value="contentregex" />
+        <label id="id-obscite.preferences.zotkeyregex-desc" value="&obscite.preferences.zotkeyregex-desc;"/>
+        <hbox style="margin: 0"  align="center">
+          <label id="id-obscite.preferences.zotkey-regex-label" value="&obscite.preferences.zotkey-regex-label;"/>
           <textbox id="id-obscite-zotkeyregex" preference="pref-obscite-zotkeyregex" flex="1" />
         </hbox>
-        <label id="id-obscite.preferences.zotkey-regex-desc" style="font-size: 10px" value="&obscite.preferences.zotkey-regex-desc;"/>
+        <label id="id-obscite.preferences.zotkey-regex-subdesc" style="font-size: 10px" value="&obscite.preferences.zotkey-regex-subdesc;"/>
 
-      </radiogroup>
+      </groupbox>
 
-    </groupbox>
-    <separator/>
-
-    <groupbox>
-      <label id="id-obscite-metadatakeyword-label" value="&obscite.preferences.metadata-keyword-label;"/>
-      <textbox id="id-obscite-metadatakeyword" preference="pref-obscite-metadatakeyword" onchange="Zotero.ObsCite.checkMetadataFormat();"/>
-      <label id="id-obscite-metadatakeyword-desc" style="font-size: 10px" value="&obscite.preferences.metadata-keyword-desc;"/>
-    </groupbox>
-    <separator/>
+    </radiogroup>
 
   </prefpane>
 

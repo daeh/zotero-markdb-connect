@@ -41,8 +41,8 @@ Zotero.ObsCite = {
         if (!this._initialized) {
 
             setTimeout(() => {
-                if (!['pinnedcitekeys', 'bbtjson', 'contentregex'].includes(this.getPref('zotidssource'))) {
-                    this.setPref('zotidssource', 'pinnedcitekeys');
+                if (!['bbtcitekey', 'zotitemkey'].includes(this.getPref('matchstrategy'))) {
+                    this.setPref('matchstrategy', 'bbtcitekey');
                 }
             }, 2000);
 
@@ -113,13 +113,13 @@ Zotero.ObsCite = {
         }
     },
 
-    _getParam_zotidssource: function () {
-        const zotidssource = this.getPref('zotidssource');
-        if (['pinnedcitekeys', 'bbtjson', 'contentregex'].includes(zotidssource)) {
-            return zotidssource;
+    _getParam_matchstrategy: function () {
+        const matchstrategy = this.getPref('matchstrategy');
+        if (['bbtcitekey', 'zotitemkey'].includes(matchstrategy)) {
+            return matchstrategy;
         } else {
-            this.setPref('zotidssource', 'pinnedcitekeys');
-            return 'pinnedcitekeys';
+            this.setPref('matchstrategy', 'bbtcitekey');
+            return 'bbtcitekey';
         }
     },
 
@@ -139,21 +139,21 @@ Zotero.ObsCite = {
         }
     },
 
-    _getParam_bbtjson: function () {
-        try {
-            const bbtjson = this.getPref('bbtjson');
-            const bbtjsonObj = new FileUtils.File(OS.Path.normalize(bbtjson));
-            if (typeof bbtjson === 'string' && bbtjson.length > 0 && bbtjsonObj.exists() && bbtjsonObj.isFile()) {
-                return bbtjsonObj.path;
-            } else {
-                throw new Error("bbtjson is not set or does not exist.");
-            }
-        } catch (e) {
-            this.showNotification("BBT JSON Library Export Not Found", "Set the path to your auto-updating BBT JSON export in the ZotObsCite preferences.", false);
-            Zotero.debug(`ObsVault Error: ${e}`);
-            return null;
-        }
-    },
+    // _getParam_bbtjson: function () {
+    //     try {
+    //         const bbtjson = this.getPref('bbtjson');
+    //         const bbtjsonObj = new FileUtils.File(OS.Path.normalize(bbtjson));
+    //         if (typeof bbtjson === 'string' && bbtjson.length > 0 && bbtjsonObj.exists() && bbtjsonObj.isFile()) {
+    //             return bbtjsonObj.path;
+    //         } else {
+    //             throw new Error("bbtjson is not set or does not exist.");
+    //         }
+    //     } catch (e) {
+    //         this.showNotification("BBT JSON Library Export Not Found", "Set the path to your auto-updating BBT JSON export in the ZotObsCite preferences.", false);
+    //         Zotero.debug(`ObsVault Error: ${e}`);
+    //         return null;
+    //     }
+    // },
 
     _getParam_zotkeyregex: function () {
         try {
@@ -188,19 +188,17 @@ Zotero.ObsCite = {
 
     checkSettings: async function () {
 
-        const zotidssource = this._getParam_zotidssource();
-        if (zotidssource == null) return false;
+        const matchstrategy = this._getParam_matchstrategy();
+        if (matchstrategy == null) return false;
         if (this._getParam_vaultpath() == null) return false;
-        if (this._getParam_metadatakeyword() == null) return false;
 
-        if (zotidssource === 'pinnedcitekeys') {
-            /// pass
-        } else if (zotidssource === 'bbtjson') {
-            if (this._getParam_bbtjson() == null) return false;
-        } else if (zotidssource === 'contentregex') {
-            if (this._getParam_zotkeyregex() == null) return false;
+        if (matchstrategy === 'bbtcitekey') {
+            if (this._getParam_metadatakeyword() == null) return false;
+        } else if (matchstrategy === 'zotitemkey') {
+            const zotkeyregex = this._getParam_zotkeyregex();
+            if (zotkeyregex == null || !zotkeyregex || zotkeyregex.length === 0) return false;
         } else {
-            this.showNotification("ZoteroObsidianCitations", 'Zotero IDs Source Not Specified: ' + zotidssource, false);
+            this.showNotification("ZoteroObsidianCitations", 'Zotero IDs Source Not Specified: ' + matchstrategy, false);
             return false;
         }
 
@@ -399,8 +397,8 @@ Zotero.ObsCite = {
                 citekey: null,
                 citekey_metadata: null,
                 citekey_title: null,
-                zotkey: null,
-                zotid: null,
+                zotkeys: [],
+                zotids: [],
                 name: name,
                 path: path
             };
@@ -484,8 +482,8 @@ Zotero.ObsCite = {
                 citekey: null,
                 citekey_metadata: null,
                 citekey_title: null,
-                zotkey: null,
-                zotid: null,
+                zotkeys: [],
+                zotids: [],
                 name: name,
                 path: path
             };
@@ -503,32 +501,32 @@ Zotero.ObsCite = {
             try {
                 /// get the ZoteroKey from the contents
                 const contents = await Zotero.File.getContentsAsync(path);
-                entry_res.zotkey = contents.match(re_contents)[1].trim();
+                entry_res.zotkeys.push(contents.match(re_contents)[1].trim());
 
                 /// optional for custom regex
                 /// get citekey from metadata
-                try {
-                    if (metadatakeyword.length > 0) {
-                        /// pattern to match citekey in MD file metadata
-                        const re_metadata = new RegExp("^" + metadatakeyword + "\: *([^s].+)", 'm');
-                        /// get metadata
-                        const contentSections = contents.split('\n---');
-                        const metadata = contentSections[0];
-                        if (contentSections.length > 1 && metadata.startsWith('---')) {
-                            entry_res.citekey_metadata = metadata.match(re_metadata)[1].trim();
-                        }
-                    }
-                } catch (e) {
-                    Zotero.debug("Error in scanVaultCustomRegex: " + e);
-                }
+                // try {
+                //     if (metadatakeyword.length > 0) {
+                //         /// pattern to match citekey in MD file metadata
+                //         const re_metadata = new RegExp("^" + metadatakeyword + "\: *([^s].+)", 'm');
+                //         /// get metadata
+                //         const contentSections = contents.split('\n---');
+                //         const metadata = contentSections[0];
+                //         if (contentSections.length > 1 && metadata.startsWith('---')) {
+                //             entry_res.citekey_metadata = metadata.match(re_metadata)[1].trim();
+                //         }
+                //     }
+                // } catch (e) {
+                //     Zotero.debug("Error in scanVaultCustomRegex: " + e);
+                // }
             } catch (e) {
                 Zotero.debug("Error in scanVaultCustomRegex: " + e);
             }
 
-            entry_res.citekey = entry_res.citekey_metadata || entry_res.citekey_title;
-            if (entry_res.zotkey == null) {
-                reserrs.push(entry_res);
-            }
+            // entry_res.citekey = entry_res.citekey_metadata || entry_res.citekey_title;
+            // if (entry_res.zotkey == null) {
+            //     reserrs.push(entry_res);
+            // }
             res.push(entry_res);
         }));
 
@@ -655,14 +653,16 @@ Zotero.ObsCite = {
          */
         let reserr = [];
 
+        const citekeys = Object.keys(citekeymap);
+
         res.forEach(entry_res => {
             if (entry_res.citekey) {
-                if (entry_res.citekey in citekeymap) {
-                    entry_res.zotid = citekeymap[entry_res.citekey];
-                } else if (entry_res.citekey_metadata in citekeymap) {
-                    entry_res.zotid = citekeymap[entry_res.citekey_metadata];
-                } else if (entry_res.citekey_title in citekeymap) {
-                    entry_res.zotid = citekeymap[entry_res.citekey_title];
+                if (citekeys.includes(entry_res.citekey)) {
+                    entry_res.zotids = citekeymap[entry_res.citekey];
+                } else if (citekeys.includes(entry_res.citekey_metadata)) {
+                    entry_res.zotids = citekeymap[entry_res.citekey_metadata];
+                } else if (citekeys.includes(entry_res.citekey_title)) {
+                    entry_res.zotids = citekeymap[entry_res.citekey_title];
                 } else {
                     reserr.push(entry_res);
                 }
@@ -690,6 +690,7 @@ Zotero.ObsCite = {
         return res;
     },
 
+
     sliceObjCustomRegex: async function (res, zoterokeymap, promptSaveErrors) {
         /* 
          * res :: array of item data
@@ -698,16 +699,16 @@ Zotero.ObsCite = {
          */
         let reserr = [];
 
+        const zotkeys = Object.keys(zoterokeymap);
+
         res.forEach(entry_res => {
-            if (entry_res.zotkey) {
-                if (entry_res.zotkey in zoterokeymap) {
-                    entry_res.zotid = zoterokeymap[entry_res.zotkey];
+            entry_res.zotkeys.forEach(zotkey => {
+                if (zotkeys.includes(zotkey)) {
+                    entry_res.zotids.push(zoterokeymap[zotkey]);
                 } else {
                     reserr.push(entry_res);
                 }
-            } else {
-                reserr.push(entry_res);
-            }
+            });
         });
 
         if (reserr.length > 0) {
@@ -732,75 +733,80 @@ Zotero.ObsCite = {
 
     processData: async function (promptSaveErrors) {
         let res;
-        let zoteroids = [];
 
-        const zotidssource = this._getParam_zotidssource();
+        const matchstrategy = this._getParam_matchstrategy();
 
-        if (zotidssource === "pinnedcitekeys") {
+        // const bbtdata = await _getBBTkeyData();
+
+        /*
+        1 - match MD notes based on BBT citekey
+        /// 1 - bbtcitekey in md note title or body >> use bbtdata
+
+        MD files to Include:
+        md notes begin with @mycitekey
+        (optional) md notes contain the BBT citekey in the metadata id: 'citekey'
+
+        OR
+
+        2- match MD notes based on zotero item key
+        /// 2 - zotkey in md body >> use contentregex
+
+        MD files to Include:
+        include notes whose filenames match this regex: '^@.+'
+            /// first filter MD files, then filter by user regex
+        regex to extract the zotkey: regex
+        */
+
+        if (matchstrategy === 'bbtcitekey') {
 
             /// get BBT citekeys from markdown files ///
             res = await this.scanVault(promptSaveErrors); /// returns data array containing BBT citekeys
             if (res.length === 0) {
                 this.showNotification("No Markdown files found", "Set the path to your Markdown notes in the ZotObsCite preferences.", false);
-                return zoteroids;
+                return;
             }
 
             /// get zoteroKeys and zoteroIDs for every item in Zotero library
-            const citekeymap = await this.mapCitekeysInternalSearch(); /// returns dict mapping zoteroKeys to zoteroIDs
+            const citekeymap = await this.mapCitekeysBBTquery(res); /// returns dict mapping citekey => [zoteroID_1, zoteroID_2, ...]
+            // const citekeymap = await this.mapCitekeysInternalSearch(); /// returns dict mapping zoteroKeys to zoteroIDs
 
             /// map BBT citekeys from markdown files with zoteroIDs
             res = await this.sliceObj(res, citekeymap, promptSaveErrors);
 
-            /// filter located zoteroIDs from data array
-            res.forEach(entry_res => {
-                if (entry_res.zotid) zoteroids.push(entry_res.zotid);
-            });
-
-        } else if (zotidssource === 'bbtjson') { /// if using BBT JSON ///
-
-            /// get BBT citekeys from markdown files ///
-            res = await this.scanVault(promptSaveErrors); /// returns data array containing BBT citekeys
-            if (res.length === 0) {
-                this.showNotification("No Markdown files found", "Set the path to your Markdown notes in the ZotObsCite preferences.", false);
-                return zoteroids;
-            }
-
-            /// read in BBT json that maps BBT citekeys to zoteroIDs ///
-            const citekeymap = await this.mapCitekeysBBTJSON(); /// returns dict mapping citekeys to zoteroIDs
-            if (Object.keys(citekeymap).length === 0) {
-                this.showNotification("BBT JSON Library Export Not Found", "Set the path to your auto-updating BBT JSON export in the ZotObsCite preferences.", false);
-                return zoteroids;
-            }
-
-            /// map BBT citekeys from markdown files with zoteroIDs
-            res = await this.sliceObj(res, citekeymap, promptSaveErrors);
-
-            /// filter located zoteroIDs from data array
-            res.forEach(entry_res => {
-                if (entry_res.zotid) zoteroids.push(entry_res.zotid);
-            });
-
-        } else if (zotidssource === 'contentregex') { /// if using user-defined regex ///
+        } else if (matchstrategy === 'zotitemkey') {
 
             /// get zoterokeys from markdown files ///
             res = await this.scanVaultCustomRegex(promptSaveErrors); /// returns data array containing zoteroKeys
             if (res.length === 0) {
                 this.showNotification("No Markdown files found", "Set the path to your Markdown notes in the ZotObsCite preferences.", false);
+                return;
             }
 
             /// get zoteroKeys and zoteroIDs for every item in Zotero library
-            const zoterokeymap = await this.mapZoteroIDkeysInternalSearch(); /// returns dict mapping zoteroKeys to zoteroIDs
+            const zoterokeymap = await this.mapZoteroIDkeysInternalSearch(); /// returns dict mapping zoteroKey => zoteroID
 
             /// map zoteroKeys from markdown files with zoteroIDs
             res = await this.sliceObjCustomRegex(res, zoterokeymap, promptSaveErrors);
 
-            /// filter located zoteroIDs from data array
-            res.forEach(entry_res => {
-                if (entry_res.zotid) zoteroids.push(entry_res.zotid);
-            });
         }
 
-        if (zoteroids.length === 0) {
+        this.data = {};
+        this.dataKeys = [];
+        res.forEach(entry_res => {
+            entry_res.zotids.forEach(zotid => {
+                if (typeof zotid === 'number') {
+                    /// filter located zoteroIDs from data array
+                    if (Object.keys(this.data).includes(zotid.toString())) {
+                        this.data[zotid.toString()].push(entry_res);
+                    } else {
+                        this.data[zotid.toString()] = [entry_res];
+                        this.dataKeys.push(zotid);
+                    }
+                }
+            });
+        });
+
+        if (this.dataKeys.length === 0) {
             this.showNotification("No Matching Entries", "None of the " + res.length.toString() + " Markdown notes could be matched to items in the Zotero library.", false);
         }
 
@@ -813,16 +819,6 @@ Zotero.ObsCite = {
             await this.offerToSaveErrors(dataErrors, warningTitle, warningMessage, saveDialogTitle, filenamesuggest);
         }
 
-        this.data = {};
-        this.dataKeys = [];
-        res.forEach(entry_res => {
-            if (typeof entry_res.zotid === 'number') {
-                this.data[entry_res.zotid.toString()] = entry_res;
-                this.dataKeys.push(entry_res.zotid);
-            }
-        });
-
-        return zoteroids;
     },
 
     /////////
@@ -883,17 +879,17 @@ Zotero.ObsCite = {
         this.suppressNotifications = false;
         let notifData = ["ZoteroObsidianCitations Syncing Error", "Some Error Occurred", false];
         if (await this.checkSettings()) {
-            const citekeyids = await this.processData(promptSaveErrors);
+            await this.processData(promptSaveErrors);
             let message;
-            if (citekeyids.length > 0) {
+            if (this.dataKeys.length > 0) {
                 if (syncTags) {
-                    message = await this.updateItems(citekeyids);
+                    message = await this.updateItems(this.dataKeys);
                 } else {
-                    message = "Found " + citekeyids.length.toString() + " notes.";
+                    message = "Found " + this.dataKeys.length.toString() + " notes.";
                 }
                 notifData = ["ZoteroObsidianCitations Synced", message, true];
             } else {
-                message = "Found " + citekeyids.length.toString() + " notes.";
+                message = "Found " + this.dataKeys.length.toString() + " notes.";
                 notifData = ["ZoteroObsidianCitations", message, false];
             }
         }
@@ -909,16 +905,14 @@ Zotero.ObsCite = {
         this.debuglog = {};
         this.suppressNotifications = true;
         this.addDebugLog('prefs', {
-            zotidssource: this.getPref('zotidssource'),
+            matchstrategy: this.getPref('matchstrategy'),
             source_dir: this.getPref('source_dir'),
-            bbtjson: this.getPref('bbtjson'),
             zotkeyregex: this.getPref('zotkeyregex'),
             metadatakeyword: this.getPref('metadatakeyword'),
         });
         this.addDebugLog('config', {
-            zotidssource: this._getParam_zotidssource(),
+            matchstrategy: this._getParam_matchstrategy(),
             vaultpath: this._getParam_vaultpath(),
-            bbtjson: this._getParam_bbtjson(),
             zotkeyregex: this._getParam_zotkeyregex(),
             metadatakeyword: this._getParam_metadatakeyword(),
             checkSettings: await this.checkSettings(),
@@ -958,7 +952,9 @@ Zotero.ObsCite = {
         for (const item of items) {
             if (this.dataKeys.includes(item.id)) {
                 /// NB skipping the subfolder path and hoping that obsidian can resolve the note based on the file name
-                const entry_res = this.data[item.id.toString()];
+                const entry_res_list = this.data[item.id.toString()];
+                /// NB ignore all be firs file entry associated with an itemID
+                const entry_res = entry_res_list[0];
                 const uriEncoded = encodeURIComponent(entry_res.name);
                 Zotero.launchURL("obsidian://open?" + vaultKey + "file=" + uriEncoded);
                 /// only open first item note
@@ -971,7 +967,9 @@ Zotero.ObsCite = {
         const items = Services.wm.getMostRecentWindow("navigator:browser").ZoteroPane.getSelectedItems();
         for (const item of items) {
             if (this.dataKeys.includes(item.id)) {
-                const entry_res = this.data[item.id.toString()];
+                const entry_res_list = this.data[item.id.toString()];
+                /// NB ignore all be firs file entry associated with an itemID
+                const entry_res = entry_res_list[0];
                 let file = new FileUtils.File(OS.Path.normalize(entry_res.path));
                 if (file.exists()) {
                     try {
@@ -1010,7 +1008,56 @@ Zotero.ObsCite = {
             io
         );
     },
+
+    _getBBTkeyData: async function () {
+        Components.utils.import('resource://gre/modules/AddonManager.jsm');
+        return new Promise(function (resolve) {
+            AddonManager.getAddonByID("better-bibtex@iris-advies.com", async function (addon) {
+                if (addon === null || !addon.isActive) {
+                    return;
+                }
+
+                let win = Services.wm.getMostRecentWindow("navigator:browser");
+                resolve(win.Zotero.BetterBibTeX.ready.then(function () {
+                    return win.Zotero.BetterBibTeX.KeyManager.keys.data;
+                }));
+            });
+        });
+    },
+
+
+    mapCitekeysBBTquery: async function () {
+        /* 
+         * make dict of BBTcitekey:zoteroID for every item
+         */
+        let citekeymap = {};
+
+        /// get all items in library
+        let s = new Zotero.Search();
+        s.libraryID = Zotero.Libraries.userLibraryID;
+        s.addCondition('deleted', 'false');
+        let itemIDs = await s.search();
+
+        const items = await this._getBBTkeyData();
+
+        items.forEach(item => {
+            /// check if zotid is in main library
+            if (itemIDs.includes(item.itemID)) {
+                /// allow for duplicate citekeys; add zotero item id to list if BBT citekey exists
+                if (Object.keys(citekeymap).includes(item.citekey)) {
+                    citekeymap[item.citekey].push(item.itemID);
+                } else { /// otherwise make array with zotero item id
+                    citekeymap[item.citekey] = [item.itemID];
+                }
+            }
+        });
+
+        return citekeymap;
+    },
+
 };
+
+
 
 
 if (typeof window !== 'undefined') {
