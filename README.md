@@ -5,9 +5,9 @@
 
 ![ZoteroObsidianCitationsScreenshot](ZoteroObsidianCitationsScreenshot.png)
 
-This is an add-on for [Zotero](https://www.zotero.org), a research source management tool. The _ZoteroObsidianCitations_ add-on finds files marked with BibTeX keys in an external folder and adds a colored tag to the corresponding Zotero items.
+This is an add-on for [Zotero](https://www.zotero.org), a research source management tool. The _ZoteroObsidianCitations_ add-on finds Markdown files that include a [Better BibTeX](https://retorque.re/zotero-better-bibtex/) citekey or Zotero Item Key in an external folder, and adds a colored tag to the corresponding Zotero items.
 
-Currently this add-on is primarily designed to be a minimal companion to the [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin), a plugin for [Obsidian](https://obsidian.md) Markdown editor, but it can be adapted to other workflows and databases used to store reading notes outside of Zotero.
+Currently this add-on designed with the [Obsidian](https://obsidian.md) Markdown editor in mind, and was inspired by the [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin) workflow. It can be adapted to other databases that store Markdown files outside of Zotero, and to other workflows that generate Markdown reading notes.
 
 Please post any bugs, questions, or feature requests in the Github repository.
 
@@ -35,13 +35,13 @@ Opens an existing Markdown note in [Obsidian](https://obsidian.md) from the cont
 
 _ZoteroObsidianCitations_ presumes that a single Markdown file corresponds to a single Zotero item, but a Zotero item can be associated with multiple Markdown files. 
 
-A Markdown file can specify which Zotero item it's linked to using either a [Better BibTex](https://retorque.re/zotero-better-bibtex/) citekey or a Zotero-Item-Key.
+A Markdown file can specify which Zotero item it's linked to using either a [Better BibTeX](https://retorque.re/zotero-better-bibtex/) citekey or a Zotero-Item-Key.
 
-1. Link Markdown files to Zotero items using **Better BibTex citekeys**.
+1. Link Markdown files to Zotero items using **Better BibTeX citekeys**.
 
    - This is recommended if you created the Markdown notes with [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin).
 
-   - The Markdown file names should start with `@mycitekey` but can include extra information after it (e.g. a reading note might have the file name `@shepard1987science.md` or `@shepard1987science Toward a universal law of generalization for psychological science.md`, where `shepard1987science` is the BetterBibTex citekey).
+   - The Markdown file names should start with `@mycitekey` but can include extra information after it (e.g. a reading note might have the file name `@shepard1987science.md` or `@shepard1987science Toward a universal law of generalization for psychological science.md`, where `shepard1987science` is the BetterBibTeX citekey).
 
 2. Link Markdown files to Zotero items using **Zotero Item Keys**.
 
@@ -52,17 +52,17 @@ A Markdown file can specify which Zotero item it's linked to using either a [Bet
 
 ---
 
-### Option 1: Using BetterBibTex citekeys
+### Option 1: Using BetterBibTeX citekeys
 
-_ZoteroObsidianCitations_ can extract the BetterBibTex citekey that specifies which Zotero Item a Markdown note corresponds to. The BetterBibTex citekey can be taken from the Markdown filename or yaml metadata.
+_ZoteroObsidianCitations_ can extract the BetterBibTeX citekey that specifies which Zotero Item a Markdown note corresponds to. The BetterBibTeX citekey can be taken from the Markdown filename or yaml metadata.
 
 - In `ZoteroObsidianCitations Preferences...` (under the `Tools` menu),
 
   - Specify the location of the folder that contains your Markdown reading notes (e.g. `/Users/me/Documents/ObsVault/ReadingNotes/`). The _ZoteroObsidianCitations_ add-on will recursively search this path for Markdown files beginning with `@`.
 
-  - Select the `Match notes based on BetterBibTex citekey` option.
+  - Select the `Match notes based on BetterBibTeX citekey` option.
 
-    - _ZoteroObsidianCitations_ expects that the filenames of your Markdown reading note files begin with `@mycitekey` but can include extra information after it (e.g. a reading note might have the file name `@shepard1987science.md` or `@shepard1987science Toward a universal law of generalization for psychological science.md`, where `shepard1987science` is the BetterBibTex citekey).
+    - _ZoteroObsidianCitations_ expects that the filenames of your Markdown reading note files begin with `@mycitekey` but can include extra information after it (e.g. a reading note might have the file name `@shepard1987science.md` or `@shepard1987science Toward a universal law of generalization for psychological science.md`, where `shepard1987science` is the BetterBibTeX citekey).
 
   - Optionally, you can have _ZoteroObsidianCitations_ read the metadata of your Markdown notes and extract the citekey from one of the fields. To enable this, specify the metadata ID (`citekey` is a common value).
 
@@ -78,7 +78,7 @@ _ZoteroObsidianCitations_ can extract the BetterBibTex citekey that specifies wh
 
 _ZoteroObsidianCitations_ can extract the Zotero-Item-Key that specifies which Zotero Item a Markdown note corresponds to. The Zotero-Item-Key is taken from the Markdown file contents using a custom RegEx pattern.
 
-Zotero automatically generates Item Keys, they take the form of `ABCD1234`, as in `zotero://select/library/items/ABCD1234`. NB this is not the same as the BetterBibTex citekey you assigned an item (e.g. `mycitekey` in `zotero://select/items/@mycitekey`).
+Zotero automatically generates Item Keys, they take the form of `ABCD1234`, as in `zotero://select/library/items/ABCD1234`. NB this is not the same as the BetterBibTeX citekey you assigned an item (e.g. `mycitekey` in `zotero://select/items/@mycitekey`).
 
 - In `ZoteroObsidianCitations Preferences...` (under the `Tools` menu),
 
