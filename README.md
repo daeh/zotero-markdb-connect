@@ -5,7 +5,7 @@
 
 ![ZoteroObsidianCitationsScreenshot](ZoteroObsidianCitationsScreenshot.png)
 
-This is an add-on for [Zotero](https://www.zotero.org), a research source management tool. The _ZoteroObsidianCitations_ add-on finds Markdown files that include a [Better BibTeX](https://retorque.re/zotero-better-bibtex/) citekey or Zotero Item Key in an external folder, and adds a colored tag to the corresponding Zotero items.
+This is an add-on for [Zotero](https://www.zotero.org), a research source management tool. The _ZoteroObsidianCitations_ add-on searchs an user-defined folder for Markdown files that include a [Better BibTeX](https://retorque.re/zotero-better-bibtex/) citekey or Zotero Item Key, and adds a colored tag to the corresponding Zotero items.
 
 Currently this add-on designed with the [Obsidian](https://obsidian.md) Markdown editor in mind, and was inspired by the [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin) workflow. It can be adapted to other databases that store Markdown files outside of Zotero, and to other workflows that generate Markdown reading notes.
 
