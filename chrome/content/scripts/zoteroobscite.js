@@ -13,7 +13,7 @@ if (typeof Zotero === 'undefined') {
 }
 
 Zotero.ObsCite = {
-    version: '0.0.11',
+    version: '0.0.12',
     folderSep: null,
     cleanrun: true,
     suppressNotifications: false,
@@ -194,7 +194,7 @@ Zotero.ObsCite = {
 
         if (matchstrategy === 'bbtcitekey') {
             const bbtactive = await this._checkBBTinstalled();
-            if (!bbtactive) return false;
+            if (!bbtactive || !bbtactive[0]) return false;
             if (this._getParam_metadatakeyword() == null) return false;
         } else if (matchstrategy === 'zotitemkey') {
             const zotkeyregex = this._getParam_zotkeyregex();
@@ -651,16 +651,16 @@ Zotero.ObsCite = {
         let deferred = Zotero.Promise.defer();
 
         function _checkBTT(addon) {
-            let found = false;
+            let res = [];
             if (addon === null || !addon.isActive) {
-                found = false;
+                res.push(false);
             } else {
                 let win = Services.wm.getMostRecentWindow("navigator:browser");
-                found = win.Zotero.BetterBibTeX.ready.then(() => {
-                    found = true;
+                win.Zotero.BetterBibTeX.ready.then(() => {
+                    res.push(true);
                 });
             }
-            deferred.resolve(found);
+            deferred.resolve(res);
         }
 
         AddonManager.getAddonByID("better-bibtex@iris-advies.com", _checkBTT);
@@ -998,29 +998,83 @@ Zotero.ObsCite = {
     //// Controls for Item menu
 
     buildItemContextMenu: function () {
-        let show = false;
+        let found_single = false;
+        let found_multiple = false;
         const pane = Services.wm.getMostRecentWindow("navigator:browser").ZoteroPane;
         const doc = pane.document;
         const items = pane.getSelectedItems();
         for (const item of items) {
             if (this.dataKeys.includes(item.id)) {
-                show = true;
+                show_single = true;
+                if (this.data[item.id.toString()].length > 1) {
+                    found_multiple = true;
+                } else {
+                    found_single = true;
+                }
+                /// only process first item if multiple selected
                 break;
             }
         }
-        doc.getElementById("id-obscite-itemmenu-open-obsidian").hidden = !show;
-        doc.getElementById("id-obscite-itemmenu-show-md").hidden = !show;
+
+        if (found_multiple) {
+            doc.getElementById("id-obscite-itemmenu-separator-top").hidden = false;
+            doc.getElementById("id-obscite-itemmenu-open-obsidian").hidden = true;
+            doc.getElementById("id-obscite-itemmenu-show-md").hidden = true;
+            doc.getElementById("id-obscite-itemmenu-listmd-restrict").hidden = false;
+        } else if (found_single) {
+            doc.getElementById("id-obscite-itemmenu-separator-top").hidden = false;
+            doc.getElementById("id-obscite-itemmenu-open-obsidian").hidden = false;
+            doc.getElementById("id-obscite-itemmenu-show-md").hidden = false;
+            doc.getElementById("id-obscite-itemmenu-listmd-restrict").hidden = true;
+        } else {
+            doc.getElementById("id-obscite-itemmenu-separator-top").hidden = true;
+            doc.getElementById("id-obscite-itemmenu-open-obsidian").hidden = true;
+            doc.getElementById("id-obscite-itemmenu-show-md").hidden = true;
+            doc.getElementById("id-obscite-itemmenu-listmd-restrict").hidden = true;
+        }
+
     },
 
-    openSelectedItemsObsidian: function () {
+    buildItemContextMenuListMD: function () {
+        let win = Services.wm.getMostRecentWindow('navigator:browser');
+        let nodes = win.ZoteroPane.document.getElementById('id-obscite-itemmenu-listmd-menu').childNodes;
+        // hide all items by default
+        for (let i = 0; i < nodes.length; i++) nodes[i].setAttribute('hidden', true);
+
+        const items = Services.wm.getMostRecentWindow("navigator:browser").ZoteroPane.getSelectedItems();
+        for (const item of items) {
+            if (this.dataKeys.includes(item.id)) {
+                const entry_res_list = this.data[item.id.toString()];
+                let ii = 0;
+                for (const entry_res of entry_res_list) {
+                    if (ii < entry_res_list.length) {
+                        // set attributes of menu item
+                        nodes[ii].setAttribute('label', entry_res.name);
+                        // nodes[ii].setAttribute('tooltiptext', this.ZFgetString('menu.collection.tooltip', [folder.path]));
+                        // show menu item
+                        nodes[ii].setAttribute('hidden', false);
+                    } else {
+                        break;
+                    }
+                    ii++;
+                }
+                /// only process first item if multiple selected
+                break;
+            }
+        }
+    },
+
+    openSelectedItemsObsidian: function (idx) {
+        idx = idx || 0;
         const items = Services.wm.getMostRecentWindow("navigator:browser").ZoteroPane.getSelectedItems();
         const vaultName = ''; ///TODO add preference to specify vault
         const vaultKey = (vaultName.length > 0) ? 'vault=' + vaultName + '&' : '';
         for (const item of items) {
             if (this.dataKeys.includes(item.id)) {
                 const entry_res_list = this.data[item.id.toString()];
-                /// NB ignore all be first file entry associated with an itemID
-                const entry_res = entry_res_list[0];
+
+                idx = (idx < entry_res_list.length) ? idx : 0;
+                const entry_res = entry_res_list[idx];
 
                 const uriEncoded = encodeURIComponent(entry_res.path);
                 Zotero.launchURL("obsidian://open?" + vaultKey + "path=" + uriEncoded);
@@ -1029,19 +1083,22 @@ Zotero.ObsCite = {
                 // const uriEncoded = encodeURIComponent(entry_res.name);
                 // Zotero.launchURL("obsidian://open?" + vaultKey + "file=" + uriEncoded);
 
-                /// only open first item note
+                /// only process first item if multiple selected
                 break;
             }
         }
     },
 
-    showSelectedItemMarkdownInFilesystem: function () {
+    showSelectedItemMarkdownInFilesystem: function (idx) {
+        idx = idx || 0;
         const items = Services.wm.getMostRecentWindow("navigator:browser").ZoteroPane.getSelectedItems();
         for (const item of items) {
             if (this.dataKeys.includes(item.id)) {
                 const entry_res_list = this.data[item.id.toString()];
-                /// NB ignore all be firs file entry associated with an itemID
-                const entry_res = entry_res_list[0];
+
+                idx = (idx < entry_res_list.length) ? idx : 0;
+                const entry_res = entry_res_list[idx];
+
                 let file = new FileUtils.File(OS.Path.normalize(entry_res.path));
                 if (file.exists()) {
                     try {
@@ -1053,7 +1110,7 @@ Zotero.ObsCite = {
                         Zotero.launchFile(file.parent);
                     }
                 }
-                /// only open first item note
+                /// only process first item if multiple selected
                 break;
             }
         }
