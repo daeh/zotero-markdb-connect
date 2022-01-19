@@ -90,8 +90,11 @@ _ZoteroObsidianCitations_ can extract the Zotero-Item-Key that specifies which Z
   - Specify a RegEx pattern to extract the Zotero-Item-Key from the Markdown contents.
 
     E.g. if your note has the line
+
     `- local:: [local zotero](zotero://select/library/items/GZ9DQ2AM)`
+
     you could extract the Zotero key (`GZ9DQ2AM`) using this RegEx pattern:
+    
     `^- local::.+\/items\/(\w+)\)`
 
 - Run the synchronization function from `Tools -> ZoteroObsidianCitations Sync Tags`.
