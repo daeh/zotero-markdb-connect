@@ -44,7 +44,7 @@ Zotero.ObsCite = {
                 if (!['bbtcitekey', 'zotitemkey'].includes(this.getPref('matchstrategy'))) {
                     this.setPref('matchstrategy', 'bbtcitekey');
                 }
-            }, 2000);
+            }, 1000);
 
             // run in future to not burden start-up
             this.futureRun(function () {
@@ -193,6 +193,8 @@ Zotero.ObsCite = {
         if (this._getParam_vaultpath() == null) return false;
 
         if (matchstrategy === 'bbtcitekey') {
+            const bbtactive = await this._checkBBTinstalled();
+            if (!bbtactive) return false;
             if (this._getParam_metadatakeyword() == null) return false;
         } else if (matchstrategy === 'zotitemkey') {
             const zotkeyregex = this._getParam_zotkeyregex();
@@ -645,6 +647,26 @@ Zotero.ObsCite = {
         return citekeymap;
     },
 
+    _checkBBTinstalled: async function () {
+        let deferred = Zotero.Promise.defer();
+
+        function _checkBTT(addon) {
+            let found = false;
+            if (addon === null || !addon.isActive) {
+                found = false;
+            } else {
+                let win = Services.wm.getMostRecentWindow("navigator:browser");
+                found = win.Zotero.BetterBibTeX.ready.then(() => {
+                    found = true;
+                });
+            }
+            deferred.resolve(found);
+        }
+
+        AddonManager.getAddonByID("better-bibtex@iris-advies.com", _checkBTT);
+        return deferred.promise;
+    },
+
     _getBBTkeyData: async function () {
         Components.utils.import('resource://gre/modules/AddonManager.jsm');
         return new Promise(function (resolve) {
@@ -996,12 +1018,17 @@ Zotero.ObsCite = {
         const vaultKey = (vaultName.length > 0) ? 'vault=' + vaultName + '&' : '';
         for (const item of items) {
             if (this.dataKeys.includes(item.id)) {
-                /// NB skipping the subfolder path and hoping that obsidian can resolve the note based on the file name
                 const entry_res_list = this.data[item.id.toString()];
-                /// NB ignore all be firs file entry associated with an itemID
+                /// NB ignore all be first file entry associated with an itemID
                 const entry_res = entry_res_list[0];
-                const uriEncoded = encodeURIComponent(entry_res.name);
-                Zotero.launchURL("obsidian://open?" + vaultKey + "file=" + uriEncoded);
+
+                const uriEncoded = encodeURIComponent(entry_res.path);
+                Zotero.launchURL("obsidian://open?" + vaultKey + "path=" + uriEncoded);
+
+                // /// NB skipping the subfolder path and hoping that obsidian can resolve the note based on the file name
+                // const uriEncoded = encodeURIComponent(entry_res.name);
+                // Zotero.launchURL("obsidian://open?" + vaultKey + "file=" + uriEncoded);
+
                 /// only open first item note
                 break;
             }

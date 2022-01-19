@@ -11,6 +11,7 @@ Currently this add-on is primarily designed to be a minimal companion to the [ob
 
 Please post any bugs, questions, or feature requests in the Github repository.
 
+
 ## Plugin Functions
 
 Adds a colored tag to Zotero items for which there are associated reading notes in an external folder.
@@ -18,6 +19,7 @@ Adds a colored tag to Zotero items for which there are associated reading notes 
 Opens an existing Markdown note in [Obsidian](https://obsidian.md) from the contextual menu of a Zotero item.
 
 ![ZoteroObsidianCitationsMenu](ZoteroObsidianCitationsMenu.png)
+
 
 ## Instalation
 
@@ -29,28 +31,32 @@ Opens an existing Markdown note in [Obsidian](https://obsidian.md) from the cont
 - Choose the file `zotero-obsidian-citations-0.0.11.xpi`
 - Restart Zotero
 
+
 ## Setup
 
-_ZoteroObsidianCitations_ can map Markdown files to Zotero items either by identifying [Better BibTex](https://retorque.re/zotero-better-bibtex/) citekeys in the Markdown filenames/metadata, or by identifying Zotero-Item-Keys in the file contents.
+_ZoteroObsidianCitations_ presumes that a given Zotero item corresponds to single Markdown file. A Markdown file can specify which Zotero item it's linked to using either a [Better BibTex](https://retorque.re/zotero-better-bibtex/) citekey or a Zotero-Item-Key. 
 
-1. Using **Better BibTex citekeys**.
 
-   - This is recommended if you created the Markdown notes using [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin).
+1. Link Markdown files to Zotero items using **Better BibTex citekeys**.
+
+   - This is recommended if you created the Markdown notes with [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin).
 
    - The Markdown file names should start with `@mycitekey` but can include extra information after it (e.g. a reading note might have the file name `@shepard1987science.md` or `@shepard1987science Toward a universal law of generalization for psychological science.md`, where `shepard1987science` is the BetterBibTex citekey).
 
 
-2. Using **Zotero Item Keys**.
+2. Link Markdown files to Zotero items using **Zotero Item Keys**.
 
-   - This is recommended if you created the Markdown notes using the `Export Note` feature of Zotero.
+   - This is recommended if you created the Markdown notes with the `Export Note` feature of Zotero.
 
    - The Markdown file names should start with `@` and the file contents should include the Zotero-Item-Key in a consistent format
      (Zotero automatically generates Item Keys; they take the form of `ABCD1234`, as in `zotero://select/library/items/ABCD1234`).
 
+---
+
 
 ### Option 1: Using BetterBibTex citekeys
 
-If your Markdown notes contain the Better BibTex citekeys, _ZoteroObsidianCitations_ can match the notes to the associated Zotero items by extracting the citekey from the note filenames or the yaml metadata.
+_ZoteroObsidianCitations_ can extract the BetterBibTex citekey that specifies which Zotero Item a Markdown note corresponds to. The BetterBibTex citekey can be taken from the Markdown filename or yaml metadata.
 
 - In `ZoteroObsidianCitations Preferences...` (under the `Tools` menu),
 
@@ -65,15 +71,15 @@ If your Markdown notes contain the Better BibTex citekeys, _ZoteroObsidianCitati
     - This is necessary if the file names do not begin with the correct citekey, which may happen if the citekeys include special characters (e.g. if a citekey contains `:`, it will probably need to be taken from the yaml metadata rather than the filename).
 
 - Run the synchronization function from `Tools -> ZoteroObsidianCitations Sync Tags`.
-
-- This will add a tag (`ObsCite`) to every Zotero item for which there exists a reading note in the external folder you specified.
-
+  - This will add a tag (`ObsCite`) to every Zotero item for which there exists a reading note in the external folder you specified.
 - In the `Tags` plane of Zotero, right-click on the `ObsCite` tag and assign it a color, which will mark the tagged items in the preview plane of Zotero.
 
+---
 
 ### Option 2: Using Zotero Item Keys
 
-If your Markdown notes contain the Zotero-Item-Keys, you can specify a RegEx pattern to extract the key from the file contents. Zotero automatically generates Item Keys under the hood; they take the form of `ABCD1234`, as in `zotero://select/library/items/ABCD1234`. NB this is not the same as the BetterBibTex citekey you assigned an item (e.g. `mycitekey` in `zotero://select/items/@mycitekey`).
+_ZoteroObsidianCitations_ can extract the Zotero-Item-Key that specifies which Zotero Item a Markdown note corresponds to. The Zotero-Item-Key is taken from the Markdown file contents using a custom RegEx pattern.
+  Zotero automatically generates Item Keys, they take the form of `ABCD1234`, as in `zotero://select/library/items/ABCD1234`. NB this is not the same as the BetterBibTex citekey you assigned an item (e.g. `mycitekey` in `zotero://select/items/@mycitekey`).
 
 - In `ZoteroObsidianCitations Preferences...` (under the `Tools` menu),
 
@@ -84,24 +90,21 @@ If your Markdown notes contain the Zotero-Item-Keys, you can specify a RegEx pat
   - Specify a RegEx pattern to extract the Zotero-Item-Key from the Markdown contents.
 
     E.g. if your note has the line
-
     `- local:: [local zotero](zotero://select/library/items/GZ9DQ2AM)`
-
     you could extract the Zotero key (`GZ9DQ2AM`) using this RegEx pattern:
-
     `^- local::.+\/items\/(\w+)\)`
 
 - Run the synchronization function from `Tools -> ZoteroObsidianCitations Sync Tags`.
-
-- This will add a tag (`ObsCite`) to every Zotero item for which there exists a reading note in the external folder you specified.
-
+  - This will add a tag (`ObsCite`) to every Zotero item for which there exists a reading note in the external folder you specified.
 - In the `Tags` plane of Zotero, right-click on the `ObsCite` tag and assign it a color, which will mark the tagged items in the preview plane of Zotero.
+
 
 ## Notes
 
 [GitHub](https://github.com/daeh/zotero-obsidian-citations): Source code repository
 
 Code for this extension is based on [ZotFile](https://github.com/jlegewie/zotfile) and [Zotero Citationcounts](https://github.com/eschnett/zotero-citationcounts) (which is based on [Zotero DOI Manager](https://github.com/bwiernik/zotero-shortdoi), which is based in part on [Zotero Google Scholar Citations](https://github.com/beloglazov/zotero-scholar-citations)).
+
 
 ## License
 
