@@ -15,6 +15,8 @@ Please post any bugs, questions, or feature requests in the Github repository.
 
 Adds a colored tag to Zotero items for which there are associated reading notes in an external folder.
 
+Supports multiple markdown files for a single Zotero item.
+
 Opens an existing Markdown note in [Obsidian](https://obsidian.md) from the contextual menu of a Zotero item.
 
 ![ZoteroObsidianCitationsMenu](ZoteroObsidianCitationsMenu.png)
@@ -31,7 +33,9 @@ Opens an existing Markdown note in [Obsidian](https://obsidian.md) from the cont
 
 ## Setup
 
-_ZoteroObsidianCitations_ presumes that a given Zotero item corresponds to single Markdown file. A Markdown file can specify which Zotero item it's linked to using either a [Better BibTex](https://retorque.re/zotero-better-bibtex/) citekey or a Zotero-Item-Key.
+_ZoteroObsidianCitations_ presumes that a single Markdown file corresponds to a single Zotero item, but a Zotero item can be associated with multiple Markdown files. 
+
+A Markdown file can specify which Zotero item it's linked to using either a [Better BibTex](https://retorque.re/zotero-better-bibtex/) citekey or a Zotero-Item-Key.
 
 1. Link Markdown files to Zotero items using **Better BibTex citekeys**.
 
