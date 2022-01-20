@@ -102,7 +102,7 @@ Zotero automatically generates Item Keys, they take the form of `ABCD1234`, as i
 
 In this example Markdown note (`@saxe2017emobtom.md`), the _ZoteroObsidianCitations_ will use the yaml metadata keyword `citekey` to find the BetterBibTeX citekey (`saxe2017emobtom`) to determine which Zotero item to associate with the Markdown file. Notice that the Markdown file can include other BetterBibTeX citekeys and Zotero-Item-Keys, which are ignored by the add-on.
 
-```md
+```markdown
 ---
 citekey: saxe2017emobtom
 doi: 10.1016/j.copsyc.2017.04.019
@@ -112,14 +112,11 @@ bbturi: zotero://select/items/@saxe2017emobtom
 
 # Formalizing emotion concepts within a Bayesian model of theory of mind
 
-A reference using a Zotero URI:
-[A generative model of people's intuitive theory of emotions: inverse planning in rich social games](zotero://select/library/items/4RJ97IFL)
+[A reference using a Zotero URI](zotero://select/library/items/4RJ97IFL)
 
-A reference using a BetterBibTeX URI:
-[Leveraging facial expressions and contextual information to investigate opaque representations of emotions](zotero://select/items/@anzellotti2021opaque)
+[A reference using a BetterBibTeX URI](zotero://select/items/@anzellotti2021opaque)
 
-A reference using an Obsidian wiki link:
-[[@cusimano2018cogsci]] - Auditory scene analysis as Bayesian inference in sound source models
+A reference using an Obsidian wiki link: [[@cusimano2018cogsci]]
 ```
 
 ## Related Projects
