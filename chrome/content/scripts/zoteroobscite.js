@@ -1005,7 +1005,6 @@ Zotero.ObsCite = {
         const items = pane.getSelectedItems();
         for (const item of items) {
             if (this.dataKeys.includes(item.id)) {
-                show_single = true;
                 if (this.data[item.id.toString()].length > 1) {
                     found_multiple = true;
                 } else {

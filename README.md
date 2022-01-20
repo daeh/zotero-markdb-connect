@@ -1,13 +1,13 @@
 # Zotero Obsidian Citations
 
 - **_Adds colored tags to Zotero items that have associated Markdown notes stored in an external folder._**
-- **_Open an associated Markdown note from the contextual menu of a Zotero item._**
+- **_Opens Markdown notes from the contextual menu of Zotero items._**
 
 ![ZoteroObsidianCitationsScreenshot](ZoteroObsidianCitationsScreenshot.png)
 
 This is an add-on for [Zotero](https://www.zotero.org), a research source management tool. The _ZoteroObsidianCitations_ add-on searchs an user-defined folder for Markdown files that include a [Better BibTeX](https://retorque.re/zotero-better-bibtex/) citekey or Zotero Item Key, and adds a colored tag to the corresponding Zotero items.
 
-Currently this add-on designed with the [Obsidian](https://obsidian.md) Markdown editor in mind, and was inspired by the [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin) workflow. It can be adapted to other databases that store Markdown files outside of Zotero, and to other workflows that generate Markdown reading notes.
+Currently this add-on designed with the [Obsidian](https://obsidian.md) Markdown editor in mind, and was inspired by the [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin) workflow. It can be adapted to other databases that store Markdown files outside of Zotero, and to other workflows that generate Markdown reading notes linked to Zotero items (such as Zotero's `Export Note` feature).
 
 Please post any bugs, questions, or feature requests in the Github repository.
 
@@ -33,8 +33,6 @@ Opens an existing Markdown note in [Obsidian](https://obsidian.md) from the cont
 
 ## Setup
 
-_ZoteroObsidianCitations_ presumes that a single Markdown file corresponds to a single Zotero item, but a Zotero item can be associated with multiple Markdown files. 
-
 A Markdown file can specify which Zotero item it's linked to using either a [Better BibTeX](https://retorque.re/zotero-better-bibtex/) citekey or a Zotero-Item-Key.
 
 1. Link Markdown files to Zotero items using **Better BibTeX citekeys**.
@@ -42,13 +40,13 @@ A Markdown file can specify which Zotero item it's linked to using either a [Bet
    - This is recommended if you created the Markdown notes with [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin).
 
    - The Markdown file names should start with `@mycitekey` but can include extra information after it (e.g. a reading note might have the file name `@shepard1987science.md` or `@shepard1987science Toward a universal law of generalization for psychological science.md`, where `shepard1987science` is the BetterBibTeX citekey).
-
 2. Link Markdown files to Zotero items using **Zotero Item Keys**.
 
    - This is recommended if you created the Markdown notes with the `Export Note` feature of Zotero.
-
    - The Markdown file names should start with `@` and the file contents should include the Zotero-Item-Key in a consistent format
      (Zotero automatically generates Item Keys; they take the form of `ABCD1234`, as in `zotero://select/library/items/ABCD1234`).
+
+NOTE: _ZoteroObsidianCitations_ assumes that a given Markdown file corresponds to a single Zotero item. (A Markdown reading note can reference multiple Zotero items throughout the file, but _ZoteroObsidianCitations_ will only link the Markdown note to one BetterBibTeX-citekey / Zotero-Item-Key.) Multiple Markdown files can point to the same Zotero item. 
 
 ---
 
@@ -83,20 +81,54 @@ Zotero automatically generates Item Keys, they take the form of `ABCD1234`, as i
 - In `ZoteroObsidianCitations Preferences...` (under the `Tools` menu),
 
   - Specify the location of the folder that contains your Markdown reading notes (e.g. `/Users/me/Documents/ObsVault/ReadingNotes/`). The _ZoteroObsidianCitations_ add-on will recursively search this path for Markdown files beginning with `@`.
+
   - Select the `Match notes based on Zotero-Item-Key` option.
+
   - Specify a RegEx pattern to extract the Zotero-Item-Key from the Markdown contents.
 
     E.g. if your note has the line
-
-    `- local:: [local zotero](zotero://select/library/items/GZ9DQ2AM)`
-
+  `- local:: [local zotero](zotero://select/library/items/GZ9DQ2AM)`
     you could extract the Zotero key (`GZ9DQ2AM`) using this RegEx pattern:
-
-    `^- local::.+\/items\/(\w+)\)`
+  `^- local::.+\/items\/(\w+)\)`
 
 - Run the synchronization function from `Tools -> ZoteroObsidianCitations Sync Tags`.
   - This will add a tag (`ObsCite`) to every Zotero item for which there exists a reading note in the external folder you specified.
 - In the `Tags` plane of Zotero, right-click on the `ObsCite` tag and assign it a color, which will mark the tagged items in the preview plane of Zotero.
+
+## Example Markdown Note
+
+In this example Markdown note (`@saxe2017emobtom.md`), the _ZoteroObsidianCitations_ will use the yaml metadata keyword `citekey` to find the BetterBibTeX citekey (`saxe2017emobtom`) to determine which Zotero item to associate with the Markdown file. Notice that the Markdown file can include other BetterBibTeX citekeys and Zotero-Item-Keys, which are ignored by the add-on.
+
+```md
+---
+citekey: saxe2017emobtom
+doi: 10.1016/j.copsyc.2017.04.019
+zoterouri: zotero://select/library/items/IACZMXU4
+bbturi: zotero://select/items/@saxe2017emobtom
+---
+
+# Formalizing emotion concepts within a Bayesian model of theory of mind
+
+A reference using a Zotero URI:
+[A generative model of people's intuitive theory of emotions: inverse planning in rich social games](zotero://select/library/items/4RJ97IFL)
+
+A reference using a BetterBibTeX URI:
+[Leveraging facial expressions and contextual information to investigate opaque representations of emotions](zotero://select/items/@anzellotti2021opaque)
+
+A reference using an Obsidian wiki link:
+[[@cusimano2018cogsci]] - Auditory scene analysis as Bayesian inference in sound source models
+```
+
+## Related Projects
+
+- [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin)
+  Obsidian plugin which integrates your academic reference manager with the Obsidian editor.
+- [Zotero 6 Markdown export of notes](https://forums.zotero.org/discussion/93521/available-for-beta-testing-markdown-export-of-notes)
+  Zotero's `Export Note` beta feature.
+- [Zotero-mdnotes](https://argentinaos.com/zotero-mdnotes/)
+  A Zotero plugin to export item metadata and notes as markdown files.
+- [Zotero to Markdown](https://github.com/e-alizadeh/Zotero2md)
+  A Python library to retrieve annotations and notes from Zotero and save them into Markdown files.
 
 ## Notes
 
