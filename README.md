@@ -5,9 +5,9 @@
 
 ![ZoteroObsidianCitationsScreenshot](ZoteroObsidianCitationsScreenshot.png)
 
-This is an add-on for [Zotero](https://www.zotero.org), a research source management tool. The _ZoteroObsidianCitations_ add-on searchs an user-defined folder for Markdown files that include a [Better BibTeX](https://retorque.re/zotero-better-bibtex/) citekey or Zotero Item Key, and adds a colored tag to the corresponding Zotero items.
+This is an plugin for [Zotero](https://www.zotero.org), a research source management tool. The _ZoteroObsidianCitations_ plugin searchs an user-defined folder for Markdown files that include a [Better BibTeX](https://retorque.re/zotero-better-bibtex/) citekey or Zotero Item Key, and adds a colored tag to the corresponding Zotero items.
 
-Currently this add-on designed with the [Obsidian](https://obsidian.md) Markdown editor in mind, and was inspired by the [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin) workflow. It can be adapted to other databases that store Markdown files outside of Zotero, and to other workflows that generate Markdown reading notes linked to Zotero items (such as Zotero's `Export Note` feature).
+Currently this plugin designed with the [Obsidian](https://obsidian.md) Markdown editor in mind, and was inspired by the [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin) workflow. It can be adapted to other databases that store Markdown files outside of Zotero, and to other workflows that generate Markdown reading notes linked to Zotero items (such as Zotero's `Export Note` feature).
 
 Please post any bugs, questions, or feature requests in the Github repository.
 
@@ -23,7 +23,7 @@ Opens an existing Markdown note in [Obsidian](https://obsidian.md) from the cont
 
 ## Instalation
 
-- Download the add-on (the .xpi file) from the latest release: https://github.com/daeh/zotero-obsidian-citations/releases
+- Download the plugin (the .xpi file) from the latest release: https://github.com/daeh/zotero-obsidian-citations/releases
 - To download the .xpi file, right click it and select 'Save link as'
 - Run Zotero (version 5.x)
 - Go to `Tools -> Add-ons`
@@ -56,7 +56,7 @@ _ZoteroObsidianCitations_ can extract the BetterBibTeX citekey that specifies wh
 
 - In `ZoteroObsidianCitations Preferences...` (under the `Tools` menu),
 
-  - Specify the location of the folder that contains your Markdown reading notes (e.g. `/Users/me/Documents/ObsVault/ReadingNotes/`). The _ZoteroObsidianCitations_ add-on will recursively search this path for Markdown files beginning with `@`.
+  - Specify the location of the folder that contains your Markdown reading notes (e.g. `/Users/me/Documents/ObsVault/ReadingNotes/`). The _ZoteroObsidianCitations_ plugin will recursively search this path for Markdown files beginning with `@`.
 
   - Select the `Match notes based on BetterBibTeX citekey` option.
 
@@ -80,7 +80,7 @@ Zotero automatically generates Item Keys, they take the form of `ABCD1234`, as i
 
 - In `ZoteroObsidianCitations Preferences...` (under the `Tools` menu),
 
-  - Specify the location of the folder that contains your Markdown reading notes (e.g. `/Users/me/Documents/ObsVault/ReadingNotes/`). The _ZoteroObsidianCitations_ add-on will recursively search this path for Markdown files beginning with `@`.
+  - Specify the location of the folder that contains your Markdown reading notes (e.g. `/Users/me/Documents/ObsVault/ReadingNotes/`). The _ZoteroObsidianCitations_ plugin will recursively search this path for Markdown files beginning with `@`.
 
   - Select the `Match notes based on Zotero-Item-Key` option.
 
@@ -98,9 +98,11 @@ Zotero automatically generates Item Keys, they take the form of `ABCD1234`, as i
   - This will add a tag (`ObsCite`) to every Zotero item for which there exists a reading note in the external folder you specified.
 - In the `Tags` plane of Zotero, right-click on the `ObsCite` tag and assign it a color, which will mark the tagged items in the preview plane of Zotero.
 
+---
+
 ## Example Markdown Note
 
-In this example Markdown note (`@saxe2017emobtom.md`), the _ZoteroObsidianCitations_ will use the yaml metadata keyword `citekey` to find the BetterBibTeX citekey (`saxe2017emobtom`) to determine which Zotero item to associate with the Markdown file. Notice that the Markdown file can include other BetterBibTeX citekeys and Zotero-Item-Keys, which are ignored by the add-on.
+In this example Markdown note (`@saxe2017emobtom.md`), the _ZoteroObsidianCitations_ will use the yaml metadata keyword `citekey` to find the BetterBibTeX citekey (`saxe2017emobtom`) to determine which Zotero item to associate with the Markdown file. Notice that the Markdown file can include other BetterBibTeX citekeys and Zotero-Item-Keys, which are ignored by the plugin.
 
 ```markdown
 ---
