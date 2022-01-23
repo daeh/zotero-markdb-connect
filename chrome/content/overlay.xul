@@ -3,49 +3,69 @@
 <!DOCTYPE overlay SYSTEM "chrome://zoteroobscite/locale/overlay.dtd">
 
 <overlay
-    id="zoteroobscite"
-    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  id="zoteroobscite"
+  xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-    <script src="chrome://zoteroobscite/content/scripts/zoteroobscite.js"/>
-    <script src="chrome://zotero/content/include.js"/>
+  <script src="chrome://zoteroobscite/content/scripts/zoteroobscite.js"/>
+  <script src="chrome://zotero/content/include.js"/>
 
-    <stringbundleset id="stringbundleset">
-        <stringbundle
-            id="obscite-bundle"
-            src="chrome://zoteroobscite/locale/zoteroobscite.properties"/>
-    </stringbundleset>
-    
-    <menupopup id="menu_ToolsPopup">
-      <menuitem id="id-obscite-menu-sync" label="&obscite.tools-menu.syncdb-label;" oncommand="Zotero.ObsCite.syncWithMarkdown()"/>
-      <menuitem id="id-obscite-menu-preferences" label="&obscite.tools-menu.preferences-label;" oncommand="Zotero.ObsCite.openPreferenceWindow();"/>
-    </menupopup>
+  <stringbundleset id="stringbundleset">
+    <stringbundle
+      id="obscite-bundle"
+      src="chrome://zoteroobscite/locale/zoteroobscite.properties"/>
+  </stringbundleset>
+  
+  <menupopup id="menu_ToolsPopup">
+    <menuitem id="id-obscite-menu-sync" label="&obscite.tools-menu.syncdb-label;" oncommand="Zotero.ObsCite.syncWithMarkdown()"/>
+    <menuitem id="id-obscite-menu-preferences" label="&obscite.tools-menu.preferences-label;" oncommand="Zotero.ObsCite.openPreferenceWindow();"/>
+  </menupopup>
 
   <menupopup id="zotero-itemmenu" onpopupshowing="Zotero.ObsCite.buildItemContextMenu();">
   <menuseparator id="id-obscite-itemmenu-separator-top"/>
     <menuitem id="id-obscite-itemmenu-open-obsidian" label="&obscite.item-menu.open-obsidian-label;" hidden="false" oncommand="Zotero.ObsCite.openSelectedItemsObsidian(0)"/>
     <menuitem id="id-obscite-itemmenu-show-md" label="&obscite.item-menu.show-md-label;" hidden="false" oncommand="Zotero.ObsCite.showSelectedItemMarkdownInFilesystem(0)"/>
 
+     <menu id="id-obscite-itemmenu-listobsidian-restrict" label="&obscite.item-menu.list-obsidian-label;" > 
+      <menupopup id="id-obscite-itemmenu-listobsidian-menu" onpopupshowing="Zotero.ObsCite.buildItemContextMenuListObsidian();">
+        <menuitem id="id-obscite-itemmenu-listobsidian-file-00" hidden="true" label="menu1" tooltiptext="" oncommand="Zotero.ObsCite.openSelectedItemsObsidian(0);"/>
+        <menuitem id="id-obscite-itemmenu-listobsidian-file-01" hidden="true" label="menu1" tooltiptext="" oncommand="Zotero.ObsCite.openSelectedItemsObsidian(1);"/>
+        <menuitem id="id-obscite-itemmenu-listobsidian-file-02" hidden="true" label="menu2" tooltiptext="" oncommand="Zotero.ObsCite.openSelectedItemsObsidian(2);"/>
+        <menuitem id="id-obscite-itemmenu-listobsidian-file-03" hidden="true" label="menu3" tooltiptext="" oncommand="Zotero.ObsCite.openSelectedItemsObsidian(3);"/>
+        <menuitem id="id-obscite-itemmenu-listobsidian-file-04" hidden="true" label="menu4" tooltiptext="" oncommand="Zotero.ObsCite.openSelectedItemsObsidian(4);"/>
+        <menuitem id="id-obscite-itemmenu-listobsidian-file-05" hidden="true" label="menu5" tooltiptext="" oncommand="Zotero.ObsCite.openSelectedItemsObsidian(5);"/>
+        <menuitem id="id-obscite-itemmenu-listobsidian-file-06" hidden="true" label="menu6" tooltiptext="" oncommand="Zotero.ObsCite.openSelectedItemsObsidian(6);"/>
+        <menuitem id="id-obscite-itemmenu-listobsidian-file-07" hidden="true" label="menu7" tooltiptext="" oncommand="Zotero.ObsCite.openSelectedItemsObsidian(7);"/>
+        <menuitem id="id-obscite-itemmenu-listobsidian-file-08" hidden="true" label="menu8" tooltiptext="" oncommand="Zotero.ObsCite.openSelectedItemsObsidian(8);"/>
+        <menuitem id="id-obscite-itemmenu-listobsidian-file-09" hidden="true" label="menu9" tooltiptext="" oncommand="Zotero.ObsCite.openSelectedItemsObsidian(9);"/>
+        <menuitem id="id-obscite-itemmenu-listobsidian-file-10" hidden="true" label="menu10" tooltiptext="" oncommand="Zotero.ObsCite.openSelectedItemsObsidian(10);"/>
+        <menuitem id="id-obscite-itemmenu-listobsidian-file-11" hidden="true" label="menu11" tooltiptext="" oncommand="Zotero.ObsCite.openSelectedItemsObsidian(11);"/>
+        <menuitem id="id-obscite-itemmenu-listobsidian-file-12" hidden="true" label="menu12" tooltiptext="" oncommand="Zotero.ObsCite.openSelectedItemsObsidian(12);"/>
+        <menuitem id="id-obscite-itemmenu-listobsidian-file-13" hidden="true" label="menu13" tooltiptext="" oncommand="Zotero.ObsCite.openSelectedItemsObsidian(13);"/>
+        <menuitem id="id-obscite-itemmenu-listobsidian-file-14" hidden="true" label="menu14" tooltiptext="" oncommand="Zotero.ObsCite.openSelectedItemsObsidian(14);"/>
+        <menuitem id="id-obscite-itemmenu-listobsidian-file-15" hidden="true" label="menu15" tooltiptext="" oncommand="Zotero.ObsCite.openSelectedItemsObsidian(15);"/>
+      </menupopup>
+    </menu>
 
- 		<menu id="id-obscite-itemmenu-listmd-restrict" label="&obscite.item-menu.list-md-label;" > 
-			<menupopup id="id-obscite-itemmenu-listmd-menu" onpopupshowing="Zotero.ObsCite.buildItemContextMenuListMD();">
+     <menu id="id-obscite-itemmenu-listmd-restrict" label="&obscite.item-menu.list-md-label;" > 
+      <menupopup id="id-obscite-itemmenu-listmd-menu" onpopupshowing="Zotero.ObsCite.buildItemContextMenuListMD();">
         <menuitem id="id-obscite-itemmenu-listmd-file-00" hidden="true" label="menu1" tooltiptext="" oncommand="Zotero.ObsCite.showSelectedItemMarkdownInFilesystem(0);"/>
-				<menuitem id="id-obscite-itemmenu-listmd-file-01" hidden="true" label="menu1" tooltiptext="" oncommand="Zotero.ObsCite.showSelectedItemMarkdownInFilesystem(1);"/>
-				<menuitem id="id-obscite-itemmenu-listmd-file-02" hidden="true" label="menu2" tooltiptext="" oncommand="Zotero.ObsCite.showSelectedItemMarkdownInFilesystem(2);"/>
-				<menuitem id="id-obscite-itemmenu-listmd-file-03" hidden="true" label="menu3" tooltiptext="" oncommand="Zotero.ObsCite.showSelectedItemMarkdownInFilesystem(3);"/>
-				<menuitem id="id-obscite-itemmenu-listmd-file-04" hidden="true" label="menu4" tooltiptext="" oncommand="Zotero.ObsCite.showSelectedItemMarkdownInFilesystem(4);"/>
-				<menuitem id="id-obscite-itemmenu-listmd-file-05" hidden="true" label="menu5" tooltiptext="" oncommand="Zotero.ObsCite.showSelectedItemMarkdownInFilesystem(5);"/>
-				<menuitem id="id-obscite-itemmenu-listmd-file-06" hidden="true" label="menu6" tooltiptext="" oncommand="Zotero.ObsCite.showSelectedItemMarkdownInFilesystem(6);"/>
-				<menuitem id="id-obscite-itemmenu-listmd-file-07" hidden="true" label="menu7" tooltiptext="" oncommand="Zotero.ObsCite.showSelectedItemMarkdownInFilesystem(7);"/>
-				<menuitem id="id-obscite-itemmenu-listmd-file-08" hidden="true" label="menu8" tooltiptext="" oncommand="Zotero.ObsCite.showSelectedItemMarkdownInFilesystem(8);"/>
-				<menuitem id="id-obscite-itemmenu-listmd-file-09" hidden="true" label="menu9" tooltiptext="" oncommand="Zotero.ObsCite.showSelectedItemMarkdownInFilesystem(9);"/>
-				<menuitem id="id-obscite-itemmenu-listmd-file-10" hidden="true" label="menu10" tooltiptext="" oncommand="Zotero.ObsCite.showSelectedItemMarkdownInFilesystem(10);"/>
-				<menuitem id="id-obscite-itemmenu-listmd-file-11" hidden="true" label="menu11" tooltiptext="" oncommand="Zotero.ObsCite.showSelectedItemMarkdownInFilesystem(11);"/>
-				<menuitem id="id-obscite-itemmenu-listmd-file-12" hidden="true" label="menu12" tooltiptext="" oncommand="Zotero.ObsCite.showSelectedItemMarkdownInFilesystem(12);"/>
-				<menuitem id="id-obscite-itemmenu-listmd-file-13" hidden="true" label="menu13" tooltiptext="" oncommand="Zotero.ObsCite.showSelectedItemMarkdownInFilesystem(13);"/>
-				<menuitem id="id-obscite-itemmenu-listmd-file-14" hidden="true" label="menu14" tooltiptext="" oncommand="Zotero.ObsCite.showSelectedItemMarkdownInFilesystem(14);"/>
-				<menuitem id="id-obscite-itemmenu-listmd-file-15" hidden="true" label="menu15" tooltiptext="" oncommand="Zotero.ObsCite.showSelectedItemMarkdownInFilesystem(15);"/>
-			</menupopup>
-		</menu>
+        <menuitem id="id-obscite-itemmenu-listmd-file-01" hidden="true" label="menu1" tooltiptext="" oncommand="Zotero.ObsCite.showSelectedItemMarkdownInFilesystem(1);"/>
+        <menuitem id="id-obscite-itemmenu-listmd-file-02" hidden="true" label="menu2" tooltiptext="" oncommand="Zotero.ObsCite.showSelectedItemMarkdownInFilesystem(2);"/>
+        <menuitem id="id-obscite-itemmenu-listmd-file-03" hidden="true" label="menu3" tooltiptext="" oncommand="Zotero.ObsCite.showSelectedItemMarkdownInFilesystem(3);"/>
+        <menuitem id="id-obscite-itemmenu-listmd-file-04" hidden="true" label="menu4" tooltiptext="" oncommand="Zotero.ObsCite.showSelectedItemMarkdownInFilesystem(4);"/>
+        <menuitem id="id-obscite-itemmenu-listmd-file-05" hidden="true" label="menu5" tooltiptext="" oncommand="Zotero.ObsCite.showSelectedItemMarkdownInFilesystem(5);"/>
+        <menuitem id="id-obscite-itemmenu-listmd-file-06" hidden="true" label="menu6" tooltiptext="" oncommand="Zotero.ObsCite.showSelectedItemMarkdownInFilesystem(6);"/>
+        <menuitem id="id-obscite-itemmenu-listmd-file-07" hidden="true" label="menu7" tooltiptext="" oncommand="Zotero.ObsCite.showSelectedItemMarkdownInFilesystem(7);"/>
+        <menuitem id="id-obscite-itemmenu-listmd-file-08" hidden="true" label="menu8" tooltiptext="" oncommand="Zotero.ObsCite.showSelectedItemMarkdownInFilesystem(8);"/>
+        <menuitem id="id-obscite-itemmenu-listmd-file-09" hidden="true" label="menu9" tooltiptext="" oncommand="Zotero.ObsCite.showSelectedItemMarkdownInFilesystem(9);"/>
+        <menuitem id="id-obscite-itemmenu-listmd-file-10" hidden="true" label="menu10" tooltiptext="" oncommand="Zotero.ObsCite.showSelectedItemMarkdownInFilesystem(10);"/>
+        <menuitem id="id-obscite-itemmenu-listmd-file-11" hidden="true" label="menu11" tooltiptext="" oncommand="Zotero.ObsCite.showSelectedItemMarkdownInFilesystem(11);"/>
+        <menuitem id="id-obscite-itemmenu-listmd-file-12" hidden="true" label="menu12" tooltiptext="" oncommand="Zotero.ObsCite.showSelectedItemMarkdownInFilesystem(12);"/>
+        <menuitem id="id-obscite-itemmenu-listmd-file-13" hidden="true" label="menu13" tooltiptext="" oncommand="Zotero.ObsCite.showSelectedItemMarkdownInFilesystem(13);"/>
+        <menuitem id="id-obscite-itemmenu-listmd-file-14" hidden="true" label="menu14" tooltiptext="" oncommand="Zotero.ObsCite.showSelectedItemMarkdownInFilesystem(14);"/>
+        <menuitem id="id-obscite-itemmenu-listmd-file-15" hidden="true" label="menu15" tooltiptext="" oncommand="Zotero.ObsCite.showSelectedItemMarkdownInFilesystem(15);"/>
+      </menupopup>
+    </menu>
 
 
   </menupopup>

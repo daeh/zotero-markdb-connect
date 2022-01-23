@@ -4,4 +4,5 @@
 <!ENTITY obscite.item-menu.open-obsidian-label "Open ObsidianMD Note">
 <!ENTITY obscite.item-menu.show-md-label "Show Markdown File">
 
-<!ENTITY obscite.item-menu.list-md-label "Linked Markdown Files">
+<!ENTITY obscite.item-menu.list-obsidian-label "Open ObsidianMD Note">
+<!ENTITY obscite.item-menu.list-md-label "Show Markdown File">
