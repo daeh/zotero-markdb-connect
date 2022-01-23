@@ -13,7 +13,7 @@ if (typeof Zotero === 'undefined') {
 }
 
 Zotero.ObsCite = {
-    version: '0.0.12',
+    version: '0.0.13',
     folderSep: null,
     cleanrun: true,
     suppressNotifications: false,
@@ -37,25 +37,32 @@ Zotero.ObsCite = {
 
     init: async function () {
         ///TODO display waiting for schema message https://github.com/retorquere/zotero-better-bibtex/blob/26a48f6a85705eeb18f31d87269d34906b1d1a94/test/fixtures/schema-logger/bootstrapped/bootstrap.js
+
         await Zotero.Schema.schemaUpdatePromise;
 
         // only do this stuff for the first run
         if (!this._initialized) {
 
-            setTimeout(() => {
-                if (!['bbtcitekey', 'zotitemkey'].includes(this.getPref('matchstrategy'))) {
-                    this.setPref('matchstrategy', 'bbtcitekey');
-                }
-            }, 1000);
+            if (!['bbtcitekey', 'zotitemkey'].includes(this.getPref('matchstrategy'))) {
+                this.setPref('matchstrategy', 'bbtcitekey');
+            }
 
             // run in future to not burden start-up
-            this.futureRun(function () {
+            this.futureRun(async function () {
                 // determine folder seperator depending on OS
                 this.folderSep = Zotero.isWin ? '\\' : '/';
 
-                setTimeout(() => {
-                    this.startupDependencyCheck();
-                }, 2000);
+                // if BBT is needed, wait for it to load
+                if (this.getPref('matchstrategy') === 'bbtcitekey') {
+                    let win = Services.wm.getMostRecentWindow("navigator:browser");
+                    win.Zotero.BetterBibTeX.ready.then(async function () {
+                        await this.startupDependencyCheck();
+                    }.bind(this));
+                } else {
+                    setTimeout(async function () {
+                        await this.startupDependencyCheck();
+                    }.bind(this), 2000);
+                }
 
             }.bind(this));
         }

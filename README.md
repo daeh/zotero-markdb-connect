@@ -28,7 +28,7 @@ Opens an existing Markdown note in [Obsidian](https://obsidian.md) from the cont
 - Run Zotero (version 5.x)
 - Go to `Tools -> Add-ons`
 - `Install Add-on From File`
-- Choose the file `zotero-obsidian-citations-0.0.12.xpi`
+- Choose the file `zotero-obsidian-citations-0.0.13.xpi`
 - Restart Zotero
 
 ## Setup
@@ -40,13 +40,14 @@ A Markdown file can specify which Zotero item it's linked to using either a [Bet
    - This is recommended if you created the Markdown notes with [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin).
 
    - The Markdown file names should start with `@mycitekey` but can include extra information after it (e.g. a reading note might have the file name `@shepard1987science.md` or `@shepard1987science Toward a universal law of generalization for psychological science.md`, where `shepard1987science` is the BetterBibTeX citekey).
+
 2. Link Markdown files to Zotero items using **Zotero Item Keys**.
 
    - This is recommended if you created the Markdown notes with the `Export Note` feature of Zotero.
    - The Markdown file names should start with `@` and the file contents should include the Zotero-Item-Key in a consistent format
      (Zotero automatically generates Item Keys; they take the form of `ABCD1234`, as in `zotero://select/library/items/ABCD1234`).
 
-NOTE: _ZoteroObsidianCitations_ assumes that a given Markdown file corresponds to a single Zotero item. (A Markdown reading note can reference multiple Zotero items throughout the file, but _ZoteroObsidianCitations_ will only link the Markdown note to one BetterBibTeX-citekey / Zotero-Item-Key.) Multiple Markdown files can point to the same Zotero item. 
+NOTE: _ZoteroObsidianCitations_ assumes that a given Markdown file corresponds to a single Zotero item. (A Markdown reading note can reference multiple Zotero items throughout the file, but _ZoteroObsidianCitations_ will only link the Markdown note to one BetterBibTeX-citekey / Zotero-Item-Key.) Multiple Markdown files can point to the same Zotero item.
 
 ---
 
