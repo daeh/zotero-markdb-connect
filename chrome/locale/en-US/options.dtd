@@ -2,8 +2,12 @@
 <!ENTITY obscite.preferences "Zotero Obsidian Citations Preferences">
 
 <!ENTITY obscite.preferences.vault-source-folder "Folder Containing Markdown Reading Notes">
-<!ENTITY obscite.preferences.vault-source-folder-desc "ZoteroObsidianCitations will search this directory recursively for markdown files beginning with '@'.">
-<!ENTITY obscite.preferences.vault-source-folder-subdesc "Markdown files should begin with '@citekey', e.g. '@shepard1987science Universal Law.md', where 'shepard1987science' is the BetterBibTex citekey.">
+<!ENTITY obscite.preferences.vault-source-folder-desc "ZoteroObsidianCitations will search this directory recursively for markdown files">
+<!ENTITY obscite.preferences.filefilterstrategy-title "File Filter">
+<!ENTITY obscite.preferences.filefilterstrategy-default-label "Default (looks for markdown files beginning with @ )">
+<!ENTITY obscite.preferences.filefilterstrategy-default-desc "Markdown files should begin with '@citekey', e.g. '@shepard1987science Universal Law.md', where 'shepard1987science' is the BetterBibTex citekey.">
+<!ENTITY obscite.preferences.filefilterstrategy-customfileregex-label "Custom RegEx pattern to match reading note files (case insensitive)">
+<!ENTITY obscite.preferences.filefilterstrategy-customfileregex-desc "Default pattern is:   ^@.+\.md$">
 
 <!ENTITY obscite.preferences.matchstrategy-bbtcitekey-label "Match notes based on BetterBibTex citekey">
 <!ENTITY obscite.preferences.matchstrategy-bbtcitekey-desc "ZoteroObsidianCitations will search the Markdown files for BetterBibTex citekeys.">
@@ -22,3 +26,7 @@
 <!ENTITY obscite.preferences.zotkey-regex-subdesc "N.B. this is not the same as the BetterBibTex citekey you assigned an item (e.g. 'shepard1987science' in 'zotero://select/items/@shepard1987science')">
 
 <!ENTITY obscite.preferences.choose-button-label "Choose…">
+
+<!ENTITY obscite.preferences.rundebug-label "Save Debugging Log">
+<!ENTITY obscite.preferences.rundebug-desc "If you're encounternig errors, you can generate a debugging file to examine yourself and/or to include in a github issue.">
+<!ENTITY obscite.preferences.rundebug-button-label "Generate Debugging File">

@@ -28,7 +28,7 @@ Opens an existing Markdown note in [Obsidian](https://obsidian.md) from the cont
 - Run Zotero (version 5.x)
 - Go to `Tools -> Add-ons`
 - `Install Add-on From File`
-- Choose the file `zotero-obsidian-citations-0.0.13.xpi`
+- Choose the file `zotero-obsidian-citations-0.0.14.xpi`
 - Restart Zotero
 
 ## Setup
@@ -126,7 +126,7 @@ A reference using an Obsidian wiki link: [[@cusimano2018cogsci]]
 
 - [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin)
   Obsidian plugin which integrates your academic reference manager with the Obsidian editor.
-- [Zotero 6 Markdown export of notes](https://forums.zotero.org/discussion/93521/available-for-beta-testing-markdown-export-of-notes)
+- [Zotero 6 Markdown export of notes](https://forums.zotero.org/discussion/93521/available-for-beta-testing-markdown-export-of-notes/p1)
   Zotero's `Export Note` beta feature.
 - [Zotero-mdnotes](https://argentinaos.com/zotero-mdnotes/)
   A Zotero plugin to export item metadata and notes as markdown files.
@@ -142,3 +142,10 @@ Code for this extension is based on [ZotFile](https://github.com/jlegewie/zotfil
 ## License
 
 Distributed under the MIT License.
+
+## Author
+
+<a href="https://daeh.info" target="_self"><img alt="Personal Website" src="https://shields.io/badge/Personal%20Website-for--the--badge-green?style=for-the-badge" /></a>
+<a href="https://twitter.com/DaeHoulihan" target="_self"><img alt="Twitter" src="https://img.shields.io/badge/twitter-%231DA1F2.svg?&style=for-the-badge&logo=twitter&logoColor=black" /></a>
+
+BAT Tips

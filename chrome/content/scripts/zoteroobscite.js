@@ -13,7 +13,7 @@ if (typeof Zotero === 'undefined') {
 }
 
 Zotero.ObsCite = {
-    version: '0.0.13',
+    version: '0.0.14',
     folderSep: null,
     cleanrun: true,
     suppressNotifications: false,
@@ -148,6 +148,34 @@ Zotero.ObsCite = {
         }
     },
 
+    _getParam_filefilterstrategy: function () {
+        const filefilterstrategy = this.getPref('filefilterstrategy');
+        if (['default', 'customfileregex'].includes(filefilterstrategy)) {
+            return filefilterstrategy;
+        } else {
+            this.setPref('filefilterstrategy', 'default');
+            return 'default';
+        }
+    },
+
+    _getParam_filepattern: function () {
+        let filepatternstr = this.getPref('filepattern');
+        if (!(typeof filepatternstr === 'string' && filepatternstr.length > 0)) {
+            filepatternstr = "^@.+\\.md$";
+            this.setPref('filepattern', filepatternstr);
+        }
+        try {
+            const re_file = new RegExp(filepatternstr, 'i');
+            return filepatternstr;
+        } catch (e) {
+            this.showNotification("File regex is not valid. Was given: >>" + filepatternstr + "<<", false);
+            Zotero.debug(`File RegEx Error: ${e}`);
+            return null;
+        }
+    },
+
+
+
     // _getParam_bbtjson: function () {
     //     try {
     //         const bbtjson = this.getPref('bbtjson');
@@ -199,6 +227,8 @@ Zotero.ObsCite = {
         let checkSettings_trace = {
             _getParam_matchstrategy: 'none',
             _getParam_vaultpath: 'none',
+            _getParam_filefilterstrategy: 'none',
+            _getParam_filepattern: 'none',
             _checkBBTinstalled: 'none',
             _getParam_metadatakeyword: 'none',
             _getParam_zotkeyregex: 'none',
@@ -214,6 +244,15 @@ Zotero.ObsCite = {
             checkSettings_trace._getParam_vaultpath = 'null';
             this.debugSettingsFail = checkSettings_trace;
             return false;
+        }
+
+        if (this._getParam_filefilterstrategy() === 'customfileregex') {
+            const filepattern = await this._getParam_filepattern();
+            if (filepattern == null || !filepattern || filepattern.length === 0) {
+                checkSettings_trace._getParam_filefilterstrategy = filepattern;
+                this.debugSettingsFail = checkSettings_trace;
+                return false;
+            }
         }
 
         if (matchstrategy === 'bbtcitekey') {
@@ -284,7 +323,7 @@ Zotero.ObsCite = {
     },
 
     chooseVaultFolder: async function () {
-        const dialogTitle = 'Select Obsidian Vault Folder containing citation notes begining with @';
+        const dialogTitle = 'Select Obsidian Vault Folder containing MD reading notes';
         const vaultpath = await this.chooseDirectory(dialogTitle);
         const vaultpathObj = new FileUtils.File(OS.Path.normalize(vaultpath));
         if (vaultpath != '' && vaultpath != undefined && vaultpath != null && vaultpathObj.exists() && vaultpathObj.isDirectory()) {
@@ -422,7 +461,13 @@ Zotero.ObsCite = {
         const metadatakeyword = this._getParam_metadatakeyword();
 
         /// pattern to match MD files
-        const re_file = new RegExp("^@.+\.md$", 'i');
+        const filefilterstrategy = this._getParam_filefilterstrategy();
+        let re_file;
+        if (filefilterstrategy === 'default') {
+            re_file = new RegExp(/^@.+\.md$/, 'i');
+        } else {
+            re_file = RegExp(this._getParam_filepattern(), 'i');
+        }
         /// pattern to trim extension from filename
         const re_suffix = /\.md$/i;
 
@@ -443,13 +488,15 @@ Zotero.ObsCite = {
                 path: path
             };
 
-            /// get citekey from filename
-            try {
-                /// pattern to match citekey in MD file name
-                const re_title = new RegExp(/^@([^\s]+)/);
-                entry_res.citekey_title = name.match(re_title)[1].trim();
-            } catch (e) {
-                Zotero.debug("Error in scanVault: " + e);
+            if (filefilterstrategy === 'default') {
+                /// get citekey from filename
+                try {
+                    /// pattern to match citekey in MD file name
+                    const re_title = new RegExp(/^@([^\s]+)/);
+                    entry_res.citekey_title = name.match(re_title)[1].trim();
+                } catch (e) {
+                    Zotero.debug("Error in scanVault: " + e);
+                }
             }
 
             /// get citekey from metadata
@@ -502,10 +549,16 @@ Zotero.ObsCite = {
 
         const vaultpath = this._getParam_vaultpath();
         const zotkeyregex = this._getParam_zotkeyregex();
-        const metadatakeyword = this._getParam_metadatakeyword();
+        // const metadatakeyword = this._getParam_metadatakeyword();
 
         /// pattern to match MD files
-        const re_file = new RegExp("^@.+\.md$", 'i');
+        const filefilterstrategy = this._getParam_filefilterstrategy();
+        let re_file;
+        if (filefilterstrategy === 'default') {
+            re_file = new RegExp(/^@.+\.md$/, 'i');
+        } else {
+            re_file = RegExp(this._getParam_filepattern(), 'i');
+        }
         /// pattern to trim extension from filename
         const re_suffix = /\.md$/i;
         /// pattern to match ZoteroKey in MD file contents
@@ -529,13 +582,15 @@ Zotero.ObsCite = {
             };
 
             /// optional for custom regex
-            /// get citekey from filename
-            try {
-                /// pattern to match citekey in MD file name
-                const re_title = new RegExp(/^@([^\s]+)/);
-                entry_res.citekey_title = name.match(re_title)[1].trim();
-            } catch (e) {
-                Zotero.debug("Error in scanVaultCustomRegex: " + e);
+            if (filefilterstrategy === 'default') {
+                /// get citekey from filename
+                try {
+                    /// pattern to match citekey in MD file name
+                    const re_title = new RegExp(/^@([^\s]+)/);
+                    entry_res.citekey_title = name.match(re_title)[1].trim();
+                } catch (e) {
+                    Zotero.debug("Error in scanVaultCustomRegex: " + e);
+                }
             }
 
             try {
@@ -868,7 +923,11 @@ Zotero.ObsCite = {
             /// get BBT citekeys from markdown files ///
             res = await this.scanVault(promptSaveErrors); /// returns data array containing BBT citekeys
             if (res.length === 0) {
-                this.showNotification("No Markdown files found", "Set the path to your Markdown notes in the ZotObsCite preferences.", false);
+                if (this._getParam_filefilterstrategy() === 'default') {
+                    this.showNotification("No Markdown files found", "Check the path to your Markdown notes in the ZotObsCite preferences.", false);
+                } else {
+                    this.showNotification("No Markdown files found", "Check the File Filter RegEx and the path to your Markdown notes in the ZotObsCite preferences.", false);
+                }
                 return;
             }
             if (debug) {
@@ -1000,12 +1059,12 @@ Zotero.ObsCite = {
     },
 
 
-    runSync: async function (promptSaveErrors, syncTags, debug) {
+    runSync: async function (promptSaveErrors, syncTags) {
         /// TODO better error notification handeling. Collect errors and show them at the end.
         /// TODO validate settings on preference window close.
-        debug = debug || false;
         this.cleanrun = true;
         this.suppressNotifications = false;
+        const debug = false;
         let trace = {
             checkSetting: 'unreached',
             processData: 'unreached',
@@ -1043,112 +1102,16 @@ Zotero.ObsCite = {
         return notifData;
     },
 
-    addDebugLog: function (key, value) {
-        this.debuglog[key] = value;
-    },
-
-    runDebug: async function (includeResults) {
-        ///TODO add 'run debug' button to preference window
-        includeResults = includeResults || false;
-        const promptSaveErrors = false;
-        const debug = true;
-        this.debuglog = {};
-        this.suppressNotifications = true;
-
-        this.addDebugLog('version', this.version);
-        this.addDebugLog('zoteroVersion', Zotero.version);
-        this.addDebugLog('isMac', Zotero.isMac);
-        this.addDebugLog('isLinux', Zotero.isLinux);
-        this.addDebugLog('isWin', Zotero.isWin);
-
-        let prefs = {};
-        for (let pref of ['matchstrategy', 'source_dir', 'zotkeyregex', 'metadatakeyword']) {
-            try {
-                prefs[pref] = this.getPref(pref);
-            } catch (e) {
-                prefs[pref] = "Error (" + e.name + ") " + e.message;
-            }
-        }
-        this.addDebugLog('prefs', prefs);
-
-        let config = {};
-        for (let pref of ['matchstrategy', 'source_dir', 'zotkeyregex', 'metadatakeyword']) {
-            try {
-                switch (pref) {
-                    case 'matchstrategy':
-                        config[pref] = this._getParam_matchstrategy();
-                        break;
-                    case 'source_dir':
-                        config[pref] = this._getParam_vaultpath();
-                        break;
-                    case 'zotkeyregex':
-                        config[pref] = this._getParam_zotkeyregex();
-                        break;
-                    case 'metadatakeyword':
-                        config[pref] = this._getParam_metadatakeyword();
-                        break;
-                }
-            } catch (e) {
-                config[pref] = "Error (" + e.name + ") " + e.message;
-            }
-        }
-        try {
-            config.bbtinstalled = await this._checkBBTinstalled();
-        } catch (e) {
-            config.bbtinstalled = "Error (" + e.name + ") " + e.message;
-        }
-        try {
-            config.checkSetting = await this.checkSettings();
-        } catch (e) {
-            config.checkSetting = "Error (" + e.name + ") " + e.message;
-        }
-        this.addDebugLog('config', config);
-
-        if (includeResults && await this.checkSettings()) {
-            let results = {};
-            try {
-                await this.processData(promptSaveErrors, debug);
-            } catch (e) {
-                results.processData = "Error (" + e.name + ") " + e.message;
-            }
-            try {
-                results.cleanrun = this.cleanrun;
-                results.ndataKeys = this.dataKeys.length;
-            } catch (e) {
-                results = "Error (" + e.name + ") " + e.message;
-            }
-            this.addDebugLog('results', results);
-        }
-
-        return this.debuglog;
-    },
-
-    saveDebug: async function () {
-        const dataDebug = JSON.stringify(this.debuglog, null, 1);
-        const saveDialogTitle = "Save ZoteroObsidianCitations Debug Log To...";
-        const filenamesuggest = 'ZoteroObsidianCitations-debug.json';
-        await this.writeToFile(dataDebug, saveDialogTitle, filenamesuggest);
-    },
-
-    runAndSaveDebug: async function (includeResults) {
-        includeResults = (typeof includeResults === 'boolean') ? includeResults : true;
-        const dataDebug = JSON.stringify(await this.runDebug(includeResults), null, 1);
-        const saveDialogTitle = "Save ZoteroObsidianCitations Debug Log To...";
-        const filenamesuggest = 'ZoteroObsidianCitations-debug.json';
-        await this.writeToFile(dataDebug, saveDialogTitle, filenamesuggest);
-    },
-
     ////////////
 
     startupDependencyCheck: async function () {
         const promptSaveErrors = false;
         const syncTags = true; // syncOnStart
-        const debug = false;
-        const notifData = await this.runSync(promptSaveErrors, syncTags, debug);
+        const notifData = await this.runSync(promptSaveErrors, syncTags);
         this.showNotification(...notifData);
     },
 
-    //// Controls for Item menu
+    //// Controls for Item Contextual Menu
 
     buildItemContextMenu: function () {
         let found_single = false;
@@ -1300,13 +1263,115 @@ Zotero.ObsCite = {
         }
     },
 
+    //// Debugging functions
+
+    addDebugLog: function (key, value) {
+        this.debuglog[key] = value;
+    },
+
+    runDebug: async function (includeResults) {
+        ///TODO add 'run debug' button to preference window
+        includeResults = includeResults || false;
+        const promptSaveErrors = false;
+        const debug = true;
+        this.debuglog = {};
+        this.suppressNotifications = true;
+
+        this.addDebugLog('version', this.version);
+        this.addDebugLog('zoteroVersion', Zotero.version);
+        this.addDebugLog('isMac', Zotero.isMac);
+        this.addDebugLog('isLinux', Zotero.isLinux);
+        this.addDebugLog('isWin', Zotero.isWin);
+
+        let prefs = {};
+        for (let pref of ['matchstrategy', 'source_dir', 'filefilterstrategy', 'filepattern', 'zotkeyregex', 'metadatakeyword']) {
+            try {
+                prefs[pref] = this.getPref(pref);
+            } catch (e) {
+                prefs[pref] = "Error (" + e.name + ") " + e.message;
+            }
+        }
+        this.addDebugLog('prefs', prefs);
+
+        let config = {};
+        for (let pref of ['matchstrategy', 'source_dir', 'filefilterstrategy', 'filepattern', 'zotkeyregex', 'metadatakeyword']) {
+            try {
+                switch (pref) {
+                    case 'matchstrategy':
+                        config[pref] = this._getParam_matchstrategy();
+                        break;
+                    case 'source_dir':
+                        config[pref] = this._getParam_vaultpath();
+                        break;
+                    case 'filefilterstrategy':
+                        config[pref] = this._getParam_filefilterstrategy();
+                        break;
+                    case 'filepattern':
+                        config[pref] = this._getParam_filepattern();
+                        break;
+                    case 'zotkeyregex':
+                        config[pref] = this._getParam_zotkeyregex();
+                        break;
+                    case 'metadatakeyword':
+                        config[pref] = this._getParam_metadatakeyword();
+                        break;
+                }
+            } catch (e) {
+                config[pref] = "Error (" + e.name + ") " + e.message;
+            }
+        }
+        try {
+            config.bbtinstalled = await this._checkBBTinstalled();
+        } catch (e) {
+            config.bbtinstalled = "Error (" + e.name + ") " + e.message;
+        }
+        try {
+            config.checkSetting = await this.checkSettings();
+        } catch (e) {
+            config.checkSetting = "Error (" + e.name + ") " + e.message;
+        }
+        this.addDebugLog('config', config);
+
+        if (includeResults && await this.checkSettings()) {
+            let results = {};
+            try {
+                await this.processData(promptSaveErrors, debug);
+            } catch (e) {
+                results.processData = "Error (" + e.name + ") " + e.message;
+            }
+            try {
+                results.cleanrun = this.cleanrun;
+                results.ndataKeys = this.dataKeys.length;
+            } catch (e) {
+                results = "Error (" + e.name + ") " + e.message;
+            }
+            this.addDebugLog('results', results);
+        }
+
+        return this.debuglog;
+    },
+
+    saveDebug: async function () {
+        const dataDebug = JSON.stringify(this.debuglog, null, 1);
+        const saveDialogTitle = "Save ZoteroObsidianCitations Debug Log To...";
+        const filenamesuggest = 'ZoteroObsidianCitations-debug.json';
+        await this.writeToFile(dataDebug, saveDialogTitle, filenamesuggest);
+    },
+
+    runAndSaveDebug: async function (includeResults) {
+        includeResults = (typeof includeResults === 'boolean') ? includeResults : true;
+        const dataDebug = JSON.stringify(await this.runDebug(includeResults), null, 1);
+        const saveDialogTitle = "Save ZoteroObsidianCitations Debug Log To...";
+        const filenamesuggest = 'ZoteroObsidianCitations-debug.json';
+        await this.writeToFile(dataDebug, saveDialogTitle, filenamesuggest);
+    },
+
     //// Controls for Tools menu
 
     syncWithMarkdown: async function () {
         const promptSaveErrors = true;
         const syncTags = true;
-        const debug = false;
-        const notifData = await this.runSync(promptSaveErrors, syncTags, debug);
+        const notifData = await this.runSync(promptSaveErrors, syncTags);
         this.showNotification(...notifData);
     },
 

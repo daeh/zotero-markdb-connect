@@ -5,7 +5,7 @@
   <Description about="urn:mozilla:install-manifest">
     <em:id>daeda@mit.edu</em:id>
     <em:name>ZoteroObsidianCitations</em:name>
-    <em:version>0.0.13</em:version>
+    <em:version>0.0.14</em:version>
     <em:type>2</em:type>
     <em:creator>Dae Houlihan</em:creator>
     <em:description>Add a tag to Zotero items that have a external note.</em:description>
@@ -16,7 +16,7 @@
       <Description>
         <em:id>zotero@chnm.gmu.edu</em:id>
         <em:minVersion>5.0.0</em:minVersion>
-        <em:maxVersion>5.*</em:maxVersion>
+        <em:maxVersion>6.0.*</em:maxVersion>
       </Description>
     </em:targetApplication>
 
