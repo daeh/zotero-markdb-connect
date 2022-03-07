@@ -122,6 +122,27 @@ Zotero.ObsCite = {
         }
     },
 
+    checkTagStr: function () {
+        const tagstr = this.getPref('tagstr');
+        if (typeof tagstr === 'string' && tagstr.length > 0) {
+            let found = [];
+            const notallowed = ["'", '"', ":", "\n", "/", "\\", "?", "*", "|", ">", "<", ",", ";", "=", "`", "~", "!", "#", "$", "%", "^", "&", "(", ")", "[", "]", "{", "}", " "];
+            notallowed.forEach(char => {
+                if (tagstr.includes(char)) {
+                    found.push(char);
+                }
+            });
+            if (found.length > 0) {
+                this.showNotification("Invalid tag string", "tag cannot contain: " + found.join(" or ") + ".", false);
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return true;
+        }
+    },
+
     _getParam_matchstrategy: function () {
         const matchstrategy = this.getPref('matchstrategy');
         if (['bbtcitekey', 'zotitemkey'].includes(matchstrategy)) {
@@ -223,6 +244,21 @@ Zotero.ObsCite = {
         }
     },
 
+    _getParam_tagstr: function () {
+        const tagstr = this.getPref('tagstr');
+        if (typeof tagstr === 'string' && tagstr.length > 0) {
+            if (this.checkTagStr()) {
+                return tagstr;
+            } else {
+                return null;
+                /// checkTagStr() will show a notification
+            }
+        } else {
+            this.setPref('tagstr', 'ObsCite');
+            return 'ObsCite';
+        }
+    },
+
     checkSettings: async function () {
         let checkSettings_trace = {
             _getParam_matchstrategy: 'none',
@@ -231,6 +267,7 @@ Zotero.ObsCite = {
             _getParam_filepattern: 'none',
             _checkBBTinstalled: 'none',
             _getParam_metadatakeyword: 'none',
+            _getParam_tagstr: 'none',
             _getParam_zotkeyregex: 'none',
             matchstrategy: 'none'
         };
@@ -253,6 +290,13 @@ Zotero.ObsCite = {
                 this.debugSettingsFail = checkSettings_trace;
                 return false;
             }
+        }
+
+        const tagstr = this._getParam_tagstr();
+        if (tagstr == null) {
+            checkSettings_trace._getParam_tagstr = 'null';
+            this.debugSettingsFail = checkSettings_trace;
+            return false;
         }
 
         if (matchstrategy === 'bbtcitekey') {
@@ -378,19 +422,21 @@ Zotero.ObsCite = {
      */
 
     findTaggedItems: async function () {
+        const tagstr = this._getParam_tagstr();
         let s = new Zotero.Search();
         s.libraryID = Zotero.Libraries.userLibraryID;
-        s.addCondition('tag', 'is', 'ObsCite');
+        s.addCondition('tag', 'is', tagstr);
         let itemIDs = await s.search();
         let items_preexisting = await Zotero.Items.getAsync(itemIDs);
         return items_preexisting;
     },
 
     removeAllTags: async function () {
+        const tagstr = this._getParam_tagstr();
         let items_preexisting = await this.findTaggedItems();
         /// remove tag
         items_preexisting.forEach(item => {
-            item.removeTag('ObsCite');
+            item.removeTag(tagstr);
             item.saveTx();
         });
         return true;
@@ -645,38 +691,38 @@ Zotero.ObsCite = {
     },
 
 
-    mapCitekeysBBTJSON: async function () {
-        /* 
-         * make dict of BBTcitekey:zoteroID for every item in the BBTJSON file
-         */
-        let citekeymap = {};
-        let citekeymaperr = {};
+    // mapCitekeysBBTJSON: async function () {
+    //     /* 
+    //      * make dict of BBTcitekey:zoteroID for every item in the BBTJSON file
+    //      */
+    //     let citekeymap = {};
+    //     let citekeymaperr = {};
 
-        const bbtjson = this._getParam_bbtjson();
+    //     const bbtjson = this._getParam_bbtjson();
 
-        const contents = JSON.parse(await Zotero.File.getContentsAsync(bbtjson));
-        const items = contents.items;
-        items.forEach(item => {
-            try {
-                const citekey = item.citekey;
-                const citationKey = item.citationKey;
-                const itemID = item.itemID;
-                const itemKey = item.itemKey;
-                citekeymap[citekey] = itemID;
-            } catch (e) {
-                citekeymaperr.push(item);
-            }
-        });
+    //     const contents = JSON.parse(await Zotero.File.getContentsAsync(bbtjson));
+    //     const items = contents.items;
+    //     items.forEach(item => {
+    //         try {
+    //             const citekey = item.citekey;
+    //             const citationKey = item.citationKey;
+    //             const itemID = item.itemID;
+    //             const itemKey = item.itemKey;
+    //             citekeymap[citekey] = itemID;
+    //         } catch (e) {
+    //             citekeymaperr.push(item);
+    //         }
+    //     });
 
-        if (citekeymaperr.length > 0) {
-            this.cleanrun = false;
-            const nerr = citekeymaperr.length;
-            Zotero.debug(`${nerr} Read ObsVault Read Errors`);
-            Zotero.debug(`${citekeymaperr[0]}`);
-            this.showNotification("mapCitekeysBBTJSON", "Error: " + nerr.toString() + ".", false);
-        }
-        return citekeymap;
-    },
+    //     if (citekeymaperr.length > 0) {
+    //         this.cleanrun = false;
+    //         const nerr = citekeymaperr.length;
+    //         Zotero.debug(`${nerr} Read ObsVault Read Errors`);
+    //         Zotero.debug(`${citekeymaperr[0]}`);
+    //         this.showNotification("mapCitekeysBBTJSON", "Error: " + nerr.toString() + ".", false);
+    //     }
+    //     return citekeymap;
+    // },
 
     mapZoteroIDkeysInternalSearch: async function () {
         /* 
@@ -1011,6 +1057,7 @@ Zotero.ObsCite = {
     /////////
 
     updateItems: async function (citekeyids) {
+        const tagstr = this._getParam_tagstr();
 
         /// find all item already tagged
         let items_withtags = await this.findTaggedItems();
@@ -1032,14 +1079,14 @@ Zotero.ObsCite = {
 
         /// remove tag from items that should not be tagged
         items_removetag.forEach(item => {
-            item.removeTag('ObsCite');
+            item.removeTag(tagstr);
             item.saveTx();
         });
 
         ///NB this doesn't run successfully as soon as zotero is started, needs to wait for schema to load
         /// add tag to items that should be tagged
         items_totag.forEach(item => {
-            item.addTag('ObsCite');
+            item.addTag(tagstr);
             item.saveTx();
         });
         ///TODO set color :: https://github.com/zotero/zotero/blob/52932b6eb03f72b5fb5591ba52d8e0f4c2ef825f/chrome/content/zotero/tagColorChooser.js
@@ -1294,7 +1341,7 @@ Zotero.ObsCite = {
         this.addDebugLog('prefs', prefs);
 
         let config = {};
-        for (let pref of ['matchstrategy', 'source_dir', 'filefilterstrategy', 'filepattern', 'zotkeyregex', 'metadatakeyword']) {
+        for (let pref of ['matchstrategy', 'source_dir', 'filefilterstrategy', 'filepattern', 'zotkeyregex', 'metadatakeyword', 'tagstr']) {
             try {
                 switch (pref) {
                     case 'matchstrategy':
@@ -1314,6 +1361,9 @@ Zotero.ObsCite = {
                         break;
                     case 'metadatakeyword':
                         config[pref] = this._getParam_metadatakeyword();
+                        break;
+                    case 'tagstr':
+                        config[pref] = this._getParam_tagstr();
                         break;
                 }
             } catch (e) {

@@ -1,31 +1,50 @@
 <!ENTITY obscite.name "Zotero Obsidian Citations">
 <!ENTITY obscite.preferences "Zotero Obsidian Citations Preferences">
 
+<!ENTITY general-settings "General">
+<!ENTITY advanced-settings "Advanced">
+
+<!ENTITY obscite.preferences.locate-mdfiles "Location of Markdown Reading Notes">
+<!ENTITY obscite.preferences.locate-mdfiles-desc "Specify how ZoteroObsidianCitations should find the markdown files">
+
 <!ENTITY obscite.preferences.vault-source-folder "Folder Containing Markdown Reading Notes">
 <!ENTITY obscite.preferences.vault-source-folder-desc "ZoteroObsidianCitations will search this directory recursively for markdown files">
+
 <!ENTITY obscite.preferences.filefilterstrategy-title "File Filter">
-<!ENTITY obscite.preferences.filefilterstrategy-default-label "Default (looks for markdown files beginning with @ )">
-<!ENTITY obscite.preferences.filefilterstrategy-default-desc "Markdown files should begin with '@citekey', e.g. '@shepard1987science Universal Law.md', where 'shepard1987science' is the BetterBibTex citekey.">
-<!ENTITY obscite.preferences.filefilterstrategy-customfileregex-label "Custom RegEx pattern to match reading note files (case insensitive)">
+<!ENTITY obscite.preferences.filefilterstrategy-default-label "Default File Filter: recursively find markdown files beginning with @">
+<!ENTITY obscite.preferences.filefilterstrategy-default-desc1 "Markdown files should begin with @{{citekey}}, where {{citekey}} is the BetterBibTeX citekey,">
+<!ENTITY obscite.preferences.filefilterstrategy-default-desc2 "e.g. a filename could be '@shepard1987science Universal Law.md', where 'shepard1987science' is the BetterBibTeX citekey.">
+
+<!ENTITY obscite.preferences.filefilterstrategy-customfileregex-label "Custom File Filter: recursively find files matching this RegEx pattern">
+<!ENTITY obscite.preferences.filepattern-label "regex (case insensitive): /">
+<!ENTITY obscite.preferences.filepattern-label-end "/i">
 <!ENTITY obscite.preferences.filefilterstrategy-customfileregex-desc "Default pattern is:   ^@.+\.md$">
 
-<!ENTITY obscite.preferences.matchstrategy-bbtcitekey-label "Match notes based on BetterBibTex citekey">
-<!ENTITY obscite.preferences.matchstrategy-bbtcitekey-desc "ZoteroObsidianCitations will search the Markdown files for BetterBibTex citekeys.">
+<!ENTITY obscite.preferences.matchstrategy-bbtcitekey-title "Use BetterBibTeX citekeys to link markdown files to Zotero items (Option 1)">
+<!ENTITY obscite.preferences.matchstrategy-bbtcitekey-label "Match notes based on BetterBibTeX citekey">
+<!ENTITY obscite.preferences.matchstrategy-bbtcitekey-desc "ZoteroObsidianCitations will search the markdown files for BetterBibTeX citekeys.">
 
 <!ENTITY obscite.preferences.metadata-keyword-title "(Optional) Markdown Metadata Keyword">
 <!ENTITY obscite.preferences.metadata-keyword-label "yaml keyword:">
-<!ENTITY obscite.preferences.metadata-keyword-desc "If you want to extract the citekey from a Markdown note's metadata, indicate the keyword here. A common value is: 'citekey'.">
-<!ENTITY obscite.preferences.metadata-keyword-subdesc "If no value is given, the citekey will be taken from the note's title.">
+<!ENTITY obscite.preferences.metadata-keyword-desc1 "If you want to extract the citekey from a markdown note's metadata, indicate the keyword here. A common value is: 'citekey'.">
+<!ENTITY obscite.preferences.metadata-keyword-desc2 "If no value is given, the citekey will be taken from the filename.">
 
+<!ENTITY obscite.preferences.matchstrategy-zotitemkey-title "Use Zotero-Item-Keys to link markdown files to Zotero items (Option 2)">
 <!ENTITY obscite.preferences.matchstrategy-zotitemkey-label "Match notes based on Zotero-Item-Key">
-<!ENTITY obscite.preferences.matchstrategy-zotitemkey-desc "ZoteroObsidianCitations will search the Markdown files for Zotero Item Keys.">
+<!ENTITY obscite.preferences.matchstrategy-zotitemkey-desc "ZoteroObsidianCitations will search the markdown file contents for Zotero-Item-Keys.">
 
-<!ENTITY obscite.preferences.zotkeyregex-title "Required: Specify a RegEx to match the Zotero-Item-Key from the Markdown contents,">
-<!ENTITY obscite.preferences.zotkeyregex-desc  "              e.g. match 'ABCD1234' in 'zotero://select/library/items/ABCD1234'">
-<!ENTITY obscite.preferences.zotkey-regex-label "regex:">
-<!ENTITY obscite.preferences.zotkey-regex-subdesc "N.B. this is not the same as the BetterBibTex citekey you assigned an item (e.g. 'shepard1987science' in 'zotero://select/items/@shepard1987science')">
+<!ENTITY obscite.preferences.zotkeyregex-title1 "Required: Specify a RegEx to match the Zotero-Item-Key from the markdown contents">
+<!ENTITY obscite.preferences.zotkeyregex-title2  "               ( e.g. match 'ABCD1234' in 'zotero://select/library/items/ABCD1234' )">
+<!ENTITY obscite.preferences.zotkeyregex-label "regex: /">
+<!ENTITY obscite.preferences.zotkeyregex-label-end "/">
+<!ENTITY obscite.preferences.zotkeyregex-desc1 "N.B. this is not the same as the BetterBibTeX citekey you assigned an item.">
+<!ENTITY obscite.preferences.zotkeyregex-desc2 "(e.g. it is not 'shepard1987science' in 'zotero://select/items/@shepard1987science')">
 
 <!ENTITY obscite.preferences.choose-button-label "Choose…">
+<!ENTITY obscite.preferences.spacer " ">
+
+<!ENTITY obscite.preferences.customtag-title "Specify a custom tag string">
+<!ENTITY obscite.preferences.customtag-label "(Default is 'ObsCite')">
 
 <!ENTITY obscite.preferences.rundebug-label "Save Debugging Log">
 <!ENTITY obscite.preferences.rundebug-desc "If you're encounternig errors, you can generate a debugging file to examine yourself and/or to include in a github issue.">
