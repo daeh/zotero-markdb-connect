@@ -15,7 +15,7 @@ Please post any bugs, questions, or feature requests in the Github repository.
 
 Adds a colored tag to Zotero items for which there are associated reading notes in an external folder.
 
-Supports multiple markdown files for a single Zotero item.
+Supports multiple Markdown files for a single Zotero item.
 
 Opens an existing Markdown note in [Obsidian](https://obsidian.md) from the contextual menu of a Zotero item.
 
@@ -25,10 +25,10 @@ Opens an existing Markdown note in [Obsidian](https://obsidian.md) from the cont
 
 - Download the plugin (the .xpi file) from the latest release: https://github.com/daeh/zotero-obsidian-citations/releases
 - To download the .xpi file, right click it and select 'Save link as'
-- Run Zotero (version 5.x)
+- Run Zotero (version 5.x or 6.x)
 - Go to `Tools -> Add-ons`
 - `Install Add-on From File`
-- Choose the file `zotero-obsidian-citations-0.0.14.xpi`
+- Choose the file `zotero-obsidian-citations-0.0.15.xpi`
 - Restart Zotero
 
 ## Setup
@@ -44,7 +44,7 @@ A Markdown file can specify which Zotero item it's linked to using either a [Bet
 2. Link Markdown files to Zotero items using **Zotero Item Keys**.
 
    - This is recommended if you created the Markdown notes with the `Export Note` feature of Zotero.
-   - The Markdown file names should start with `@` and the file contents should include the Zotero-Item-Key in a consistent format
+   - The Markdown file contents should include the Zotero-Item-Key in a consistent format
      (Zotero automatically generates Item Keys; they take the form of `ABCD1234`, as in `zotero://select/library/items/ABCD1234`).
 
 NOTE: _ZoteroObsidianCitations_ assumes that a given Markdown file corresponds to a single Zotero item. (A Markdown reading note can reference multiple Zotero items throughout the file, but _ZoteroObsidianCitations_ will only link the Markdown note to one BetterBibTeX-citekey / Zotero-Item-Key.) Multiple Markdown files can point to the same Zotero item.
@@ -57,11 +57,14 @@ _ZoteroObsidianCitations_ can extract the BetterBibTeX citekey that specifies wh
 
 - In `ZoteroObsidianCitations Preferences...` (under the `Tools` menu),
 
-  - Specify the location of the folder that contains your Markdown reading notes (e.g. `/Users/me/Documents/ObsVault/ReadingNotes/`). The _ZoteroObsidianCitations_ plugin will recursively search this path for Markdown files beginning with `@`.
+  - Specify the location of the folder that contains your Markdown reading notes (e.g. `/Users/me/Documents/ObsVault/ReadingNotes/`). The _ZoteroObsidianCitations_ plugin will recursively search this path for Markdown files.
+
+    - The default behavior is to search for markdown files beginning with `@`.
+    - Alternatively, you can specify a RegEx pattern to match your reading note files.
 
   - Select the `Match notes based on BetterBibTeX citekey` option.
 
-    - _ZoteroObsidianCitations_ expects that the filenames of your Markdown reading note files begin with `@mycitekey` but can include extra information after it (e.g. a reading note might have the file name `@shepard1987science.md` or `@shepard1987science Toward a universal law of generalization for psychological science.md`, where `shepard1987science` is the BetterBibTeX citekey).
+    - By default, _ZoteroObsidianCitations_ expects that the filenames of your Markdown reading note files begin with `@mycitekey` but can include extra information after it (e.g. a reading note might have the file name `@shepard1987science.md` or `@shepard1987science Toward a universal law of generalization for psychological science.md`, where `shepard1987science` is the BetterBibTeX citekey).
 
   - Optionally, you can have _ZoteroObsidianCitations_ read the metadata of your Markdown notes and extract the citekey from one of the fields. To enable this, specify the metadata ID (`citekey` is a common value).
 
@@ -81,7 +84,10 @@ Zotero automatically generates Item Keys, they take the form of `ABCD1234`, as i
 
 - In `ZoteroObsidianCitations Preferences...` (under the `Tools` menu),
 
-  - Specify the location of the folder that contains your Markdown reading notes (e.g. `/Users/me/Documents/ObsVault/ReadingNotes/`). The _ZoteroObsidianCitations_ plugin will recursively search this path for Markdown files beginning with `@`.
+  - Specify the location of the folder that contains your Markdown reading notes (e.g. `/Users/me/Documents/ObsVault/ReadingNotes/`). The _ZoteroObsidianCitations_ plugin will recursively search this path for Markdown files.
+
+    - The default behavior is to search for markdown files beginning with `@`.
+    - Alternatively, you can specify a RegEx pattern to match your reading note files.
 
   - Select the `Match notes based on Zotero-Item-Key` option.
 
@@ -129,7 +135,7 @@ A reference using an Obsidian wiki link: [[@cusimano2018cogsci]]
 - [Zotero 6 Markdown export of notes](https://forums.zotero.org/discussion/93521/available-for-beta-testing-markdown-export-of-notes/p1)
   Zotero's `Export Note` beta feature.
 - [Zotero-mdnotes](https://argentinaos.com/zotero-mdnotes/)
-  A Zotero plugin to export item metadata and notes as markdown files.
+  A Zotero plugin to export item metadata and notes as Markdown files.
 - [Zotero to Markdown](https://github.com/e-alizadeh/Zotero2md)
   A Python library to retrieve annotations and notes from Zotero and save them into Markdown files.
 
@@ -145,7 +151,5 @@ Distributed under the MIT License.
 
 ## Author
 
-<a href="https://daeh.info" target="_self"><img alt="Personal Website" src="https://shields.io/badge/Personal%20Website-for--the--badge-green?style=for-the-badge" /></a>
+<a href="https://daeh.info" target="_self"><img alt="Personal Website" src="https://shields.io/badge/Personal%20Website-daeh.info-green?style=for-the-badge" /></a>
 <a href="https://twitter.com/DaeHoulihan" target="_self"><img alt="Twitter" src="https://img.shields.io/badge/twitter-%231DA1F2.svg?&style=for-the-badge&logo=twitter&logoColor=black" /></a>
-
-BAT Tips

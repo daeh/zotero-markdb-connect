@@ -13,7 +13,7 @@ if (typeof Zotero === 'undefined') {
 }
 
 Zotero.ObsCite = {
-    version: '0.0.14',
+    version: '0.0.15',
     folderSep: null,
     cleanrun: true,
     suppressNotifications: false,
