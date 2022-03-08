@@ -43,8 +43,17 @@
 <!ENTITY obscite.preferences.choose-button-label "Choose…">
 <!ENTITY obscite.preferences.spacer " ">
 
-<!ENTITY obscite.preferences.customtag-title "Specify a custom tag string">
-<!ENTITY obscite.preferences.customtag-label "(Default is 'ObsCite')">
+<!ENTITY obscite.preferences.customtag-title "Specify a Custom Tag Name">
+<!ENTITY obscite.preferences.customtag-desc "The default tag is 'ObsCite'. If would prefer the tag to be something else, specify the tag name here.">
+<!ENTITY obscite.preferences.customtag-label "tag:">
+
+<!ENTITY obscite.preferences.vaultresolution-title "Obsidian URI - File Resolution Protocol">
+<!ENTITY obscite.preferences.vaultresolution-desc "The Obsidian URI can resolve files using a file path or a file name. The 'path' option is advised since file names are not necessarily unique.">
+<!ENTITY obscite.preferences.vaultresolution-label "Resolve Obsidian notes using the file">
+<!ENTITY obscite.preferences.vaultresolution-path-label "path (default)">
+<!ENTITY obscite.preferences.vaultresolution-file-label "name (only advised if 'path' is not working)">
+<!ENTITY obscite.preferences.vaultname-label "If you use multiple Vaults, you can specify which Vault should open your markdown reading notes.">
+<!ENTITY obscite.preferences.vaultname-label2 "Obsidian Vault Name:">
 
 <!ENTITY obscite.preferences.rundebug-label "Save Debugging Log">
 <!ENTITY obscite.preferences.rundebug-desc "If you're encounternig errors, you can generate a debugging file to examine yourself and/or to include in a github issue.">

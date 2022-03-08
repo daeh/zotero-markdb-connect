@@ -20,6 +20,8 @@
       <preference id="pref-obscite-zotkeyregex" name="extensions.obscite.zotkeyregex" type="string"/>
       <preference id="pref-obscite-metadatakeyword" name="extensions.obscite.metadatakeyword" type="string"/>
       <preference id="pref-obscite-tagstr" name="extensions.obscite.tagstr" type="string"/>
+      <preference id="pref-obscite-vaultresolution" name="extensions.obscite.vaultresolution" type="string"/>
+      <preference id="pref-obscite-vaultname" name="extensions.obscite.vaultname" type="string"/>
     </preferences>
 
     <tabbox id="zotfile-tabbox">
@@ -120,11 +122,37 @@
 
           <!-- tag name -->
           <groupbox>
-              <label value="&obscite.preferences.customtag-title;"/>
-              <hbox style="margin: 0"  align="center">
-                <label value="&obscite.preferences.customtag-label;"/>
-                <textbox preference="pref-obscite-tagstr" onchange="Zotero.ObsCite.checkTagStr();"/>
-              </hbox>
+            <caption label="&obscite.preferences.customtag-title;"/>
+            <description style="width: 420px">&obscite.preferences.customtag-desc;</description>
+            <hbox style="margin: 0"  align="center">
+              <label value="&obscite.preferences.customtag-label;"/>
+              <textbox preference="pref-obscite-tagstr" onchange="Zotero.ObsCite.checkTagStr();"/>
+            </hbox>
+          </groupbox>
+
+          <!-- obsidian file resolution -->
+          <groupbox>
+            <caption label="&obscite.preferences.vaultresolution-title;"/>
+            <description style="width: 420px">&obscite.preferences.vaultresolution-desc;</description>
+
+            <separator/>
+            
+            <!-- file name or file path -->
+            <label value="&obscite.preferences.vaultresolution-label;"/>
+            <radiogroup preference="pref-obscite-vaultresolution">
+              <radio label="&obscite.preferences.vaultresolution-path-label;" value="path" />
+              <radio label="&obscite.preferences.vaultresolution-file-label;" value="file" />
+            </radiogroup>
+
+            <separator/>
+
+            <!-- vault name -->
+            <label value="&obscite.preferences.vaultname-label;"/>
+            <hbox style="margin: 0"  align="center">
+              <label value="&obscite.preferences.vaultname-label2;"/>
+              <textbox preference="pref-obscite-vaultname"/>
+            </hbox>
+
           </groupbox>
 
           <!-- generate debugging log -->
@@ -135,28 +163,6 @@
             <separator/>
           </groupbox>
         </tabpanel>
-
-      <!-- File name or file path -->
-            <!-- <radiogroup id="id-obscite-uri-strategy" preference="pref-uri-strategy"> -->
-
-            <!-- <radio label="&obscite.preferences.filefilterstrategy-default-label;" value="default" />
-            <label id="id-obscite-filefilterstrategy-default-desc" style="font-size: 10px" value="&obscite.preferences.filefilterstrategy-default-desc;"/>
-
-            <radio label="&obscite.preferences.filefilterstrategy-customfileregex-label;" value="customfileregex" />
-            <hbox style="margin: 0"  align="center">
-              <label id="id-obscite-filepattern-label" value="&obscite.preferences.zotkeyregex-label;"/>
-              <textbox id="id-obscite-filepattern" preference="pref-obscite-filepattern" flex="1" />
-            </hbox>
-            <label id="id-obscite-filefilterstrategy-customfileregex-desc" style="font-size: 11px" value="&obscite.preferences.filefilterstrategy-customfileregex-desc;"/> -->
-
-            <!-- </radiogroup> -->
-
-      <!-- vault name -->
-
-
-
-
-
 
       </tabpanels>
     </tabbox>

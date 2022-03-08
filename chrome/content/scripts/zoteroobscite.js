@@ -259,6 +259,26 @@ Zotero.ObsCite = {
         }
     },
 
+    _getParam_vaultresolution: function () {
+        const vaultresolution = this.getPref('vaultresolution');
+        if (['path', 'file'].includes(vaultresolution)) {
+            return vaultresolution;
+        } else {
+            this.setPref('vaultresolution', 'path');
+            return 'path';
+        }
+    },
+
+    _getParam_vaultname: function () {
+        const vaultname = this.getPref('vaultname');
+        if (typeof vaultname === 'string' && vaultname.length > 0) {
+            return vaultname;
+        } else {
+            this.setPref('vaultname', '');
+            return '';
+        }
+    },
+
     checkSettings: async function () {
         let checkSettings_trace = {
             _getParam_matchstrategy: 'none',
@@ -1261,8 +1281,11 @@ Zotero.ObsCite = {
     openSelectedItemsObsidian: function (idx) {
         idx = idx || 0;
         const items = Services.wm.getMostRecentWindow("navigator:browser").ZoteroPane.getSelectedItems();
-        const vaultName = ''; ///TODO add preference to specify vault
+
+        const uri_spec = this._getParam_vaultresolution();
+        const vaultName = this._getParam_vaultname();
         const vaultKey = (vaultName.length > 0) ? 'vault=' + vaultName + '&' : '';
+
         for (const item of items) {
             if (this.dataKeys.includes(item.id)) {
                 const entry_res_list = this.data[item.id.toString()];
@@ -1270,8 +1293,18 @@ Zotero.ObsCite = {
                 idx = (idx < entry_res_list.length && idx >= 0) ? idx : 0;
                 const entry_res = entry_res_list[idx];
 
-                const uriEncoded = encodeURIComponent(entry_res.path);
-                Zotero.launchURL("obsidian://open?" + vaultKey + "path=" + uriEncoded);
+                const fileKey = (uri_spec === 'file') ? "file=" + encodeURIComponent(entry_res.name) : "path=" + encodeURIComponent(entry_res.path);
+
+                Zotero.launchURL("obsidian://open?" + vaultKey + fileKey);
+
+                // let fileKey;
+                // if (uri_spec === 'file') {
+                //     const uriEncodedName = encodeURIComponent(entry_res.name);
+                //     fileKey = "file=" + uriEncodedName;
+                // } else {
+                //     const uriEncodedPath = encodeURIComponent(entry_res.path);
+                //     fileKey = "path=" + uriEncodedPath;
+                // }
 
                 // /// NB skipping the subfolder path and hoping that obsidian can resolve the note based on the file name
                 // const uriEncoded = encodeURIComponent(entry_res.name);
@@ -1341,7 +1374,7 @@ Zotero.ObsCite = {
         this.addDebugLog('prefs', prefs);
 
         let config = {};
-        for (let pref of ['matchstrategy', 'source_dir', 'filefilterstrategy', 'filepattern', 'zotkeyregex', 'metadatakeyword', 'tagstr']) {
+        for (let pref of ['matchstrategy', 'source_dir', 'filefilterstrategy', 'filepattern', 'zotkeyregex', 'metadatakeyword', 'tagstr', 'vaultresolution', 'vaultname']) {
             try {
                 switch (pref) {
                     case 'matchstrategy':
@@ -1364,6 +1397,12 @@ Zotero.ObsCite = {
                         break;
                     case 'tagstr':
                         config[pref] = this._getParam_tagstr();
+                        break;
+                    case 'vaultresolution':
+                        config[pref] = this._getParam_vaultresolution();
+                        break;
+                    case 'vaultname':
+                        config[pref] = this._getParam_vaultname();
                         break;
                 }
             } catch (e) {

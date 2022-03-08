@@ -5,3 +5,5 @@ pref("extensions.obscite.metadatakeyword", "");
 pref("extensions.obscite.filefilterstrategy", "default");
 pref("extensions.obscite.filepattern", "^@.+\\.md$");
 pref("extensions.obscite.tagstr", "ObsCite");
+pref("extensions.obscite.vaultresolution", "path");
+pref("extensions.obscite.vaultname", "");
