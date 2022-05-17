@@ -13,7 +13,7 @@ if (typeof Zotero === 'undefined') {
 }
 
 Zotero.ObsCite = {
-    version: '0.0.15',
+    version: '0.0.16',
     folderSep: null,
     cleanrun: true,
     suppressNotifications: false,
@@ -195,8 +195,6 @@ Zotero.ObsCite = {
         }
     },
 
-
-
     // _getParam_bbtjson: function () {
     //     try {
     //         const bbtjson = this.getPref('bbtjson');
@@ -223,7 +221,7 @@ Zotero.ObsCite = {
                 throw new Error("bbtjson is not set or does not exist.");
             }
         } catch (e) {
-            this.showNotification("User Defined RegEx Invalid", "The RegEx you specifed in the ZoteroObsidianCitations preferences is invalid: " + e, false);
+            this.showNotification("User Defined RegEx Invalid", "The RegEx you specified in the ZoteroObsidianCitations preferences is invalid: " + e, false);
             Zotero.debug(`ObsVault Error: ${e}`);
             return null;
         }
@@ -339,7 +337,7 @@ Zotero.ObsCite = {
                 return false;
             }
         } else {
-            this.showNotification("ZoteroObsidianCitations", 'Zotero IDs Source Not Specified: ' + matchstrategy, false);
+            this.showNotification("ZotObsCite Error", 'Zotero IDs Source Not Specified: ' + matchstrategy, false);
             checkSettings_trace.matchstrategy = matchstrategy;
             this.debugSettingsFail = checkSettings_trace;
             return false;
@@ -597,9 +595,9 @@ Zotero.ObsCite = {
             if (promptSaveErrors) {
                 const dataErrors = JSON.stringify(reserrs, null, 1);
                 const warningTitle = "Markdown Import Error";
-                const warningMessage = "There were " + nerr.toString() + " Markdown notes that could note be parsed. \n\nWould you like to save these errors to a json file? \n\n(There were " + (res.length - reserrs.length).toString() + " notes parsed successfully.)";
+                const warningMessage = "There were " + nerr.toString() + " Markdown notes that could not be parsed. \n\nWould you like to save these errors to a json file? \n\n(There were " + (res.length - reserrs.length).toString() + " notes parsed successfully.)";
                 const saveDialogTitle = "Save ZoteroObsidianCitations Errors To...";
-                const filenamesuggest = 'ZoteroObsidianCitations-md-parsing-errors.json';
+                const filenamesuggest = 'ZotObsCite-md-parsing-errors.json';
                 await this.offerToSaveErrors(dataErrors, warningTitle, warningMessage, saveDialogTitle, filenamesuggest);
             } else {
                 this.showNotification("scanVault", "Unable to parse " + nerr.toString() + " of " + mdFiles.length.toString() + " notes.", false);
@@ -699,9 +697,9 @@ Zotero.ObsCite = {
             if (promptSaveErrors) {
                 const dataErrors = JSON.stringify(reserrs, null, 1);
                 const warningTitle = "Markdown Import Error";
-                const warningMessage = "There were " + nerr.toString() + " Markdown notes that could note be parsed. \n\nWould you like to save these errors to a json file? \n\n(There were " + (res.length - reserrs.length).toString() + " notes parsed successfully.)";
+                const warningMessage = "There were " + nerr.toString() + " Markdown notes that could not be parsed. \n\nWould you like to save these errors to a json file? \n\n(There were " + (res.length - reserrs.length).toString() + " notes parsed successfully.)";
                 const saveDialogTitle = "Save ZoteroObsidianCitations Errors To...";
-                const filenamesuggest = 'ZoteroObsidianCitations-md-parsing-errors.json';
+                const filenamesuggest = 'ZotObsCite-md-parsing-errors.json';
                 await this.offerToSaveErrors(dataErrors, warningTitle, warningMessage, saveDialogTitle, filenamesuggest);
             } else {
                 this.showNotification("scanVaultCustomRegex", "Unable to parse " + nerr.toString() + " of " + mdFiles.length.toString() + " notes.", false);
@@ -709,7 +707,6 @@ Zotero.ObsCite = {
         }
         return res;
     },
-
 
     // mapCitekeysBBTJSON: async function () {
     //     /* 
@@ -904,13 +901,13 @@ Zotero.ObsCite = {
 
             if (promptSaveErrors) {
                 const dataErrors = JSON.stringify(reserr, null, 1);
-                const warningTitle = "Umatched citekeys";
+                const warningTitle = "ZotObsCite Warning: Unmatched citekeys";
                 const warningMessage = "There were " + nerr.toString() + " citekeys in your Markdown notes that could not be matched to items in your Zotero library. \n\nWould you like to save the names of these citekeys in a json file? \n\n(Matches for " + (res.length - reserr.length).toString() + " citekeys were found successfully.)";
                 const saveDialogTitle = "Save ZoteroObsidianCitations Errors To...";
-                const filenamesuggest = 'ZoteroObsidianCitations-missing-entries.json';
+                const filenamesuggest = 'ZotObsCite-missing-entries.json';
                 await this.offerToSaveErrors(dataErrors, warningTitle, warningMessage, saveDialogTitle, filenamesuggest);
             } else {
-                this.showNotification("ZoteroObsidianCitations", "sliceObj Error: " + nerr.toString() + ".", false);
+                this.showNotification("ZotObsCite Warning", "" + nerr.toString() + " unmatched citekeys. Run Sync from Tools menu to generate report.", false);
             }
         }
         return res;
@@ -944,13 +941,13 @@ Zotero.ObsCite = {
 
             if (promptSaveErrors) {
                 const dataErrors = JSON.stringify(reserr, null, 1);
-                const warningTitle = "Umatched zoteroKeys";
+                const warningTitle = "ZotObsCite Warning: Unmatched zoteroKeys";
                 const warningMessage = "There were " + nerr.toString() + " zoteroKeys in your Markdown notes that could not be matched to items in your Zotero library. \n\nWould you like to save the names of these in a json file? \n\n(Matches for " + (res.length - reserr.length).toString() + " zoteroIDs were found successfully.)";
                 const saveDialogTitle = "Save ZoteroObsidianCitations Errors To...";
-                const filenamesuggest = 'ZoteroObsidianCitations-missing-entries.json';
+                const filenamesuggest = 'ZotObsCite-missing-entries.json';
                 await this.offerToSaveErrors(dataErrors, warningTitle, warningMessage, saveDialogTitle, filenamesuggest);
             } else {
-                this.showNotification("ZoteroObsidianCitations", "sliceObjCustomRegex Error: " + nerr.toString() + ".", false);
+                this.showNotification("ZotObsCite sliceObjCustomRegex Warning", "" + nerr.toString() + " unmatched zoteroKeys. Run Sync from Tools menu to generate report.", false);
             }
         }
         return res;
@@ -1065,10 +1062,10 @@ Zotero.ObsCite = {
 
         if (!this.cleanrun && promptSaveErrors) {
             const dataErrors = JSON.stringify(res, null, 1);
-            const warningTitle = "ZoteroObsidianCitations Warning";
-            const warningMessage = "There an issue matching some of your Markdown notes (" + this.dataKeys.length.toString() + " notes were matched successfully).\n\nWould you like to save the data extracted from the notes to a json file?";
+            const warningTitle = "ZotObsCite Warning";
+            const warningMessage = "There was an issue matching some of your Markdown notes (" + this.dataKeys.length.toString() + " notes were matched successfully).\n\nWould you like to save the data extracted from the notes to a json file?";
             const saveDialogTitle = "Save ZoteroObsidianCitations Data To...";
-            const filenamesuggest = 'ZoteroObsidianCitations-all-data.json';
+            const filenamesuggest = 'ZotObsCite-alldata.json';
             await this.offerToSaveErrors(dataErrors, warningTitle, warningMessage, saveDialogTitle, filenamesuggest);
         }
 
@@ -1138,7 +1135,7 @@ Zotero.ObsCite = {
             ndataKeys: 'unreached',
             updateItems: 'unreached'
         };
-        let notifData = ["ZoteroObsidianCitations Syncing Error", "Some Error Occurred", false];
+        let notifData = ["ZotObsCite Syncing Error", "Some Error Occurred", false];
         if (await this.checkSettings()) {
             trace.checkSetting = 'pass';
             await this.processData(promptSaveErrors, debug);
@@ -1153,10 +1150,10 @@ Zotero.ObsCite = {
                     message = "Found " + this.dataKeys.length.toString() + " notes.";
                     trace.updateItems = 'skipped';
                 }
-                notifData = ["ZoteroObsidianCitations Synced", message, true];
+                notifData = ["ZotObsCite Synced", message, true];
             } else {
                 message = "Found " + this.dataKeys.length.toString() + " notes.";
-                notifData = ["ZoteroObsidianCitations", message, false];
+                notifData = ["ZotObsCite", message, false];
             }
         } else {
             const failedSetting = JSON.stringify(this.debugSettingsFail);
@@ -1443,7 +1440,7 @@ Zotero.ObsCite = {
     saveDebug: async function () {
         const dataDebug = JSON.stringify(this.debuglog, null, 1);
         const saveDialogTitle = "Save ZoteroObsidianCitations Debug Log To...";
-        const filenamesuggest = 'ZoteroObsidianCitations-debug.json';
+        const filenamesuggest = 'ZotObsCite-debug.json';
         await this.writeToFile(dataDebug, saveDialogTitle, filenamesuggest);
     },
 
@@ -1451,7 +1448,7 @@ Zotero.ObsCite = {
         includeResults = (typeof includeResults === 'boolean') ? includeResults : true;
         const dataDebug = JSON.stringify(await this.runDebug(includeResults), null, 1);
         const saveDialogTitle = "Save ZoteroObsidianCitations Debug Log To...";
-        const filenamesuggest = 'ZoteroObsidianCitations-debug.json';
+        const filenamesuggest = 'ZotObsCite-debug.json';
         await this.writeToFile(dataDebug, saveDialogTitle, filenamesuggest);
     },
 

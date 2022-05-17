@@ -147,6 +147,11 @@
             <separator/>
 
             <!-- vault name -->
+            <label value="&obscite.preferences.vaultname-break;"/>
+
+            <separator/>
+            
+            <label value="&obscite.preferences.vaultname-label0;"/>
             <label value="&obscite.preferences.vaultname-label;"/>
             <hbox style="margin: 0"  align="center">
               <label value="&obscite.preferences.vaultname-label2;"/>
@@ -162,6 +167,14 @@
             <button id="id-obscite-rundebug-button" label="&obscite.preferences.rundebug-button-label;" oncommand="Zotero.ObsCite.runAndSaveDebug();"/>
             <separator/>
           </groupbox>
+
+          <!-- open github issues -->
+          <!-- <hbox style="margin: 0">
+            <label style="margin-right:0px" value="&...;"/>
+            <label style="margin-left:0px; margin-right:0px" class="text-link" onclick="Zotero.ObsCite.loadURL('https://github.com/daeh/zotero-obsidian-citations/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc');" value="&...;"/>
+            <label style="margin-left:0px; margin-right:0px" value="."/>
+          </hbox> -->
+
         </tabpanel>
 
       </tabpanels>

@@ -22,7 +22,7 @@
 
 <!ENTITY obscite.preferences.matchstrategy-bbtcitekey-title "Use BetterBibTeX citekeys to link markdown files to Zotero items (Option 1)">
 <!ENTITY obscite.preferences.matchstrategy-bbtcitekey-label "Match notes based on BetterBibTeX citekey">
-<!ENTITY obscite.preferences.matchstrategy-bbtcitekey-desc "ZoteroObsidianCitations will search the markdown files for BetterBibTeX citekeys.">
+<!ENTITY obscite.preferences.matchstrategy-bbtcitekey-desc "ZoteroObsidianCitations will search for a BetterBibTeX citekey in the filename and/or metadata.">
 
 <!ENTITY obscite.preferences.metadata-keyword-title "(Optional) Markdown Metadata Keyword">
 <!ENTITY obscite.preferences.metadata-keyword-label "yaml keyword:">
@@ -31,7 +31,7 @@
 
 <!ENTITY obscite.preferences.matchstrategy-zotitemkey-title "Use Zotero-Item-Keys to link markdown files to Zotero items (Option 2)">
 <!ENTITY obscite.preferences.matchstrategy-zotitemkey-label "Match notes based on Zotero-Item-Key">
-<!ENTITY obscite.preferences.matchstrategy-zotitemkey-desc "ZoteroObsidianCitations will search the markdown file contents for Zotero-Item-Keys.">
+<!ENTITY obscite.preferences.matchstrategy-zotitemkey-desc "ZoteroObsidianCitations will search for a Zotero-Item-Key in the file's contents.">
 
 <!ENTITY obscite.preferences.zotkeyregex-title1 "Required: Specify a RegEx to match the Zotero-Item-Key from the markdown contents">
 <!ENTITY obscite.preferences.zotkeyregex-title2  "               ( e.g. match 'ABCD1234' in 'zotero://select/library/items/ABCD1234' )">
@@ -44,17 +44,19 @@
 <!ENTITY obscite.preferences.spacer " ">
 
 <!ENTITY obscite.preferences.customtag-title "Specify a Custom Tag Name">
-<!ENTITY obscite.preferences.customtag-desc "The default tag is 'ObsCite'. If would prefer the tag to be something else, specify the tag name here.">
+<!ENTITY obscite.preferences.customtag-desc "The default Zotero tag is 'ObsCite'. If would prefer the tag to be something else, specify the tag name here.">
 <!ENTITY obscite.preferences.customtag-label "tag:">
 
 <!ENTITY obscite.preferences.vaultresolution-title "Obsidian URI - File Resolution Protocol">
 <!ENTITY obscite.preferences.vaultresolution-desc "The Obsidian URI can resolve files using a file path or a file name. The 'path' option is advised since file names are not necessarily unique.">
-<!ENTITY obscite.preferences.vaultresolution-label "Resolve Obsidian notes using the file">
-<!ENTITY obscite.preferences.vaultresolution-path-label "path (default)">
-<!ENTITY obscite.preferences.vaultresolution-file-label "name (only advised if 'path' is not working)">
+<!ENTITY obscite.preferences.vaultresolution-label "Resolve Obsidian notes using the MD file's">
+<!ENTITY obscite.preferences.vaultresolution-path-label "path (recommended)">
+<!ENTITY obscite.preferences.vaultresolution-file-label "name (only advised if 'path' option is not working)">
+<!ENTITY obscite.preferences.vaultname-break "- - - - - - - - - - ">
+<!ENTITY obscite.preferences.vaultname-label0 "(Optional) Obsidian Vault Name">
 <!ENTITY obscite.preferences.vaultname-label "If you use multiple Vaults, you can specify which Vault should open your markdown reading notes.">
 <!ENTITY obscite.preferences.vaultname-label2 "Obsidian Vault Name:">
 
 <!ENTITY obscite.preferences.rundebug-label "Save Debugging Log">
-<!ENTITY obscite.preferences.rundebug-desc "If you're encounternig errors, you can generate a debugging file to examine yourself and/or to include in a github issue.">
+<!ENTITY obscite.preferences.rundebug-desc "If you're encountering errors, you can generate a debugging file to examine yourself and/or to include in a GitHub issue.">
 <!ENTITY obscite.preferences.rundebug-button-label "Generate Debugging File">
