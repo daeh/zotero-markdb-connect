@@ -131,15 +131,17 @@ A reference using an Obsidian wiki link: [[@cusimano2018cogsci]]
 ## Related Projects
 
 - [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin)
-  Obsidian plugin which integrates your academic reference manager with the Obsidian editor.
+  Obsidian plugin that integrates your Zotero database with Obsidian.
+- [BibNotes Formatter](https://github.com/stefanopagliari/bibnotes)
+  Obsidian plugin to facilitate exporting annotations from Zotero into Obsidian.
+- [Obsidian Zotero Desktop Connector](https://github.com/mgmeyers/obsidian-zotero-desktop-connector)
+  Obsidian plugin to facilitate exporting annotations from Zotero into Obsidian.
 - [Zotero 6 'Export Notes' feature](https://forums.zotero.org/discussion/93521/available-for-beta-testing-markdown-export-of-notes/p1)
-  Zotero's `Export Note` beta feature to export notes from Zotero items as Markdown files.
+  Zotero 6 beta feature to export notes and annotations from Zotero items as Markdown files.
 - [Zotero-mdnotes](https://argentinaos.com/zotero-mdnotes/)
   Zotero plugin to export metadata and notes from Zotero items as Markdown files.
 - [Zotero to Markdown](https://github.com/e-alizadeh/Zotero2md)
   Python library to export annotations and notes from Zotero items as Markdown files.
-- [BibNotes Formatter](https://github.com/stefanopagliari/bibnotes)
-  Obsidian plugin to facilitate exporting annotations from Zotero items as Markdown files.
 
 ## Notes
 
