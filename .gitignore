@@ -1,8 +1,8 @@
 .project
 *.xpi
 .vscode
-*_gitignore
-*-gitignore
+*_gitignore.*
+*-gitignore.*
 node_modules
 package-lock.json
 package.json

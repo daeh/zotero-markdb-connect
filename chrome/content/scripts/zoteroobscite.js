@@ -13,7 +13,7 @@ if (typeof Zotero === 'undefined') {
 }
 
 Zotero.ObsCite = {
-    version: '0.0.16',
+    version: '0.0.17',
     folderSep: null,
     cleanrun: true,
     suppressNotifications: false,
@@ -195,22 +195,6 @@ Zotero.ObsCite = {
         }
     },
 
-    // _getParam_bbtjson: function () {
-    //     try {
-    //         const bbtjson = this.getPref('bbtjson');
-    //         const bbtjsonObj = new FileUtils.File(OS.Path.normalize(bbtjson));
-    //         if (typeof bbtjson === 'string' && bbtjson.length > 0 && bbtjsonObj.exists() && bbtjsonObj.isFile()) {
-    //             return bbtjsonObj.path;
-    //         } else {
-    //             throw new Error("bbtjson is not set or does not exist.");
-    //         }
-    //     } catch (e) {
-    //         this.showNotification("BBT JSON Library Export Not Found", "Set the path to your auto-updating BBT JSON export in the ZotObsCite preferences.", false);
-    //         Zotero.debug(`ObsVault Error: ${e}`);
-    //         return null;
-    //     }
-    // },
-
     _getParam_zotkeyregex: function () {
         try {
             const zotkeyregex = this.getPref('zotkeyregex');
@@ -254,6 +238,16 @@ Zotero.ObsCite = {
         } else {
             this.setPref('tagstr', 'ObsCite');
             return 'ObsCite';
+        }
+    },
+
+    _getParam_grouplibraries: function () {
+        const grouplibraries = this.getPref('grouplibraries');
+        if (['user', 'group'].includes(grouplibraries)) {
+            return grouplibraries;
+        } else {
+            this.setPref('grouplibraries', 'user');
+            return 'user';
         }
     },
 
@@ -442,7 +436,9 @@ Zotero.ObsCite = {
     findTaggedItems: async function () {
         const tagstr = this._getParam_tagstr();
         let s = new Zotero.Search();
-        s.libraryID = Zotero.Libraries.userLibraryID;
+        if (this._getParam_grouplibraries() === 'user') {
+            s.libraryID = Zotero.Libraries.userLibraryID;
+        }
         s.addCondition('tag', 'is', tagstr);
         let itemIDs = await s.search();
         let items_preexisting = await Zotero.Items.getAsync(itemIDs);
@@ -458,15 +454,6 @@ Zotero.ObsCite = {
             item.saveTx();
         });
         return true;
-    },
-
-    findPinnedCitekeyItems: async function () {
-        let s = new Zotero.Search();
-        s.libraryID = Zotero.Libraries.userLibraryID;
-        s.addCondition('extra', 'contains', 'Citation Key:');
-        let itemIDs = await s.search();
-        let items_preexisting = await Zotero.Items.getAsync(itemIDs);
-        return items_preexisting;
     },
 
     /*
@@ -708,39 +695,6 @@ Zotero.ObsCite = {
         return res;
     },
 
-    // mapCitekeysBBTJSON: async function () {
-    //     /* 
-    //      * make dict of BBTcitekey:zoteroID for every item in the BBTJSON file
-    //      */
-    //     let citekeymap = {};
-    //     let citekeymaperr = {};
-
-    //     const bbtjson = this._getParam_bbtjson();
-
-    //     const contents = JSON.parse(await Zotero.File.getContentsAsync(bbtjson));
-    //     const items = contents.items;
-    //     items.forEach(item => {
-    //         try {
-    //             const citekey = item.citekey;
-    //             const citationKey = item.citationKey;
-    //             const itemID = item.itemID;
-    //             const itemKey = item.itemKey;
-    //             citekeymap[citekey] = itemID;
-    //         } catch (e) {
-    //             citekeymaperr.push(item);
-    //         }
-    //     });
-
-    //     if (citekeymaperr.length > 0) {
-    //         this.cleanrun = false;
-    //         const nerr = citekeymaperr.length;
-    //         Zotero.debug(`${nerr} Read ObsVault Read Errors`);
-    //         Zotero.debug(`${citekeymaperr[0]}`);
-    //         this.showNotification("mapCitekeysBBTJSON", "Error: " + nerr.toString() + ".", false);
-    //     }
-    //     return citekeymap;
-    // },
-
     mapZoteroIDkeysInternalSearch: async function () {
         /* 
          * make dict of zoteroKey:zoteroID for every item in the library
@@ -750,7 +704,9 @@ Zotero.ObsCite = {
 
         /// get all items in library
         let s = new Zotero.Search();
-        s.libraryID = Zotero.Libraries.userLibraryID;
+        if (this._getParam_grouplibraries() === 'user') {
+            s.libraryID = Zotero.Libraries.userLibraryID;
+        }
         s.addCondition('deleted', 'false');
         let itemIDs = await s.search();
         let items = await Zotero.Items.getAsync(itemIDs);
@@ -771,36 +727,6 @@ Zotero.ObsCite = {
             this.showNotification("mapZoteroIDkeysInternalSearch", "Error: " + nerr.toString() + ".", false);
         }
         return keymap;
-    },
-
-    mapCitekeysInternalSearch: async function () {
-        /* 
-         * make dict of BBTcitekey:zoteroID for every item where the BBTcitekey in pinned
-         */
-        let citekeymap = {};
-        let citekeymaperr = {};
-
-        const items = await this.findPinnedCitekeyItems();
-
-        const re_extra = new RegExp(/^Citation Key: *(\S+)/m);
-        items.forEach(item => {
-            try {
-                const extra = item.getField('extra');
-                const citekey = extra.match(re_extra)[1].trim();
-                citekeymap[citekey] = item.itemID;
-            } catch (e) {
-                citekeymaperr.push(item);
-            }
-        });
-
-        if (citekeymaperr.length > 0) {
-            this.cleanrun = false;
-            const nerr = citekeymaperr.length;
-            Zotero.debug(`${nerr} Read ObsVault Read Errors`);
-            Zotero.debug(`${citekeymaperr[0]}`);
-            this.showNotification("mapCitekeysInternalSearch", "Error: " + nerr.toString() + ".", false);
-        }
-        return citekeymap;
     },
 
     _checkBBTinstalled: async function () {
@@ -847,7 +773,9 @@ Zotero.ObsCite = {
 
         /// get all items in library
         let s = new Zotero.Search();
-        s.libraryID = Zotero.Libraries.userLibraryID;
+        if (this._getParam_grouplibraries() === 'user') {
+            s.libraryID = Zotero.Libraries.userLibraryID;
+        }
         s.addCondition('deleted', 'false');
         let itemIDs = await s.search();
 
@@ -1002,7 +930,6 @@ Zotero.ObsCite = {
             if (debug) {
                 this.addDebugLog('mapCitekeysBBTquery', JSON.parse(JSON.stringify(citekeymap)));
             }
-            // const citekeymap = await this.mapCitekeysInternalSearch(); /// returns dict mapping zoteroKeys to zoteroIDs
 
             /// map BBT citekeys from markdown files with zoteroIDs
             res = await this.sliceObj(res, citekeymap, promptSaveErrors);
@@ -1313,6 +1240,27 @@ Zotero.ObsCite = {
         }
     },
 
+    openSelectedItemsLogseq: function (idx) {
+        idx = idx || 0;
+        const items = Services.wm.getMostRecentWindow("navigator:browser").ZoteroPane.getSelectedItems();
+
+        for (const item of items) {
+            if (this.dataKeys.includes(item.id)) {
+                const entry_res_list = this.data[item.id.toString()];
+
+                idx = (idx < entry_res_list.length && idx >= 0) ? idx : 0;
+                const entry_res = entry_res_list[idx];
+
+                const fileKey = "page=" + encodeURIComponent(entry_res.name);
+
+                Zotero.launchURL("logseq://graph/knowledge?" + fileKey);
+
+                /// only process first item if multiple selected
+                break;
+            }
+        }
+    },
+
     showSelectedItemMarkdownInFilesystem: function (idx) {
         idx = idx || 0;
         const items = Services.wm.getMostRecentWindow("navigator:browser").ZoteroPane.getSelectedItems();
@@ -1371,7 +1319,7 @@ Zotero.ObsCite = {
         this.addDebugLog('prefs', prefs);
 
         let config = {};
-        for (let pref of ['matchstrategy', 'source_dir', 'filefilterstrategy', 'filepattern', 'zotkeyregex', 'metadatakeyword', 'tagstr', 'vaultresolution', 'vaultname']) {
+        for (let pref of ['matchstrategy', 'source_dir', 'filefilterstrategy', 'filepattern', 'zotkeyregex', 'metadatakeyword', 'grouplibraries', 'tagstr', 'vaultresolution', 'vaultname']) {
             try {
                 switch (pref) {
                     case 'matchstrategy':
@@ -1391,6 +1339,9 @@ Zotero.ObsCite = {
                         break;
                     case 'metadatakeyword':
                         config[pref] = this._getParam_metadatakeyword();
+                        break;
+                    case 'grouplibraries':
+                        config[pref] = this._getParam_grouplibraries();
                         break;
                     case 'tagstr':
                         config[pref] = this._getParam_tagstr();

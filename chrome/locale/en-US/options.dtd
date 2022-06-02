@@ -43,6 +43,12 @@
 <!ENTITY obscite.preferences.choose-button-label "Choose…">
 <!ENTITY obscite.preferences.spacer " ">
 
+<!ENTITY obscite.preferences.grouplibraries-title "Include Group Libraries">
+<!ENTITY obscite.preferences.grouplibraries-desc "Whether to include items in Group Libraries when matching MD files, or only search for matches in the User Library.">
+<!ENTITY obscite.preferences.grouplibraries-user-label "Only match items in User Library.">
+<!ENTITY obscite.preferences.grouplibraries-group-label "Also match items in Group Libraries.">
+<!ENTITY obscite.preferences.grouplibraries-subdesc "NB you will need to assign a color to the ObsCite tag in each Group Library.">
+
 <!ENTITY obscite.preferences.customtag-title "Specify a Custom Tag Name">
 <!ENTITY obscite.preferences.customtag-desc "The default Zotero tag is 'ObsCite'. If would prefer the tag to be something else, specify the tag name here.">
 <!ENTITY obscite.preferences.customtag-label "tag:">
@@ -52,7 +58,7 @@
 <!ENTITY obscite.preferences.vaultresolution-label "Resolve Obsidian notes using the MD file's">
 <!ENTITY obscite.preferences.vaultresolution-path-label "path (recommended)">
 <!ENTITY obscite.preferences.vaultresolution-file-label "name (only advised if 'path' option is not working)">
-<!ENTITY obscite.preferences.vaultname-break "- - - - - - - - - - ">
+<!ENTITY obscite.preferences.vaultname-break "  ">
 <!ENTITY obscite.preferences.vaultname-label0 "(Optional) Obsidian Vault Name">
 <!ENTITY obscite.preferences.vaultname-label "If you use multiple Vaults, you can specify which Vault should open your markdown reading notes.">
 <!ENTITY obscite.preferences.vaultname-label2 "Obsidian Vault Name:">

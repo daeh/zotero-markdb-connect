@@ -1,3 +1,5 @@
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/daeh/zotero-obsidian-citations?style=for-the-badge)](https://github.com/daeh/zotero-obsidian-citations/releases/latest)![GitHub all releases](https://img.shields.io/github/downloads/daeh/zotero-obsidian-citations/total?style=for-the-badge)
+
 # Zotero Obsidian Citations
 
 - **_Adds colored tags to Zotero items that have associated Markdown notes stored in an external folder._**
@@ -28,7 +30,7 @@ Opens an existing Markdown note in [Obsidian](https://obsidian.md) from the cont
 - Run Zotero (version 5.x or 6.x)
 - Go to `Tools -> Add-ons`
 - `Install Add-on From File`
-- Choose the file `zotero-obsidian-citations-0.0.16.xpi`
+- Choose the file `zotero-obsidian-citations-0.0.17.xpi`
 - Restart Zotero
 
 ## Setup
@@ -155,5 +157,4 @@ Distributed under the MIT License.
 
 ## Author
 
-<a href="https://daeh.info" target="_self"><img alt="Personal Website" src="https://shields.io/badge/Personal%20Website-daeh.info-green?style=for-the-badge" /></a>
-<a href="https://twitter.com/DaeHoulihan" target="_self"><img alt="Twitter" src="https://img.shields.io/badge/twitter-%231DA1F2.svg?&style=for-the-badge&logo=twitter&logoColor=black" /></a>
+[![Personal Website](https://img.shields.io/badge/personal%20website-daeh.info-orange?style=for-the-badge)](https://daeh.info)[![Twitter](https://img.shields.io/badge/twitter-@DaeHoulihan-blue?style=for-the-badge&logo=twitter)](https://twitter.com/DaeHoulihan)

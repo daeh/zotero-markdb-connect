@@ -20,6 +20,7 @@
       <preference id="pref-obscite-zotkeyregex" name="extensions.obscite.zotkeyregex" type="string"/>
       <preference id="pref-obscite-metadatakeyword" name="extensions.obscite.metadatakeyword" type="string"/>
       <preference id="pref-obscite-tagstr" name="extensions.obscite.tagstr" type="string"/>
+      <preference id="pref-obscite-grouplibraries" name="extensions.obscite.grouplibraries" type="string"/>
       <preference id="pref-obscite-vaultresolution" name="extensions.obscite.vaultresolution" type="string"/>
       <preference id="pref-obscite-vaultname" name="extensions.obscite.vaultname" type="string"/>
     </preferences>
@@ -79,7 +80,7 @@
 
             <groupbox>
               <caption label="&obscite.preferences.matchstrategy-bbtcitekey-label;"/>
-              <radio label="&obscite.preferences.matchstrategy-bbtcitekey-label;" value="bbtcitekey" />
+              <radio style="font-size: 14px" label="&obscite.preferences.matchstrategy-bbtcitekey-label;" value="bbtcitekey" />
               <description style="width: 420px">&obscite.preferences.matchstrategy-bbtcitekey-desc;</description>
 
               <separator/>
@@ -97,7 +98,7 @@
 
             <groupbox>
               <caption label="&obscite.preferences.matchstrategy-zotitemkey-label;"/>
-              <radio label="&obscite.preferences.matchstrategy-zotitemkey-label;" value="zotitemkey" />
+              <radio style="font-size: 14px" label="&obscite.preferences.matchstrategy-zotitemkey-label;" value="zotitemkey" />
               <description style="width: 420px">&obscite.preferences.matchstrategy-zotitemkey-desc;</description>
 
               <separator/>
@@ -130,6 +131,17 @@
             </hbox>
           </groupbox>
 
+          <!-- include group libraries -->
+          <groupbox>
+            <caption label="&obscite.preferences.grouplibraries-title;"/>
+            <description style="width: 420px">&obscite.preferences.grouplibraries-desc;</description>
+            <radiogroup preference="pref-obscite-grouplibraries">
+              <radio label="&obscite.preferences.grouplibraries-user-label;" value="user" />
+              <radio label="&obscite.preferences.grouplibraries-group-label;" value="group" />
+            </radiogroup>
+            <label style="font-size: 10px" value="&obscite.preferences.grouplibraries-subdesc;"/>
+          </groupbox>
+
           <!-- obsidian file resolution -->
           <groupbox>
             <caption label="&obscite.preferences.vaultresolution-title;"/>
@@ -138,7 +150,7 @@
             <separator/>
             
             <!-- file name or file path -->
-            <label value="&obscite.preferences.vaultresolution-label;"/>
+            <label style="font-size: 14px" value="&obscite.preferences.vaultresolution-label;"/>
             <radiogroup preference="pref-obscite-vaultresolution">
               <radio label="&obscite.preferences.vaultresolution-path-label;" value="path" />
               <radio label="&obscite.preferences.vaultresolution-file-label;" value="file" />
@@ -151,7 +163,7 @@
 
             <separator/>
             
-            <label value="&obscite.preferences.vaultname-label0;"/>
+            <label style="font-size: 14px" value="&obscite.preferences.vaultname-label0;"/>
             <label value="&obscite.preferences.vaultname-label;"/>
             <hbox style="margin: 0"  align="center">
               <label value="&obscite.preferences.vaultname-label2;"/>
