@@ -1,4 +1,4 @@
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/daeh/zotero-obsidian-citations?style=for-the-badge)](https://github.com/daeh/zotero-obsidian-citations/releases/latest)![GitHub all releases](https://img.shields.io/github/downloads/daeh/zotero-obsidian-citations/total?style=for-the-badge)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/daeh/zotero-obsidian-citations?style=for-the-badge)](https://github.com/daeh/zotero-obsidian-citations/releases/latest)  ![GitHub all releases](https://img.shields.io/github/downloads/daeh/zotero-obsidian-citations/total?style=for-the-badge)
 
 # Zotero Obsidian Citations
 
@@ -157,4 +157,4 @@ Distributed under the MIT License.
 
 ## Author
 
-[![Personal Website](https://img.shields.io/badge/personal%20website-daeh.info-orange?style=for-the-badge)](https://daeh.info)[![Twitter](https://img.shields.io/badge/twitter-@DaeHoulihan-blue?style=for-the-badge&logo=twitter)](https://twitter.com/DaeHoulihan)
+[![Personal Website](https://img.shields.io/badge/personal%20website-daeh.info-orange?style=for-the-badge)](https://daeh.info)  [![Twitter](https://img.shields.io/badge/twitter-@DaeHoulihan-blue?style=for-the-badge&logo=twitter)](https://twitter.com/DaeHoulihan)
