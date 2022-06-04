@@ -49,7 +49,7 @@
             <label style="font-size: 14px" value="&mdbconnect.preferences.vault-source-folder;"/>
             <hbox  style="margin: 0"  align="center">
               <textbox id="id-mdbconnect-source_dir" preference="pref-mdbconnect-source_dir" flex="1" />
-              <button id="id-mdbconnect-source_dir-button" label="&mdbconnect.preferences.choose-button-label;" oncommand="Zotero.MDBconnect.chooseVaultFolder();"/>
+              <button id="id-mdbconnect-source_dir-button" label="&mdbconnect.preferences.choose-button-label;" oncommand="Zotero.MarkDBconnect.chooseVaultFolder();"/>
             </hbox>
             <label value="&mdbconnect.preferences.vault-source-folder-desc;"/>
             
@@ -90,7 +90,7 @@
               <label id="id-mdbconnect-metadatakeyword-title" value="&mdbconnect.preferences.metadata-keyword-title;"/>
               <hbox style="margin: 0"  align="center">
                 <label id="id-mdbconnect-metadatakeyword-label" value="&mdbconnect.preferences.metadata-keyword-label;"/>
-                <textbox id="id-mdbconnect-metadatakeyword" preference="pref-mdbconnect-metadatakeyword" onchange="Zotero.MDBconnect.checkMetadataFormat();"/>
+                <textbox id="id-mdbconnect-metadatakeyword" preference="pref-mdbconnect-metadatakeyword" onchange="Zotero.MarkDBconnect.checkMetadataFormat();"/>
               </hbox>
               <label id="id-mdbconnect-metadatakeyword-desc1" style="font-size: 10px" value="&mdbconnect.preferences.metadata-keyword-desc1;"/>
               <label id="id-mdbconnect-metadatakeyword-desc2" style="font-size: 10px" value="&mdbconnect.preferences.metadata-keyword-desc2;"/>
@@ -129,7 +129,7 @@
             <description style="width: 420px">&mdbconnect.preferences.customtag-desc;</description>
             <hbox style="margin: 0"  align="center">
               <label value="&mdbconnect.preferences.customtag-label;"/>
-              <textbox preference="pref-mdbconnect-tagstr" onchange="Zotero.MDBconnect.checkTagStr();"/>
+              <textbox preference="pref-mdbconnect-tagstr" onchange="Zotero.MarkDBconnect.checkTagStr();"/>
             </hbox>
           </groupbox>
 
@@ -203,13 +203,13 @@
           <groupbox>
             <caption label="&mdbconnect.preferences.rundebug-label;"/>
             <description style="width: 420px">&mdbconnect.preferences.rundebug-desc;</description>
-            <button id="id-mdbconnect-rundebug-button" label="&mdbconnect.preferences.rundebug-button-label;" oncommand="Zotero.MDBconnect.runAndSaveDebug();"/>
+            <button id="id-mdbconnect-rundebug-button" label="&mdbconnect.preferences.rundebug-button-label;" oncommand="Zotero.MarkDBconnect.runAndSaveDebug();"/>
           </groupbox>
 
           <!-- open github issues -->
           <!-- <hbox style="margin: 0">
             <label style="margin-right:0px" value="&...;"/>
-            <label style="margin-left:0px; margin-right:0px" class="text-link" onclick="Zotero.MDBconnect.loadURL('https://github.com/daeh/zotero-markdowndb-connect/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc');" value="&...;"/>
+            <label style="margin-left:0px; margin-right:0px" class="text-link" onclick="Zotero.MarkDBconnect.loadURL('https://github.com/daeh/zotero-markdowndb-connect/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc');" value="&...;"/>
             <label style="margin-left:0px; margin-right:0px" value="."/>
           </hbox> -->
 

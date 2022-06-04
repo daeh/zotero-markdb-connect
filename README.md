@@ -1,15 +1,16 @@
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/daeh/zotero-markdowndb-connect?style=for-the-badge)](https://github.com/daeh/zotero-markdowndb-connect/releases/latest) ![GitHub all releases](https://img.shields.io/github/downloads/daeh/zotero-markdowndb-connect/total?style=for-the-badge)
 
-# MarkDBConnect (Zotero Obsidian Citations)
+# MarkDBConnect (Zotero Markdown DataBase Connect)
 
 - **_Adds colored tags to Zotero items that have associated Markdown notes stored in an external folder._**
 - **_Opens Markdown notes from the contextual menu of Zotero items._**
+- **_Supports various Markdown databases, including [Obsidian](https://obsidian.md), [logseq](https://logseq.com), and [Zettlr](https://www.zettlr.com)_**
 
 ![MarkDBConnectScreenshot](MarkDBConnectScreenshot.png)
 
-This is an plugin for [Zotero](https://www.zotero.org), a research source management tool. The _MarkDBConnect_ plugin searchs an user-defined folder for Markdown files that include a [Better BibTeX](https://retorque.re/zotero-better-bibtex/) citekey or Zotero Item Key, and adds a colored tag to the corresponding Zotero items.
+This is a plugin for [Zotero](https://www.zotero.org), a research source management tool. The _MarkDBConnect_ plugin searches a user-defined folder for Markdown files that include a [Better BibTeX](https://retorque.re/zotero-better-bibtex/) citekey or Zotero Item Key, and adds a colored tag to the corresponding Zotero items.
 
-Currently this plugin designed with the [Obsidian](https://obsidian.md) Markdown editor in mind, and was inspired by the [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin) workflow. It can be adapted to other databases that store Markdown files outside of Zotero, and to other workflows that generate Markdown reading notes linked to Zotero items (such as Zotero's `Export Note` feature).
+This plugin was initially designed with the [Obsidian](https://obsidian.md) Markdown editor in mind, and was inspired by the [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin) workflow. It offers preliminary support for [logseq](https://logseq.com) and [Zettlr](https://www.zettlr.com). It can be adapted to other databases that store Markdown files outside of Zotero, and to other workflows that generate Markdown reading notes linked to Zotero items (such as Zotero's `Export Note` feature).
 
 Please post any bugs, questions, or feature requests in the Github repository.
 
@@ -19,7 +20,7 @@ Adds a colored tag to Zotero items for which there are associated reading notes 
 
 Supports multiple Markdown files for a single Zotero item.
 
-Opens an existing Markdown note in [Obsidian](https://obsidian.md) from the contextual menu of a Zotero item.
+Opens an existing Markdown note in [Obsidian](https://obsidian.md), [logseq](https://logseq.com), or the system's default Markdown note editor (e.g. [Zettlr](https://www.zettlr.com), [Typora](https://typora.io)) from the contextual menu of a Zotero item.
 
 ![MarkDBConnectMenu](MarkDBConnectMenu.png)
 
@@ -30,7 +31,7 @@ Opens an existing Markdown note in [Obsidian](https://obsidian.md) from the cont
 - Run Zotero (version 5.x or 6.x)
 - Go to `Tools -> Add-ons`
 - `Install Add-on From File`
-- Choose the file `MarkDBConnect-0.0.17.xpi`
+- Choose the file `MarkDBConnect-0.0.18.xpi`
 - Restart Zotero
 
 ## Setup

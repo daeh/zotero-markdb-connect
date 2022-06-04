@@ -13,8 +13,8 @@ if (typeof Zotero === 'undefined') {
 }
 
 
-Zotero.MDBconnect = {
-    version: '0.0.17',
+Zotero.MarkDBconnect = {
+    version: '0.0.18',
     folderSep: null,
     cleanrun: true,
     suppressNotifications: false,
@@ -1120,6 +1120,14 @@ Zotero.MDBconnect = {
                     }
                 }
                 this.setPref('configuration', this.version);
+
+                try {
+                    let obscite = Zotero.ObsCite.version;
+                    if (typeof obscite === 'string' && obscite.length > 0) {
+                        this.showNotification(...["MarkDBConnect", "ZotObsCite has been renamed. Please remove 'ZoteroObsidianCitations' from your Extensions", false]);
+                        return;
+                    }
+                } catch (error) {}
             } else {
                 /// don't run sync if plugin has yet to be configured
                 this.showNotification(...["MarkDBConnect", "Please configure MarkDBConnect preferences", true]);
@@ -1449,6 +1457,6 @@ Zotero.MDBconnect = {
 
 if (typeof window !== 'undefined') {
     window.addEventListener('load', e => {
-        Zotero.MDBconnect.init();
+        Zotero.MarkDBconnect.init();
     }, false);
 }
