@@ -2,8 +2,8 @@
 
 version='0.0.18a'
 
-rm -f ZotObsCite-${version}.xpi
-zip -r ZotObsCite-${version}.xpi chrome/* defaults/* chrome.manifest install.rdf
+rm -f MarkDBConnect-${version}.xpi
+zip -r MarkDBConnect-${version}.xpi chrome/* defaults/* chrome.manifest install.rdf -x "*.DS_Store"
 
 # To release a new version:
 # - increase version number in all files (not just here)

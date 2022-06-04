@@ -1,7 +1,7 @@
-content zotobscite chrome/content/
+content markdbconnect chrome/content/
 
-overlay chrome://zotero/content/zoteroPane.xul chrome://zotobscite/content/overlay.xul
+overlay chrome://zotero/content/zoteroPane.xul chrome://markdbconnect/content/overlay.xul
 
-locale  zotobscite  en-US   chrome/locale/en-US/
+locale  markdbconnect  en-US   chrome/locale/en-US/
 
-skin    zotobscite  default chrome/skin/default/zotobscite/
+skin    markdbconnect  default chrome/skin/default/markdbconnect/

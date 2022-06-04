@@ -1,5 +1,5 @@
 /**
-ZotObsCite
+MarkDBConnect
 Dae Houlihan
 */
 
@@ -12,7 +12,8 @@ if (typeof Zotero === 'undefined') {
     Zotero = {};
 }
 
-Zotero.ObsCite = {
+
+Zotero.MDBconnect = {
     version: '0.0.17',
     folderSep: null,
     cleanrun: true,
@@ -71,11 +72,11 @@ Zotero.ObsCite = {
     },
 
     getPref: function (pref) {
-        return Zotero.Prefs.get('extensions.obscite.' + pref, true);
+        return Zotero.Prefs.get('extensions.mdbconnect.' + pref, true);
     },
 
     setPref: function (pref, value) {
-        Zotero.Prefs.set('extensions.obscite.' + pref, value, true);
+        Zotero.Prefs.set('extensions.mdbconnect.' + pref, value, true);
     },
 
     futureRun: function (fn) {
@@ -163,7 +164,7 @@ Zotero.ObsCite = {
                 throw new Error("vaultpath is not set or does not exist.");
             }
         } catch (e) {
-            this.showNotification("Vault Path Not Found", "Set the path to your notes in the ZotObsCite preferences.", false);
+            this.showNotification("Vault Path Not Found", "Set the path to your notes in the MarkDBConnect preferences.", false);
             Zotero.debug(`ObsVault Error: ${e}`);
             return null;
         }
@@ -205,7 +206,7 @@ Zotero.ObsCite = {
                 throw new Error("bbtjson is not set or does not exist.");
             }
         } catch (e) {
-            this.showNotification("User Defined RegEx Invalid", "The RegEx you specified in the ZotObsCite preferences is invalid: " + e, false);
+            this.showNotification("User Defined RegEx Invalid", "The RegEx you specified in the MarkDBConnect preferences is invalid: " + e, false);
             Zotero.debug(`ObsVault Error: ${e}`);
             return null;
         }
@@ -341,7 +342,7 @@ Zotero.ObsCite = {
                 return false;
             }
         } else {
-            this.showNotification("ZotObsCite Error", 'Zotero IDs Source Not Specified: ' + matchstrategy, false);
+            this.showNotification("MarkDBConnect Error", 'Zotero IDs Source Not Specified: ' + matchstrategy, false);
             checkSettings_trace.matchstrategy = matchstrategy;
             this.debugSettingsFail = checkSettings_trace;
             return false;
@@ -593,8 +594,8 @@ Zotero.ObsCite = {
                 const dataErrors = JSON.stringify(reserrs, null, 1);
                 const warningTitle = "Markdown Import Error";
                 const warningMessage = "There were " + nerr.toString() + " Markdown notes that could not be parsed. \n\nWould you like to save these errors to a json file? \n\n(There were " + (res.length - reserrs.length).toString() + " notes parsed successfully.)";
-                const saveDialogTitle = "Save ZotObsCite Errors To...";
-                const filenamesuggest = 'ZotObsCite-md-parsing-errors.json';
+                const saveDialogTitle = "Save MarkDBConnect Errors To...";
+                const filenamesuggest = 'MarkDBConnect-md-parsing-errors.json';
                 await this.offerToSaveErrors(dataErrors, warningTitle, warningMessage, saveDialogTitle, filenamesuggest);
             } else {
                 this.showNotification("scanVault", "Unable to parse " + nerr.toString() + " of " + mdFiles.length.toString() + " notes.", false);
@@ -695,8 +696,8 @@ Zotero.ObsCite = {
                 const dataErrors = JSON.stringify(reserrs, null, 1);
                 const warningTitle = "Markdown Import Error";
                 const warningMessage = "There were " + nerr.toString() + " Markdown notes that could not be parsed. \n\nWould you like to save these errors to a json file? \n\n(There were " + (res.length - reserrs.length).toString() + " notes parsed successfully.)";
-                const saveDialogTitle = "Save ZotObsCite Errors To...";
-                const filenamesuggest = 'ZotObsCite-md-parsing-errors.json';
+                const saveDialogTitle = "Save MarkDBConnect Errors To...";
+                const filenamesuggest = 'MarkDBConnect-md-parsing-errors.json';
                 await this.offerToSaveErrors(dataErrors, warningTitle, warningMessage, saveDialogTitle, filenamesuggest);
             } else {
                 this.showNotification("scanVaultCustomRegex", "Unable to parse " + nerr.toString() + " of " + mdFiles.length.toString() + " notes.", false);
@@ -839,13 +840,13 @@ Zotero.ObsCite = {
 
             if (promptSaveErrors) {
                 const dataErrors = JSON.stringify(reserr, null, 1);
-                const warningTitle = "ZotObsCite Warning: Unmatched citekeys";
+                const warningTitle = "MarkDBConnect Warning: Unmatched citekeys";
                 const warningMessage = "There were " + nerr.toString() + " citekeys in your Markdown notes that could not be matched to items in your Zotero library. \n\nWould you like to save the names of these citekeys in a json file? \n\n(Matches for " + (res.length - reserr.length).toString() + " citekeys were found successfully.)";
-                const saveDialogTitle = "Save ZotObsCite Errors To...";
-                const filenamesuggest = 'ZotObsCite-missing-entries.json';
+                const saveDialogTitle = "Save MarkDBConnect Errors To...";
+                const filenamesuggest = 'MarkDBConnect-missing-entries.json';
                 await this.offerToSaveErrors(dataErrors, warningTitle, warningMessage, saveDialogTitle, filenamesuggest);
             } else {
-                this.showNotification("ZotObsCite Warning", "" + nerr.toString() + " unmatched citekeys. Run Sync from Tools menu to generate report.", false);
+                this.showNotification("MarkDBConnect Warning", "" + nerr.toString() + " unmatched citekeys. Run Sync from Tools menu to generate report.", false);
             }
         }
         return res;
@@ -879,13 +880,13 @@ Zotero.ObsCite = {
 
             if (promptSaveErrors) {
                 const dataErrors = JSON.stringify(reserr, null, 1);
-                const warningTitle = "ZotObsCite Warning: Unmatched zoteroKeys";
+                const warningTitle = "MarkDBConnect Warning: Unmatched zoteroKeys";
                 const warningMessage = "There were " + nerr.toString() + " zoteroKeys in your Markdown notes that could not be matched to items in your Zotero library. \n\nWould you like to save the names of these in a json file? \n\n(Matches for " + (res.length - reserr.length).toString() + " zoteroIDs were found successfully.)";
-                const saveDialogTitle = "Save ZotObsCite Errors To...";
-                const filenamesuggest = 'ZotObsCite-missing-entries.json';
+                const saveDialogTitle = "Save MarkDBConnect Errors To...";
+                const filenamesuggest = 'MarkDBConnect-missing-entries.json';
                 await this.offerToSaveErrors(dataErrors, warningTitle, warningMessage, saveDialogTitle, filenamesuggest);
             } else {
-                this.showNotification("ZotObsCite sliceObjCustomRegex Warning", "" + nerr.toString() + " unmatched zoteroKeys. Run Sync from Tools menu to generate report.", false);
+                this.showNotification("MarkDBConnect sliceObjCustomRegex Warning", "" + nerr.toString() + " unmatched zoteroKeys. Run Sync from Tools menu to generate report.", false);
             }
         }
         return res;
@@ -925,9 +926,9 @@ Zotero.ObsCite = {
             res = await this.scanVault(promptSaveErrors); /// returns data array containing BBT citekeys
             if (res.length === 0) {
                 if (this._getParam_filefilterstrategy() === 'default') {
-                    this.showNotification("No Markdown files found", "Check the path to your Markdown notes in the ZotObsCite preferences.", false);
+                    this.showNotification("No Markdown files found", "Check the path to your Markdown notes in the MarkDBConnect preferences.", false);
                 } else {
-                    this.showNotification("No Markdown files found", "Check the File Filter RegEx and the path to your Markdown notes in the ZotObsCite preferences.", false);
+                    this.showNotification("No Markdown files found", "Check the File Filter RegEx and the path to your Markdown notes in the MarkDBConnect preferences.", false);
                 }
                 return;
             }
@@ -952,7 +953,7 @@ Zotero.ObsCite = {
             /// get zoterokeys from markdown files ///
             res = await this.scanVaultCustomRegex(promptSaveErrors); /// returns data array containing zoteroKeys
             if (res.length === 0) {
-                this.showNotification("No Markdown files found", "Set the path to your Markdown notes in the ZotObsCite preferences.", false);
+                this.showNotification("No Markdown files found", "Set the path to your Markdown notes in the MarkDBConnect preferences.", false);
                 return;
             }
             if (debug) {
@@ -999,10 +1000,10 @@ Zotero.ObsCite = {
 
         if (!this.cleanrun && promptSaveErrors) {
             const dataErrors = JSON.stringify(res, null, 1);
-            const warningTitle = "ZotObsCite Warning";
+            const warningTitle = "MarkDBConnect Warning";
             const warningMessage = "There was an issue matching some of your Markdown notes (" + this.dataKeys.length.toString() + " notes were matched successfully).\n\nWould you like to save the data extracted from the notes to a json file?";
-            const saveDialogTitle = "Save ZotObsCite Data To...";
-            const filenamesuggest = 'ZotObsCite-alldata.json';
+            const saveDialogTitle = "Save MarkDBConnect Data To...";
+            const filenamesuggest = 'MarkDBConnect-alldata.json';
             await this.offerToSaveErrors(dataErrors, warningTitle, warningMessage, saveDialogTitle, filenamesuggest);
         }
 
@@ -1072,7 +1073,7 @@ Zotero.ObsCite = {
             ndataKeys: 'unreached',
             updateItems: 'unreached'
         };
-        let notifData = ["ZotObsCite Syncing Error", "Some Error Occurred", false];
+        let notifData = ["MarkDBConnect Syncing Error", "Some Error Occurred", false];
         if (await this.checkSettings()) {
             trace.checkSetting = 'pass';
             await this.processData(promptSaveErrors, debug);
@@ -1087,10 +1088,10 @@ Zotero.ObsCite = {
                     message = "Found " + this.dataKeys.length.toString() + " notes.";
                     trace.updateItems = 'skipped';
                 }
-                notifData = ["ZotObsCite Synced", message, true];
+                notifData = ["MarkDBConnect Synced", message, true];
             } else {
                 message = "Found " + this.dataKeys.length.toString() + " notes.";
-                notifData = ["ZotObsCite", message, false];
+                notifData = ["MarkDBConnect", message, false];
             }
         } else {
             const failedSetting = JSON.stringify(this.debugSettingsFail);
@@ -1106,6 +1107,25 @@ Zotero.ObsCite = {
     ////////////
 
     startupDependencyCheck: async function () {
+        const configuration = this.getPref('configuration');
+        if (configuration === 'false') {
+            /// check if there are preexisting preferences
+            const obscite_source_dir = Zotero.Prefs.get('extensions.obscite.source_dir', true);
+            let obscite_prefs_found = (typeof obscite_source_dir === 'string' && obscite_source_dir.length > 0) ? true : false;
+            if (obscite_prefs_found === true) {
+                for (let pref of ['matchstrategy', 'source_dir', 'filefilterstrategy', 'filepattern', 'zotkeyregex', 'metadatakeyword', 'grouplibraries', 'tagstr', 'vaultresolution', 'vaultname', 'logseqgraphname']) {
+                    let prefval = Zotero.Prefs.get('extensions.obscite.' + pref, true);
+                    if (typeof prefval === 'string' && prefval.length > 0) {
+                        this.setPref(pref, prefval);
+                    }
+                }
+                this.setPref('configuration', this.version);
+            } else {
+                /// don't run sync if plugin has yet to be configured
+                this.showNotification(...["MarkDBConnect", "Please configure MarkDBConnect preferences", true]);
+                return;
+            }
+        }
         const promptSaveErrors = false;
         const syncTags = true; // syncOnStart
         const notifData = await this.runSync(promptSaveErrors, syncTags);
@@ -1132,43 +1152,31 @@ Zotero.ObsCite = {
             }
         }
 
-        const uri_spec = this._getParam_vaultresolution();
-
         if (found_multiple) {
-            doc.getElementById("id-obscite-itemmenu-separator-top").hidden = false;
-            doc.getElementById("id-obscite-itemmenu-open-obsidian").hidden = true;
-            doc.getElementById("id-obscite-itemmenu-show-md").hidden = true;
-            doc.getElementById("id-obscite-itemmenu-listobsidian-restrict").hidden = false;
-            doc.getElementById("id-obscite-itemmenu-listmd-restrict").hidden = false;
-            if (uri_spec === "logseq") {
-                doc.getElementById("id-obscite-itemmenu-listobsidian-restrict").setAttribute('label', "Open logseq Page");
-            } else if (uri_spec === "default") {
-                doc.getElementById("id-obscite-itemmenu-listobsidian-restrict").setAttribute('label', "Open MD File in Default Editor");
-            }
+            doc.getElementById("id-mdbconnect-itemmenu-separator-top").hidden = false;
+            doc.getElementById("id-mdbconnect-itemmenu-open-obsidian").hidden = true;
+            doc.getElementById("id-mdbconnect-itemmenu-show-md").hidden = true;
+            doc.getElementById("id-mdbconnect-itemmenu-listobsidian-restrict").hidden = false;
+            doc.getElementById("id-mdbconnect-itemmenu-listmd-restrict").hidden = false;
         } else if (found_single) {
-            doc.getElementById("id-obscite-itemmenu-separator-top").hidden = false;
-            doc.getElementById("id-obscite-itemmenu-open-obsidian").hidden = false;
-            doc.getElementById("id-obscite-itemmenu-show-md").hidden = false;
-            doc.getElementById("id-obscite-itemmenu-listobsidian-restrict").hidden = true;
-            doc.getElementById("id-obscite-itemmenu-listmd-restrict").hidden = true;
-            if (uri_spec === "logseq") {
-                doc.getElementById("id-obscite-itemmenu-open-obsidian").setAttribute('label', "Open logseq Page");
-            } else if (uri_spec === "default") {
-                doc.getElementById("id-obscite-itemmenu-open-obsidian").setAttribute('label', "Open MD File in Default Editor");
-            }
+            doc.getElementById("id-mdbconnect-itemmenu-separator-top").hidden = false;
+            doc.getElementById("id-mdbconnect-itemmenu-open-obsidian").hidden = false;
+            doc.getElementById("id-mdbconnect-itemmenu-show-md").hidden = false;
+            doc.getElementById("id-mdbconnect-itemmenu-listobsidian-restrict").hidden = true;
+            doc.getElementById("id-mdbconnect-itemmenu-listmd-restrict").hidden = true;
         } else {
-            doc.getElementById("id-obscite-itemmenu-separator-top").hidden = true;
-            doc.getElementById("id-obscite-itemmenu-open-obsidian").hidden = true;
-            doc.getElementById("id-obscite-itemmenu-show-md").hidden = true;
-            doc.getElementById("id-obscite-itemmenu-listobsidian-restrict").hidden = true;
-            doc.getElementById("id-obscite-itemmenu-listmd-restrict").hidden = true;
+            doc.getElementById("id-mdbconnect-itemmenu-separator-top").hidden = true;
+            doc.getElementById("id-mdbconnect-itemmenu-open-obsidian").hidden = true;
+            doc.getElementById("id-mdbconnect-itemmenu-show-md").hidden = true;
+            doc.getElementById("id-mdbconnect-itemmenu-listobsidian-restrict").hidden = true;
+            doc.getElementById("id-mdbconnect-itemmenu-listmd-restrict").hidden = true;
         }
 
     },
 
     buildItemContextMenuListObsidian: function () {
         let win = Services.wm.getMostRecentWindow('navigator:browser');
-        let nodes = win.ZoteroPane.document.getElementById('id-obscite-itemmenu-listobsidian-menu').childNodes;
+        let nodes = win.ZoteroPane.document.getElementById('id-mdbconnect-itemmenu-listobsidian-menu').childNodes;
         // hide all items by default
         for (let i = 0; i < nodes.length; i++) nodes[i].setAttribute('hidden', true);
 
@@ -1197,7 +1205,7 @@ Zotero.ObsCite = {
 
     buildItemContextMenuListMD: function () {
         let win = Services.wm.getMostRecentWindow('navigator:browser');
-        let nodes = win.ZoteroPane.document.getElementById('id-obscite-itemmenu-listmd-menu').childNodes;
+        let nodes = win.ZoteroPane.document.getElementById('id-mdbconnect-itemmenu-listmd-menu').childNodes;
         // hide all items by default
         for (let i = 0; i < nodes.length; i++) nodes[i].setAttribute('hidden', true);
 
@@ -1400,16 +1408,16 @@ Zotero.ObsCite = {
 
     saveDebug: async function () {
         const dataDebug = JSON.stringify(this.debuglog, null, 1);
-        const saveDialogTitle = "Save ZotObsCite Debug Log To...";
-        const filenamesuggest = 'ZotObsCite-debug.json';
+        const saveDialogTitle = "Save MarkDBConnect Debug Log To...";
+        const filenamesuggest = 'MarkDBConnect-debug.json';
         await this.writeToFile(dataDebug, saveDialogTitle, filenamesuggest);
     },
 
     runAndSaveDebug: async function (includeResults) {
         includeResults = (typeof includeResults === 'boolean') ? includeResults : true;
         const dataDebug = JSON.stringify(await this.runDebug(includeResults), null, 1);
-        const saveDialogTitle = "Save ZotObsCite Debug Log To...";
-        const filenamesuggest = 'ZotObsCite-debug.json';
+        const saveDialogTitle = "Save MarkDBConnect Debug Log To...";
+        const filenamesuggest = 'MarkDBConnect-debug.json';
         await this.writeToFile(dataDebug, saveDialogTitle, filenamesuggest);
     },
 
@@ -1423,13 +1431,14 @@ Zotero.ObsCite = {
     },
 
     openPreferenceWindow: function (paneID, action) {
+        this.setPref('configuration', this.version);
         let io = {
             pane: paneID,
             action: action
         };
         window.openDialog(
-            'chrome://zotobscite/content/options.xul',
-            'obscite-pref',
+            'chrome://markdbconnect/content/options.xul',
+            'mdbconnect-pref',
             'chrome,titlebar,toolbar,centerscreen' + Zotero.Prefs.get('browser.preferences.instantApply', true) ? 'dialog=no' : 'modal',
             io
         );
@@ -1440,6 +1449,6 @@ Zotero.ObsCite = {
 
 if (typeof window !== 'undefined') {
     window.addEventListener('load', e => {
-        Zotero.ObsCite.init();
+        Zotero.MDBconnect.init();
     }, false);
 }

@@ -1,8 +1,8 @@
-<!ENTITY obscite.tools-menu.syncdb-label "ZotObsCite Sync Tags">
-<!ENTITY obscite.tools-menu.preferences-label "ZotObsCite Preferences…">
+<!ENTITY mdbconnect.tools-menu.syncdb-label "MarkDBConnect Sync Tags">
+<!ENTITY mdbconnect.tools-menu.preferences-label "MarkDBConnect Preferences…">
 
-<!ENTITY obscite.item-menu.open-obsidian-label "Open ObsidianMD Note">
-<!ENTITY obscite.item-menu.show-md-label "Show Markdown File">
+<!ENTITY mdbconnect.item-menu.open-obsidian-label "Open MD Note">
+<!ENTITY mdbconnect.item-menu.show-md-label "Show Markdown File">
 
-<!ENTITY obscite.item-menu.list-obsidian-label "Open ObsidianMD Note">
-<!ENTITY obscite.item-menu.list-md-label "Show Markdown File">
+<!ENTITY mdbconnect.item-menu.list-obsidian-label "Open MD Note">
+<!ENTITY mdbconnect.item-menu.list-md-label "Show Markdown File">
