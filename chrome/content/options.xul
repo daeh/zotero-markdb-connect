@@ -3,7 +3,7 @@
 <?xml-stylesheet href="chrome://zotero-platform/content/preferences.css"?>
 <?xml-stylesheet href="chrome://zotero-platform-version/content/style.css"?>
 
-<!DOCTYPE window SYSTEM "chrome://zoteroobscite/locale/options.dtd">
+<!DOCTYPE window SYSTEM "chrome://zotobscite/locale/options.dtd">
 
 <!-- onload="updatePreferenceWindow('all');" -->
 <prefwindow id="id-obscite-prefwindow" title="&obscite.preferences;" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
@@ -23,12 +23,14 @@
       <preference id="pref-obscite-grouplibraries" name="extensions.obscite.grouplibraries" type="string"/>
       <preference id="pref-obscite-vaultresolution" name="extensions.obscite.vaultresolution" type="string"/>
       <preference id="pref-obscite-vaultname" name="extensions.obscite.vaultname" type="string"/>
+      <preference id="pref-obscite-logseqgraph" name="extensions.obscite.logseqgraph" type="string"/>
     </preferences>
 
     <tabbox id="zotfile-tabbox">
       <tabs id="zotfile-tabs">
         <tab label="&general-settings;"/>
         <tab label="&advanced-settings;"/>
+        <tab label="&debug-settings;"/>
         <!-- <tab label="&renaming-rules;"/>
         <tab label="&advanced-settings;"/> -->
       </tabs>
@@ -143,6 +145,7 @@
           </groupbox>
 
           <!-- obsidian file resolution -->
+          <radiogroup preference="pref-obscite-vaultresolution">
           <groupbox>
             <caption label="&obscite.preferences.vaultresolution-title;"/>
             <description style="width: 420px">&obscite.preferences.vaultresolution-desc;</description>
@@ -151,17 +154,17 @@
             
             <!-- file name or file path -->
             <label style="font-size: 14px" value="&obscite.preferences.vaultresolution-label;"/>
-            <radiogroup preference="pref-obscite-vaultresolution">
+            
               <radio label="&obscite.preferences.vaultresolution-path-label;" value="path" />
               <radio label="&obscite.preferences.vaultresolution-file-label;" value="file" />
-            </radiogroup>
+            
 
             <separator/>
 
             <!-- vault name -->
-            <label value="&obscite.preferences.vaultname-break;"/>
+            <!-- <label value="&obscite.preferences.vaultname-break;"/> -->
 
-            <separator/>
+            <!-- <separator/> -->
             
             <label style="font-size: 14px" value="&obscite.preferences.vaultname-label0;"/>
             <label value="&obscite.preferences.vaultname-label;"/>
@@ -172,12 +175,35 @@
 
           </groupbox>
 
+          <!-- use logseq -->
+          <groupbox>
+            <caption label="&obscite.preferences.logseq-title;"/>
+            <!-- <label style="font-size: 14px" value="&obscite.preferences.logseq-label0;"/> -->
+            <radio style="font-size: 14px" label="&obscite.preferences.vaultresolution-logseq-label;" value="logseq" />
+            <hbox style="margin: 0"  align="center">
+              <label value="&obscite.preferences.vaultresolution-logseq-label2;"/>
+              <textbox preference="pref-obscite-logseqgraph"/>
+            </hbox>
+            <label style="font-size: 10px" value="&obscite.preferences.logseq-label;"/>
+          </groupbox>
+
+          <!-- use logseq -->
+          <groupbox>
+            <caption label="&obscite.preferences.default-title;"/>
+            <radio style="font-size: 14px" label="&obscite.preferences.vaultresolution-default-label;" value="default" />
+            <label value="&obscite.preferences.vaultresolution-default-label2;"/>
+          </groupbox>
+          </radiogroup>
+
+        </tabpanel>
+
+        <tabpanel orient="vertical">
+
           <!-- generate debugging log -->
           <groupbox>
             <caption label="&obscite.preferences.rundebug-label;"/>
             <description style="width: 420px">&obscite.preferences.rundebug-desc;</description>
             <button id="id-obscite-rundebug-button" label="&obscite.preferences.rundebug-button-label;" oncommand="Zotero.ObsCite.runAndSaveDebug();"/>
-            <separator/>
           </groupbox>
 
           <!-- open github issues -->

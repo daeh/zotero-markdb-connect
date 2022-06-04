@@ -4,7 +4,7 @@
 
   <Description about="urn:mozilla:install-manifest">
     <em:id>daeda@mit.edu</em:id>
-    <em:name>ZoteroObsidianCitations</em:name>
+    <em:name>ZotObsCite</em:name>
     <em:version>0.0.17</em:version>
     <em:type>2</em:type>
     <em:creator>Dae Houlihan</em:creator>

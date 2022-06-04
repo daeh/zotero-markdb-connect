@@ -8,3 +8,4 @@ pref("extensions.obscite.grouplibraries", "user");
 pref("extensions.obscite.tagstr", "ObsCite");
 pref("extensions.obscite.vaultresolution", "path");
 pref("extensions.obscite.vaultname", "");
+pref("extensions.obscite.logseqgraph", "");

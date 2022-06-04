@@ -1,14 +1,15 @@
-<!ENTITY obscite.name "Zotero Obsidian Citations">
-<!ENTITY obscite.preferences "Zotero Obsidian Citations Preferences">
+<!ENTITY obscite.name "ZotObsCite">
+<!ENTITY obscite.preferences "ZotObsCite Preferences">
 
 <!ENTITY general-settings "General">
 <!ENTITY advanced-settings "Advanced">
+<!ENTITY debug-settings "Debugging">
 
 <!ENTITY obscite.preferences.locate-mdfiles "Location of Markdown Reading Notes">
-<!ENTITY obscite.preferences.locate-mdfiles-desc "Specify how ZoteroObsidianCitations should find the markdown files">
+<!ENTITY obscite.preferences.locate-mdfiles-desc "Specify how ZotObsCite should find the markdown files">
 
 <!ENTITY obscite.preferences.vault-source-folder "Folder Containing Markdown Reading Notes">
-<!ENTITY obscite.preferences.vault-source-folder-desc "ZoteroObsidianCitations will search this directory recursively for markdown files">
+<!ENTITY obscite.preferences.vault-source-folder-desc "ZotObsCite will search this directory recursively for markdown files">
 
 <!ENTITY obscite.preferences.filefilterstrategy-title "File Filter">
 <!ENTITY obscite.preferences.filefilterstrategy-default-label "Default File Filter: recursively find markdown files beginning with @">
@@ -22,7 +23,7 @@
 
 <!ENTITY obscite.preferences.matchstrategy-bbtcitekey-title "Use BetterBibTeX citekeys to link markdown files to Zotero items (Option 1)">
 <!ENTITY obscite.preferences.matchstrategy-bbtcitekey-label "Match notes based on BetterBibTeX citekey">
-<!ENTITY obscite.preferences.matchstrategy-bbtcitekey-desc "ZoteroObsidianCitations will search for a BetterBibTeX citekey in the filename and/or metadata.">
+<!ENTITY obscite.preferences.matchstrategy-bbtcitekey-desc "ZotObsCite will search for a BetterBibTeX citekey in the filename and/or metadata.">
 
 <!ENTITY obscite.preferences.metadata-keyword-title "(Optional) Markdown Metadata Keyword">
 <!ENTITY obscite.preferences.metadata-keyword-label "yaml keyword:">
@@ -31,7 +32,7 @@
 
 <!ENTITY obscite.preferences.matchstrategy-zotitemkey-title "Use Zotero-Item-Keys to link markdown files to Zotero items (Option 2)">
 <!ENTITY obscite.preferences.matchstrategy-zotitemkey-label "Match notes based on Zotero-Item-Key">
-<!ENTITY obscite.preferences.matchstrategy-zotitemkey-desc "ZoteroObsidianCitations will search for a Zotero-Item-Key in the file's contents.">
+<!ENTITY obscite.preferences.matchstrategy-zotitemkey-desc "ZotObsCite will search for a Zotero-Item-Key in the file's contents.">
 
 <!ENTITY obscite.preferences.zotkeyregex-title1 "Required: Specify a RegEx to match the Zotero-Item-Key from the markdown contents">
 <!ENTITY obscite.preferences.zotkeyregex-title2  "               ( e.g. match 'ABCD1234' in 'zotero://select/library/items/ABCD1234' )">
@@ -58,10 +59,22 @@
 <!ENTITY obscite.preferences.vaultresolution-label "Resolve Obsidian notes using the MD file's">
 <!ENTITY obscite.preferences.vaultresolution-path-label "path (recommended)">
 <!ENTITY obscite.preferences.vaultresolution-file-label "name (only advised if 'path' option is not working)">
-<!ENTITY obscite.preferences.vaultname-break "  ">
+
 <!ENTITY obscite.preferences.vaultname-label0 "(Optional) Obsidian Vault Name">
 <!ENTITY obscite.preferences.vaultname-label "If you use multiple Vaults, you can specify which Vault should open your markdown reading notes.">
 <!ENTITY obscite.preferences.vaultname-label2 "Obsidian Vault Name:">
+
+<!ENTITY obscite.preferences.vaultname-break "  ">
+
+<!ENTITY obscite.preferences.logseq-title "logseq URI - File Resolution">
+<!ENTITY obscite.preferences.logseq-label0 "Open MD files in logseq rather than Obsidian">
+<!ENTITY obscite.preferences.vaultresolution-logseq-label "Open MD files in logseq rather than Obsidian">
+<!ENTITY obscite.preferences.vaultresolution-logseq-label2 "logseq graph name:">
+<!ENTITY obscite.preferences.logseq-label "The graph name replaces {graphname} in logseq://graph/{graphname}?page=somefile.md">
+
+<!ENTITY obscite.preferences.default-title "Default MD Editor URI - File Resolution">
+<!ENTITY obscite.preferences.vaultresolution-default-label "Open MD files in the system's default editor">
+<!ENTITY obscite.preferences.vaultresolution-default-label2 "Enables support for databases like Zettlr or manually organized file structures.">
 
 <!ENTITY obscite.preferences.rundebug-label "Save Debugging Log">
 <!ENTITY obscite.preferences.rundebug-desc "If you're encountering errors, you can generate a debugging file to examine yourself and/or to include in a GitHub issue.">

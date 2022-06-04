@@ -1,5 +1,5 @@
 /**
-ZoteroObsidianCitations
+ZotObsCite
 Dae Houlihan
 */
 
@@ -163,7 +163,7 @@ Zotero.ObsCite = {
                 throw new Error("vaultpath is not set or does not exist.");
             }
         } catch (e) {
-            this.showNotification("Obsidian Vault Path Not Found", "Set the path to your Obsidian Citations Notes in the ZotObsCite preferences.", false);
+            this.showNotification("Vault Path Not Found", "Set the path to your notes in the ZotObsCite preferences.", false);
             Zotero.debug(`ObsVault Error: ${e}`);
             return null;
         }
@@ -205,7 +205,7 @@ Zotero.ObsCite = {
                 throw new Error("bbtjson is not set or does not exist.");
             }
         } catch (e) {
-            this.showNotification("User Defined RegEx Invalid", "The RegEx you specified in the ZoteroObsidianCitations preferences is invalid: " + e, false);
+            this.showNotification("User Defined RegEx Invalid", "The RegEx you specified in the ZotObsCite preferences is invalid: " + e, false);
             Zotero.debug(`ObsVault Error: ${e}`);
             return null;
         }
@@ -253,7 +253,7 @@ Zotero.ObsCite = {
 
     _getParam_vaultresolution: function () {
         const vaultresolution = this.getPref('vaultresolution');
-        if (['path', 'file'].includes(vaultresolution)) {
+        if (['path', 'file', 'logseq', 'default'].includes(vaultresolution)) {
             return vaultresolution;
         } else {
             this.setPref('vaultresolution', 'path');
@@ -265,6 +265,16 @@ Zotero.ObsCite = {
         const vaultname = this.getPref('vaultname');
         if (typeof vaultname === 'string' && vaultname.length > 0) {
             return vaultname;
+        } else {
+            this.setPref('vaultname', '');
+            return '';
+        }
+    },
+
+    _getParam_logseqgraphname: function () {
+        const logseqgraph = this.getPref('logseqgraph');
+        if (typeof logseqgraph === 'string' && logseqgraph.length > 0) {
+            return logseqgraph;
         } else {
             this.setPref('vaultname', '');
             return '';
@@ -379,7 +389,7 @@ Zotero.ObsCite = {
     },
 
     chooseVaultFolder: async function () {
-        const dialogTitle = 'Select Obsidian Vault Folder containing MD reading notes';
+        const dialogTitle = 'Select Folder containing MD reading notes';
         const vaultpath = await this.chooseDirectory(dialogTitle);
         const vaultpathObj = new FileUtils.File(OS.Path.normalize(vaultpath));
         if (vaultpath != '' && vaultpath != undefined && vaultpath != null && vaultpathObj.exists() && vaultpathObj.isDirectory()) {
@@ -583,7 +593,7 @@ Zotero.ObsCite = {
                 const dataErrors = JSON.stringify(reserrs, null, 1);
                 const warningTitle = "Markdown Import Error";
                 const warningMessage = "There were " + nerr.toString() + " Markdown notes that could not be parsed. \n\nWould you like to save these errors to a json file? \n\n(There were " + (res.length - reserrs.length).toString() + " notes parsed successfully.)";
-                const saveDialogTitle = "Save ZoteroObsidianCitations Errors To...";
+                const saveDialogTitle = "Save ZotObsCite Errors To...";
                 const filenamesuggest = 'ZotObsCite-md-parsing-errors.json';
                 await this.offerToSaveErrors(dataErrors, warningTitle, warningMessage, saveDialogTitle, filenamesuggest);
             } else {
@@ -685,7 +695,7 @@ Zotero.ObsCite = {
                 const dataErrors = JSON.stringify(reserrs, null, 1);
                 const warningTitle = "Markdown Import Error";
                 const warningMessage = "There were " + nerr.toString() + " Markdown notes that could not be parsed. \n\nWould you like to save these errors to a json file? \n\n(There were " + (res.length - reserrs.length).toString() + " notes parsed successfully.)";
-                const saveDialogTitle = "Save ZoteroObsidianCitations Errors To...";
+                const saveDialogTitle = "Save ZotObsCite Errors To...";
                 const filenamesuggest = 'ZotObsCite-md-parsing-errors.json';
                 await this.offerToSaveErrors(dataErrors, warningTitle, warningMessage, saveDialogTitle, filenamesuggest);
             } else {
@@ -831,7 +841,7 @@ Zotero.ObsCite = {
                 const dataErrors = JSON.stringify(reserr, null, 1);
                 const warningTitle = "ZotObsCite Warning: Unmatched citekeys";
                 const warningMessage = "There were " + nerr.toString() + " citekeys in your Markdown notes that could not be matched to items in your Zotero library. \n\nWould you like to save the names of these citekeys in a json file? \n\n(Matches for " + (res.length - reserr.length).toString() + " citekeys were found successfully.)";
-                const saveDialogTitle = "Save ZoteroObsidianCitations Errors To...";
+                const saveDialogTitle = "Save ZotObsCite Errors To...";
                 const filenamesuggest = 'ZotObsCite-missing-entries.json';
                 await this.offerToSaveErrors(dataErrors, warningTitle, warningMessage, saveDialogTitle, filenamesuggest);
             } else {
@@ -871,7 +881,7 @@ Zotero.ObsCite = {
                 const dataErrors = JSON.stringify(reserr, null, 1);
                 const warningTitle = "ZotObsCite Warning: Unmatched zoteroKeys";
                 const warningMessage = "There were " + nerr.toString() + " zoteroKeys in your Markdown notes that could not be matched to items in your Zotero library. \n\nWould you like to save the names of these in a json file? \n\n(Matches for " + (res.length - reserr.length).toString() + " zoteroIDs were found successfully.)";
-                const saveDialogTitle = "Save ZoteroObsidianCitations Errors To...";
+                const saveDialogTitle = "Save ZotObsCite Errors To...";
                 const filenamesuggest = 'ZotObsCite-missing-entries.json';
                 await this.offerToSaveErrors(dataErrors, warningTitle, warningMessage, saveDialogTitle, filenamesuggest);
             } else {
@@ -991,7 +1001,7 @@ Zotero.ObsCite = {
             const dataErrors = JSON.stringify(res, null, 1);
             const warningTitle = "ZotObsCite Warning";
             const warningMessage = "There was an issue matching some of your Markdown notes (" + this.dataKeys.length.toString() + " notes were matched successfully).\n\nWould you like to save the data extracted from the notes to a json file?";
-            const saveDialogTitle = "Save ZoteroObsidianCitations Data To...";
+            const saveDialogTitle = "Save ZotObsCite Data To...";
             const filenamesuggest = 'ZotObsCite-alldata.json';
             await this.offerToSaveErrors(dataErrors, warningTitle, warningMessage, saveDialogTitle, filenamesuggest);
         }
@@ -1122,18 +1132,30 @@ Zotero.ObsCite = {
             }
         }
 
+        const uri_spec = this._getParam_vaultresolution();
+
         if (found_multiple) {
             doc.getElementById("id-obscite-itemmenu-separator-top").hidden = false;
             doc.getElementById("id-obscite-itemmenu-open-obsidian").hidden = true;
             doc.getElementById("id-obscite-itemmenu-show-md").hidden = true;
             doc.getElementById("id-obscite-itemmenu-listobsidian-restrict").hidden = false;
             doc.getElementById("id-obscite-itemmenu-listmd-restrict").hidden = false;
+            if (uri_spec === "logseq") {
+                doc.getElementById("id-obscite-itemmenu-listobsidian-restrict").setAttribute('label', "Open logseq Page");
+            } else if (uri_spec === "default") {
+                doc.getElementById("id-obscite-itemmenu-listobsidian-restrict").setAttribute('label', "Open MD File in Default Editor");
+            }
         } else if (found_single) {
             doc.getElementById("id-obscite-itemmenu-separator-top").hidden = false;
             doc.getElementById("id-obscite-itemmenu-open-obsidian").hidden = false;
             doc.getElementById("id-obscite-itemmenu-show-md").hidden = false;
             doc.getElementById("id-obscite-itemmenu-listobsidian-restrict").hidden = true;
             doc.getElementById("id-obscite-itemmenu-listmd-restrict").hidden = true;
+            if (uri_spec === "logseq") {
+                doc.getElementById("id-obscite-itemmenu-open-obsidian").setAttribute('label', "Open logseq Page");
+            } else if (uri_spec === "default") {
+                doc.getElementById("id-obscite-itemmenu-open-obsidian").setAttribute('label', "Open MD File in Default Editor");
+            }
         } else {
             doc.getElementById("id-obscite-itemmenu-separator-top").hidden = true;
             doc.getElementById("id-obscite-itemmenu-open-obsidian").hidden = true;
@@ -1202,45 +1224,7 @@ Zotero.ObsCite = {
         }
     },
 
-    openSelectedItemsObsidian: function (idx) {
-        idx = idx || 0;
-        const items = Services.wm.getMostRecentWindow("navigator:browser").ZoteroPane.getSelectedItems();
-
-        const uri_spec = this._getParam_vaultresolution();
-        const vaultName = this._getParam_vaultname();
-        const vaultKey = (vaultName.length > 0) ? 'vault=' + vaultName + '&' : '';
-
-        for (const item of items) {
-            if (this.dataKeys.includes(item.id)) {
-                const entry_res_list = this.data[item.id.toString()];
-
-                idx = (idx < entry_res_list.length && idx >= 0) ? idx : 0;
-                const entry_res = entry_res_list[idx];
-
-                const fileKey = (uri_spec === 'file') ? "file=" + encodeURIComponent(entry_res.name) : "path=" + encodeURIComponent(entry_res.path);
-
-                Zotero.launchURL("obsidian://open?" + vaultKey + fileKey);
-
-                // let fileKey;
-                // if (uri_spec === 'file') {
-                //     const uriEncodedName = encodeURIComponent(entry_res.name);
-                //     fileKey = "file=" + uriEncodedName;
-                // } else {
-                //     const uriEncodedPath = encodeURIComponent(entry_res.path);
-                //     fileKey = "path=" + uriEncodedPath;
-                // }
-
-                // /// NB skipping the subfolder path and hoping that obsidian can resolve the note based on the file name
-                // const uriEncoded = encodeURIComponent(entry_res.name);
-                // Zotero.launchURL("obsidian://open?" + vaultKey + "file=" + uriEncoded);
-
-                /// only process first item if multiple selected
-                break;
-            }
-        }
-    },
-
-    openSelectedItemsLogseq: function (idx) {
+    _getSelectedEntry: function (idx) {
         idx = idx || 0;
         const items = Services.wm.getMostRecentWindow("navigator:browser").ZoteroPane.getSelectedItems();
 
@@ -1249,43 +1233,66 @@ Zotero.ObsCite = {
                 const entry_res_list = this.data[item.id.toString()];
 
                 idx = (idx < entry_res_list.length && idx >= 0) ? idx : 0;
-                const entry_res = entry_res_list[idx];
-
-                const fileKey = "page=" + encodeURIComponent(entry_res.name);
-
-                Zotero.launchURL("logseq://graph/knowledge?" + fileKey);
-
-                /// only process first item if multiple selected
-                break;
+                return entry_res_list[idx];
             }
         }
     },
 
     showSelectedItemMarkdownInFilesystem: function (idx) {
-        idx = idx || 0;
-        const items = Services.wm.getMostRecentWindow("navigator:browser").ZoteroPane.getSelectedItems();
-        for (const item of items) {
-            if (this.dataKeys.includes(item.id)) {
-                const entry_res_list = this.data[item.id.toString()];
 
-                idx = (idx < entry_res_list.length && idx >= 0) ? idx : 0;
-                const entry_res = entry_res_list[idx];
+        const entry_res = this._getSelectedEntry(idx);
 
-                let file = new FileUtils.File(OS.Path.normalize(entry_res.path));
-                if (file.exists()) {
-                    try {
-                        Zotero.debug("Revealing " + file.path);
-                        file.reveal();
-                    } catch (e) {
-                        // On platforms that don't support nsIFile.reveal() (e.g. Linux),
-                        // launch the parent directory
-                        Zotero.launchFile(file.parent);
-                    }
-                }
-                /// only process first item if multiple selected
-                break;
+        const file = new FileUtils.File(OS.Path.normalize(entry_res.path));
+        if (file.exists()) {
+            try {
+                Zotero.debug("Revealing " + file.path);
+                file.reveal();
+            } catch (e) {
+                // On platforms that don't support nsIFile.reveal() (e.g. Linux),
+                // launch the parent directory
+                Zotero.launchFile(file.parent);
             }
         }
+    },
+
+    openObsidianURI: function (entry_res) {
+
+        const uri_spec = this._getParam_vaultresolution();
+        const vaultName = this._getParam_vaultname();
+        const vaultKey = (vaultName.length > 0) ? 'vault=' + vaultName + '&' : '';
+
+        const fileKey = (uri_spec === 'file') ? "file=" + encodeURIComponent(entry_res.name) : "path=" + encodeURIComponent(entry_res.path);
+
+        Zotero.launchURL("obsidian://open?" + vaultKey + fileKey);
+    },
+
+    openLogseqURI: function (entry_res) {
+
+        let graphName = this._getParam_logseqgraphname();
+        if (graphName.length === 0) {
+            const fileObj = new FileUtils.File(OS.Path.normalize(entry_res.path));
+            graphName = fileObj.parent.parent.leafName;
+        }
+
+        const fileKey = "page=" + encodeURIComponent(entry_res.name);
+
+        Zotero.launchURL("logseq://graph/" + graphName + "?" + fileKey);
+    },
+
+    openSelectedItemsURI: function (idx) {
+
+        const uri_spec = this._getParam_vaultresolution();
+
+        const entry_res = this._getSelectedEntry(idx);
+
+        if (uri_spec === 'path' || uri_spec === 'file') {
+            this.openObsidianURI(entry_res);
+        } else if (uri_spec === 'logseq') {
+            this.openLogseqURI(entry_res);
+        } else {
+            Zotero.launchFile(entry_res.path);
+        }
+
     },
 
     //// Debugging functions
@@ -1319,7 +1326,7 @@ Zotero.ObsCite = {
         this.addDebugLog('prefs', prefs);
 
         let config = {};
-        for (let pref of ['matchstrategy', 'source_dir', 'filefilterstrategy', 'filepattern', 'zotkeyregex', 'metadatakeyword', 'grouplibraries', 'tagstr', 'vaultresolution', 'vaultname']) {
+        for (let pref of ['matchstrategy', 'source_dir', 'filefilterstrategy', 'filepattern', 'zotkeyregex', 'metadatakeyword', 'grouplibraries', 'tagstr', 'vaultresolution', 'vaultname', 'logseqgraphname']) {
             try {
                 switch (pref) {
                     case 'matchstrategy':
@@ -1351,6 +1358,9 @@ Zotero.ObsCite = {
                         break;
                     case 'vaultname':
                         config[pref] = this._getParam_vaultname();
+                        break;
+                    case 'logseqgraphname':
+                        config[pref] = this._getParam_logseqgraphname();
                         break;
                 }
             } catch (e) {
@@ -1390,7 +1400,7 @@ Zotero.ObsCite = {
 
     saveDebug: async function () {
         const dataDebug = JSON.stringify(this.debuglog, null, 1);
-        const saveDialogTitle = "Save ZoteroObsidianCitations Debug Log To...";
+        const saveDialogTitle = "Save ZotObsCite Debug Log To...";
         const filenamesuggest = 'ZotObsCite-debug.json';
         await this.writeToFile(dataDebug, saveDialogTitle, filenamesuggest);
     },
@@ -1398,7 +1408,7 @@ Zotero.ObsCite = {
     runAndSaveDebug: async function (includeResults) {
         includeResults = (typeof includeResults === 'boolean') ? includeResults : true;
         const dataDebug = JSON.stringify(await this.runDebug(includeResults), null, 1);
-        const saveDialogTitle = "Save ZoteroObsidianCitations Debug Log To...";
+        const saveDialogTitle = "Save ZotObsCite Debug Log To...";
         const filenamesuggest = 'ZotObsCite-debug.json';
         await this.writeToFile(dataDebug, saveDialogTitle, filenamesuggest);
     },
@@ -1418,7 +1428,7 @@ Zotero.ObsCite = {
             action: action
         };
         window.openDialog(
-            'chrome://zoteroobscite/content/options.xul',
+            'chrome://zotobscite/content/options.xul',
             'obscite-pref',
             'chrome,titlebar,toolbar,centerscreen' + Zotero.Prefs.get('browser.preferences.instantApply', true) ? 'dialog=no' : 'modal',
             io

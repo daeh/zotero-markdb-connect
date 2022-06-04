@@ -1,7 +1,7 @@
-content zoteroobscite chrome/content/
+content zotobscite chrome/content/
 
-overlay chrome://zotero/content/zoteroPane.xul chrome://zoteroobscite/content/overlay.xul
+overlay chrome://zotero/content/zoteroPane.xul chrome://zotobscite/content/overlay.xul
 
-locale  zoteroobscite  en-US   chrome/locale/en-US/
+locale  zotobscite  en-US   chrome/locale/en-US/
 
-skin    zoteroobscite  default chrome/skin/default/zoteroobscite/
+skin    zotobscite  default chrome/skin/default/zotobscite/
