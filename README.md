@@ -1,4 +1,4 @@
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/daeh/zotero-markdowndb-connect?style=for-the-badge)](https://github.com/daeh/zotero-markdowndb-connect/releases/latest) ![GitHub all releases](https://img.shields.io/github/downloads/daeh/zotero-markdowndb-connect/total?style=for-the-badge)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/daeh/zotero-markdb-connect?style=for-the-badge)](https://github.com/daeh/zotero-markdb-connect/releases/latest) ![GitHub all releases](https://img.shields.io/github/downloads/daeh/zotero-markdb-connect/total?style=for-the-badge)
 
 # MarkDBConnect (Zotero Markdown DataBase Connect)
 
@@ -26,7 +26,7 @@ Opens an existing Markdown note in [Obsidian](https://obsidian.md), [logseq](htt
 
 ## Instalation
 
-- Download the plugin (the .xpi file) from the latest release: https://github.com/daeh/zotero-markdowndb-connect/releases
+- Download the plugin (the .xpi file) from the latest release: https://github.com/daeh/zotero-markdb-connect/releases
 - To download the .xpi file, right click it and select 'Save link as'
 - Run Zotero (version 5.x or 6.x)
 - Go to `Tools -> Add-ons`
@@ -147,7 +147,7 @@ A reference using an Obsidian wiki link: [[@cusimano2018cogsci]]
 
 ## Notes
 
-[GitHub](https://github.com/daeh/zotero-markdowndb-connect): Source code repository
+[GitHub](https://github.com/daeh/zotero-markdb-connect): Source code repository
 
 Code for this extension is based on [ZotFile](https://github.com/jlegewie/zotfile) and [Zotero Citationcounts](https://github.com/eschnett/zotero-citationcounts) (which is based on [Zotero DOI Manager](https://github.com/bwiernik/zotero-shortdoi), which is based in part on [Zotero Google Scholar Citations](https://github.com/beloglazov/zotero-scholar-citations)).
 

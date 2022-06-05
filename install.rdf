@@ -9,8 +9,8 @@
     <em:type>2</em:type>
     <em:creator>Dae Houlihan</em:creator>
     <em:description>Add a tag to Zotero items that have a external note.</em:description>
-    <em:homepageURL>https://github.com/daeh/zotero-markdowndb-connect</em:homepageURL>
-    <em:updateURL>https://raw.githubusercontent.com/daeh/zotero-markdowndb-connect/main/update.rdf</em:updateURL>
+    <em:homepageURL>https://github.com/daeh/zotero-markdb-connect</em:homepageURL>
+    <em:updateURL>https://raw.githubusercontent.com/daeh/zotero-markdb-connect/main/update.rdf</em:updateURL>
 
     <em:targetApplication>
       <Description>

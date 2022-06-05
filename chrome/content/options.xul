@@ -209,7 +209,7 @@
           <!-- open github issues -->
           <!-- <hbox style="margin: 0">
             <label style="margin-right:0px" value="&...;"/>
-            <label style="margin-left:0px; margin-right:0px" class="text-link" onclick="Zotero.MarkDBconnect.loadURL('https://github.com/daeh/zotero-markdowndb-connect/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc');" value="&...;"/>
+            <label style="margin-left:0px; margin-right:0px" class="text-link" onclick="Zotero.MarkDBconnect.loadURL('https://github.com/daeh/zotero-markdb-connect/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc');" value="&...;"/>
             <label style="margin-left:0px; margin-right:0px" value="."/>
           </hbox> -->
 
