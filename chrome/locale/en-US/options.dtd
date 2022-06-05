@@ -1,9 +1,9 @@
 <!ENTITY mdbconnect.name "MarkDBConnect">
 <!ENTITY mdbconnect.preferences "MarkDBConnect Preferences">
 
-<!ENTITY general-settings "General">
+<!ENTITY locating-settings "Locating MD Files">
+<!ENTITY launching-settings "Launching MD Files">
 <!ENTITY advanced-settings "Advanced">
-<!ENTITY debug-settings "Debugging">
 
 <!ENTITY mdbconnect.preferences.locate-mdfiles "Location of Markdown Reading Notes">
 <!ENTITY mdbconnect.preferences.locate-mdfiles-desc "Specify how MarkDBConnect should find the markdown files">
@@ -54,9 +54,9 @@
 <!ENTITY mdbconnect.preferences.customtag-desc "The default Zotero tag is 'ObsCite'. If would prefer the tag to be something else, specify the tag name here.">
 <!ENTITY mdbconnect.preferences.customtag-label "tag:">
 
-<!ENTITY mdbconnect.preferences.vaultresolution-title "Obsidian URI - File Resolution Protocol">
+<!ENTITY mdbconnect.preferences.vaultresolution-title "Obsidian File URI">
+<!ENTITY mdbconnect.preferences.vaultresolution-label "Launch MD Notes in Obsidian, using the MD file's">
 <!ENTITY mdbconnect.preferences.vaultresolution-desc "The Obsidian URI can resolve files using a file path or a file name. The 'path' option is advised since file names are not necessarily unique.">
-<!ENTITY mdbconnect.preferences.vaultresolution-label "Resolve Obsidian notes using the MD file's">
 <!ENTITY mdbconnect.preferences.vaultresolution-path-label "path (recommended)">
 <!ENTITY mdbconnect.preferences.vaultresolution-file-label "name (only advised if 'path' option is not working)">
 
@@ -66,14 +66,13 @@
 
 <!ENTITY mdbconnect.preferences.vaultname-break "  ">
 
-<!ENTITY mdbconnect.preferences.logseq-title "logseq URI - File Resolution">
-<!ENTITY mdbconnect.preferences.logseq-label0 "Open MD files in logseq rather than Obsidian">
-<!ENTITY mdbconnect.preferences.vaultresolution-logseq-label "Open MD files in logseq rather than Obsidian">
+<!ENTITY mdbconnect.preferences.logseq-title "logseq File URI">
+<!ENTITY mdbconnect.preferences.vaultresolution-logseq-label "Launch MD Pages in logseq">
 <!ENTITY mdbconnect.preferences.vaultresolution-logseq-label2 "logseq graph name:">
 <!ENTITY mdbconnect.preferences.logseq-label "The graph name replaces {graphname} in logseq://graph/{graphname}?page=somefile.md">
 
-<!ENTITY mdbconnect.preferences.default-title "Default MD Editor URI - File Resolution">
-<!ENTITY mdbconnect.preferences.vaultresolution-default-label "Open MD files in the system's default editor">
+<!ENTITY mdbconnect.preferences.default-title "System's Default MD Editor">
+<!ENTITY mdbconnect.preferences.vaultresolution-default-label "Open MD notes in the system's default editor">
 <!ENTITY mdbconnect.preferences.vaultresolution-default-label2 "Enables support for databases like Zettlr or manually organized file structures.">
 
 <!ENTITY mdbconnect.preferences.rundebug-label "Save Debugging Log">

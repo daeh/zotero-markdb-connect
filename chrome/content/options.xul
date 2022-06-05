@@ -28,9 +28,9 @@
 
     <tabbox id="zotfile-tabbox">
       <tabs id="zotfile-tabs">
-        <tab label="&general-settings;"/>
+        <tab label="&locating-settings;"/>
+        <tab label="&launching-settings;"/>
         <tab label="&advanced-settings;"/>
-        <tab label="&debug-settings;"/>
         <!-- <tab label="&renaming-rules;"/>
         <tab label="&advanced-settings;"/> -->
       </tabs>
@@ -120,6 +120,55 @@
 
         </tabpanel>
 
+        <!-- LAUNCHING MD FILES SETTINGS -->
+        <tabpanel orient="vertical">
+
+          <!-- obsidian file resolution -->
+          <radiogroup preference="pref-mdbconnect-vaultresolution">
+          <groupbox>
+            <caption label="&mdbconnect.preferences.vaultresolution-title;"/>
+            
+            <!-- file name or file path -->
+            <label style="font-size: 14px" value="&mdbconnect.preferences.vaultresolution-label;"/>
+            
+              <radio label="&mdbconnect.preferences.vaultresolution-path-label;" value="path" />
+              <radio label="&mdbconnect.preferences.vaultresolution-file-label;" value="file" />
+            
+            <label style="font-size: 11px">&mdbconnect.preferences.vaultresolution-desc;</label>
+
+            <separator/>
+
+            <!-- vault name -->
+            <label style="font-size: 14px" value="&mdbconnect.preferences.vaultname-label0;"/>
+            <label value="&mdbconnect.preferences.vaultname-label;"/>
+            <hbox style="margin: 0"  align="center">
+              <label value="&mdbconnect.preferences.vaultname-label2;"/>
+              <textbox preference="pref-mdbconnect-vaultname"/>
+            </hbox>
+
+          </groupbox>
+
+          <!-- use logseq -->
+          <groupbox>
+            <caption label="&mdbconnect.preferences.logseq-title;"/>
+            <radio style="font-size: 14px" label="&mdbconnect.preferences.vaultresolution-logseq-label;" value="logseq" />
+            <hbox style="margin: 0"  align="center">
+              <label value="&mdbconnect.preferences.vaultresolution-logseq-label2;"/>
+              <textbox preference="pref-mdbconnect-logseqgraph"/>
+            </hbox>
+            <label style="font-size: 10px" value="&mdbconnect.preferences.logseq-label;"/>
+          </groupbox>
+
+          <!-- use system default -->
+          <groupbox>
+            <caption label="&mdbconnect.preferences.default-title;"/>
+            <radio style="font-size: 14px" label="&mdbconnect.preferences.vaultresolution-default-label;" value="default" />
+            <label value="&mdbconnect.preferences.vaultresolution-default-label2;"/>
+          </groupbox>
+          </radiogroup>
+
+        </tabpanel>
+
         <!-- ADVANCED SETTINGS -->
         <tabpanel orient="vertical">
 
@@ -143,61 +192,6 @@
             </radiogroup>
             <label style="font-size: 10px" value="&mdbconnect.preferences.grouplibraries-subdesc;"/>
           </groupbox>
-
-          <!-- obsidian file resolution -->
-          <radiogroup preference="pref-mdbconnect-vaultresolution">
-          <groupbox>
-            <caption label="&mdbconnect.preferences.vaultresolution-title;"/>
-            <description style="width: 420px">&mdbconnect.preferences.vaultresolution-desc;</description>
-
-            <separator/>
-            
-            <!-- file name or file path -->
-            <label style="font-size: 14px" value="&mdbconnect.preferences.vaultresolution-label;"/>
-            
-              <radio label="&mdbconnect.preferences.vaultresolution-path-label;" value="path" />
-              <radio label="&mdbconnect.preferences.vaultresolution-file-label;" value="file" />
-            
-
-            <separator/>
-
-            <!-- vault name -->
-            <!-- <label value="&mdbconnect.preferences.vaultname-break;"/> -->
-
-            <!-- <separator/> -->
-            
-            <label style="font-size: 14px" value="&mdbconnect.preferences.vaultname-label0;"/>
-            <label value="&mdbconnect.preferences.vaultname-label;"/>
-            <hbox style="margin: 0"  align="center">
-              <label value="&mdbconnect.preferences.vaultname-label2;"/>
-              <textbox preference="pref-mdbconnect-vaultname"/>
-            </hbox>
-
-          </groupbox>
-
-          <!-- use logseq -->
-          <groupbox>
-            <caption label="&mdbconnect.preferences.logseq-title;"/>
-            <!-- <label style="font-size: 14px" value="&mdbconnect.preferences.logseq-label0;"/> -->
-            <radio style="font-size: 14px" label="&mdbconnect.preferences.vaultresolution-logseq-label;" value="logseq" />
-            <hbox style="margin: 0"  align="center">
-              <label value="&mdbconnect.preferences.vaultresolution-logseq-label2;"/>
-              <textbox preference="pref-mdbconnect-logseqgraph"/>
-            </hbox>
-            <label style="font-size: 10px" value="&mdbconnect.preferences.logseq-label;"/>
-          </groupbox>
-
-          <!-- use logseq -->
-          <groupbox>
-            <caption label="&mdbconnect.preferences.default-title;"/>
-            <radio style="font-size: 14px" label="&mdbconnect.preferences.vaultresolution-default-label;" value="default" />
-            <label value="&mdbconnect.preferences.vaultresolution-default-label2;"/>
-          </groupbox>
-          </radiogroup>
-
-        </tabpanel>
-
-        <tabpanel orient="vertical">
 
           <!-- generate debugging log -->
           <groupbox>
