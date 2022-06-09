@@ -36,7 +36,7 @@ Opens an existing markdown note in [Obsidian](https://obsidian.md), [logseq](htt
 
 ## Setup
 
-A markdown file can specify which Zotero item it's linked to using either a [Better BibTeX](https://retorque.re/zotero-better-bibtex/) citekey or a Zotero-Item-Key.
+A markdown file can specify which Zotero item it's linked to using either a [Better BibTeX](https://retorque.re/zotero-better-bibtex/) citekey or a Zotero-Item-Key. I recommend using Better BibTeX citekeys when possible.
 
 1. Using **Better BibTeX citekeys** to link markdown files to Zotero items.
 
@@ -133,17 +133,23 @@ A reference to another paper using an Obsidian wiki link: [[@cusimano2018cogsci]
 ## Related Projects
 
 - [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin) by hans
-  Obsidian plugin that integrates your Zotero database with Obsidian.
+  - Obsidian plugin that integrates your Zotero database with Obsidian.
+  
 - [BibNotes Formatter](https://github.com/stefanopagliari/bibnotes) by stefanopagliari
-  Obsidian plugin to facilitate exporting annotations from Zotero into Obsidian.
+  - Obsidian plugin to facilitate exporting annotations from Zotero into Obsidian.
+
 - [Obsidian Zotero Integration](https://github.com/mgmeyers/obsidian-zotero-integration) by mgmeyers
-  Obsidian plugin to facilitate exporting annotations from Zotero into Obsidian.
+  - Obsidian plugin to facilitate exporting annotations from Zotero into Obsidian.
+
 - [Zotero 6 'Export Notes' feature](https://forums.zotero.org/discussion/93521/available-for-beta-testing-markdown-export-of-notes/p1) by Zotero
-  Zotero 6 beta feature to export notes and annotations from Zotero items as markdown files.
+  - Zotero 6 beta feature to export notes and annotations from Zotero items as markdown files.
+
 - [Zotero-mdnotes](https://argentinaos.com/zotero-mdnotes/) by argenos
-  Zotero plugin to export metadata and notes from Zotero items as markdown files.
+  - Zotero plugin to export metadata and notes from Zotero items as markdown files.
+
 - [Zotero to Markdown](https://github.com/e-alizadeh/Zotero2md) by e-alizadeh
-  Python library to export annotations and notes from Zotero items as markdown files.
+  - Python library to export annotations and notes from Zotero items as markdown files.
+
 
 ## Notes
 
