@@ -78,3 +78,6 @@
 <!ENTITY mdbconnect.preferences.rundebug-label "Save Debugging Log">
 <!ENTITY mdbconnect.preferences.rundebug-desc "If you're encountering errors, you can generate a debugging file to examine yourself and/or to include in a GitHub issue.">
 <!ENTITY mdbconnect.preferences.rundebug-button-label "Generate Debugging File">
+
+<!ENTITY mdbconnect.preferences.gitissue-title "Git Help">
+<!ENTITY mdbconnect.preferences.gitissue-button-label "Open Issue on Github">

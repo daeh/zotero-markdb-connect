@@ -31,8 +31,6 @@
         <tab label="&locating-settings;"/>
         <tab label="&launching-settings;"/>
         <tab label="&advanced-settings;"/>
-        <!-- <tab label="&renaming-rules;"/>
-        <tab label="&advanced-settings;"/> -->
       </tabs>
 
       <!-- GENERAL SETTINGS -->
@@ -201,22 +199,21 @@
           </groupbox>
 
           <!-- open github issues -->
-          <!-- <hbox style="margin: 0">
-            <label style="margin-right:0px" value="&...;"/>
-            <label style="margin-left:0px; margin-right:0px" class="text-link" onclick="Zotero.MarkDBconnect.loadURL('https://github.com/daeh/zotero-markdb-connect/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc');" value="&...;"/>
-            <label style="margin-left:0px; margin-right:0px" value="."/>
-          </hbox> -->
+          <groupbox>
+            <caption label="&mdbconnect.preferences.gitissue-title;"/>
+            <!-- <hbox style="margin: 0"> -->
+            <button label="&mdbconnect.preferences.gitissue-button-label;" oncommand="Zotero.launchURL('https://github.com/daeh/zotero-markdb-connect/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc');"/>
+            <!-- </hbox> -->
+          </groupbox>
 
         </tabpanel>
 
       </tabpanels>
     </tabbox>
 
-
-
   </prefpane>
 
   <script src="options.js"/>
-  <script src="chrome://zotero/content/include.js"/>
+  <!-- <script src="chrome://zotero/content/include.js"/> -->
 
 </prefwindow>

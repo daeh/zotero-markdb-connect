@@ -14,7 +14,7 @@ if (typeof Zotero === 'undefined') {
 
 
 Zotero.MarkDBconnect = {
-    version: '0.0.18',
+    version: '0.0.19',
     folderSep: null,
     cleanrun: true,
     suppressNotifications: false,
@@ -165,7 +165,7 @@ Zotero.MarkDBconnect = {
             }
         } catch (e) {
             this.showNotification("Vault Path Not Found", "Set the path to your notes in the MarkDBConnect preferences.", false);
-            Zotero.debug(`ObsVault Error: ${e}`);
+            Zotero.debug(`MarkDBconnect Error: ${e}`);
             return null;
         }
     },
@@ -207,7 +207,7 @@ Zotero.MarkDBconnect = {
             }
         } catch (e) {
             this.showNotification("User Defined RegEx Invalid", "The RegEx you specified in the MarkDBConnect preferences is invalid: " + e, false);
-            Zotero.debug(`ObsVault Error: ${e}`);
+            Zotero.debug(`MarkDBconnect Error: ${e}`);
             return null;
         }
     },
@@ -588,7 +588,7 @@ Zotero.MarkDBconnect = {
         if (reserrs.length > 0) {
             this.cleanrun = false;
             const nerr = reserrs.length;
-            Zotero.debug(`${nerr} Read ObsVault Read Errors`);
+            Zotero.debug(`${nerr} MarkDBconnect Read Errors`);
 
             if (promptSaveErrors) {
                 const dataErrors = JSON.stringify(reserrs, null, 1);
@@ -690,7 +690,7 @@ Zotero.MarkDBconnect = {
         if (reserrs.length > 0) {
             this.cleanrun = false;
             const nerr = reserrs.length;
-            Zotero.debug(`${nerr} Read ObsVault Read Errors`);
+            Zotero.debug(`${nerr} MarkDBconnect Read Errors`);
 
             if (promptSaveErrors) {
                 const dataErrors = JSON.stringify(reserrs, null, 1);
@@ -836,7 +836,7 @@ Zotero.MarkDBconnect = {
         if (reserr.length > 0) {
             this.cleanrun = false;
             const nerr = reserr.length;
-            Zotero.debug(`${nerr} ObsVault Read Errors`);
+            Zotero.debug(`${nerr} MarkDBconnect Read Errors`);
 
             if (promptSaveErrors) {
                 const dataErrors = JSON.stringify(reserr, null, 1);
@@ -876,7 +876,7 @@ Zotero.MarkDBconnect = {
         if (reserr.length > 0) {
             this.cleanrun = false;
             const nerr = reserr.length;
-            Zotero.debug(`${nerr} ObsVault Read Errors`);
+            Zotero.debug(`${nerr} MarkDBconnect Read Errors`);
 
             if (promptSaveErrors) {
                 const dataErrors = JSON.stringify(reserr, null, 1);
@@ -1110,9 +1110,9 @@ Zotero.MarkDBconnect = {
         const configuration = this.getPref('configuration');
         if (configuration === 'false') {
             /// check if there are preexisting preferences
-            const obscite_source_dir = Zotero.Prefs.get('extensions.obscite.source_dir', true);
-            let obscite_prefs_found = (typeof obscite_source_dir === 'string' && obscite_source_dir.length > 0) ? true : false;
-            if (obscite_prefs_found === true) {
+            const old_source_dir = Zotero.Prefs.get('extensions.obscite.source_dir', true);
+            let old_prefs_found = (typeof old_source_dir === 'string' && old_source_dir.length > 0) ? true : false;
+            if (old_prefs_found === true) {
                 for (let pref of ['matchstrategy', 'source_dir', 'filefilterstrategy', 'filepattern', 'zotkeyregex', 'metadatakeyword', 'grouplibraries', 'tagstr', 'vaultresolution', 'vaultname', 'logseqgraphname']) {
                     let prefval = Zotero.Prefs.get('extensions.obscite.' + pref, true);
                     if (typeof prefval === 'string' && prefval.length > 0) {
@@ -1122,8 +1122,8 @@ Zotero.MarkDBconnect = {
                 this.setPref('configuration', this.version);
 
                 try {
-                    let obscite = Zotero.ObsCite.version;
-                    if (typeof obscite === 'string' && obscite.length > 0) {
+                    let old_obscite_version = Zotero.ObsCite.version;
+                    if (typeof old_obscite_version === 'string' && old_obscite_version.length > 0) {
                         this.showNotification(...["MarkDBConnect", "ZotObsCite has been renamed. Please remove 'ZoteroObsidianCitations' from your Extensions", false]);
                         return;
                     }

@@ -1,13 +1,10 @@
 <?xml version="1.0"?>
-
+<!-- <?xml-stylesheet href="chrome://zotfile/skin/overlay.css" type="text/css"?> -->
 <!DOCTYPE overlay SYSTEM "chrome://markdbconnect/locale/overlay.dtd">
 
 <overlay
-  id="markdbconnect"
+  id="markdbconnect-overlay"
   xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-
-  <script src="chrome://markdbconnect/content/scripts/mdbconnect.js"/>
-  <script src="chrome://zotero/content/include.js"/>
 
   <stringbundleset id="stringbundleset">
     <stringbundle
@@ -25,7 +22,7 @@
     <menuitem id="id-mdbconnect-itemmenu-open-obsidian" label="&mdbconnect.item-menu.open-obsidian-label;" hidden="false" oncommand="Zotero.MarkDBconnect.openSelectedItemsURI(0)"/>
     <menuitem id="id-mdbconnect-itemmenu-show-md" label="&mdbconnect.item-menu.show-md-label;" hidden="false" oncommand="Zotero.MarkDBconnect.showSelectedItemMarkdownInFilesystem(0)"/>
 
-     <menu id="id-mdbconnect-itemmenu-listobsidian-restrict" label="&mdbconnect.item-menu.list-obsidian-label;" > 
+     <menu id="id-mdbconnect-itemmenu-listobsidian-restrict" label="&mdbconnect.item-menu.list-obsidian-label;"> 
       <menupopup id="id-mdbconnect-itemmenu-listobsidian-menu" onpopupshowing="Zotero.MarkDBconnect.buildItemContextMenuListObsidian();">
         <menuitem id="id-mdbconnect-itemmenu-listobsidian-file-00" hidden="true" label="menu1" tooltiptext="" oncommand="Zotero.MarkDBconnect.openSelectedItemsURI(0);"/>
         <menuitem id="id-mdbconnect-itemmenu-listobsidian-file-01" hidden="true" label="menu1" tooltiptext="" oncommand="Zotero.MarkDBconnect.openSelectedItemsURI(1);"/>
@@ -70,5 +67,8 @@
 
   </menupopup>
 
+  <!-- Includes -->
+  <!-- <script src="chrome://zotero/content/include.js"/> -->
+  <script src="chrome://markdbconnect/content/scripts/mdbconnect.js"/>
 
 </overlay>
