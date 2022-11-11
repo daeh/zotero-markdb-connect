@@ -165,7 +165,8 @@ Zotero.MarkDBconnect = {
             }
         } catch (e) {
             this.showNotification("Vault Path Not Found", "Set the path to your notes in the MarkDBConnect preferences.", false);
-            Zotero.debug(`MarkDBconnect Error: ${e}`);
+            Zotero.debug(`MarkDBconnect: Error: ${e}`);
+            Zotero.debug("MarkDBconnect: Error in vaultpath: >>" + this.getPref('source_dir') + "<<");
             return null;
         }
     },
@@ -191,7 +192,7 @@ Zotero.MarkDBconnect = {
             return filepatternstr;
         } catch (e) {
             this.showNotification("File regex is not valid. Was given: >>" + filepatternstr + "<<", false);
-            Zotero.debug(`File RegEx Error: ${e}`);
+            Zotero.debug(`MarkDBconnect: File RegEx Error: ${e}`);
             return null;
         }
     },
@@ -207,7 +208,7 @@ Zotero.MarkDBconnect = {
             }
         } catch (e) {
             this.showNotification("User Defined RegEx Invalid", "The RegEx you specified in the MarkDBConnect preferences is invalid: " + e, false);
-            Zotero.debug(`MarkDBconnect Error: ${e}`);
+            Zotero.debug(`MarkDBconnect: Error: ${e}`);
             return null;
         }
     },
@@ -347,6 +348,8 @@ Zotero.MarkDBconnect = {
             this.debugSettingsFail = checkSettings_trace;
             return false;
         }
+
+        Zotero.debug("MarkDBconnect: checkSettings() complete");
 
         return true;
     },
@@ -501,7 +504,7 @@ Zotero.MarkDBconnect = {
         // nsIFile.path
 
         if (!basedir.exists() || !basedir.isDirectory()) {
-            Zotero.debug(`${basedir} does not exist or is file`);
+            Zotero.debug(`MarkDBconnect: ${basedir} does not exist or is file`);
             return files;
         }
 
@@ -557,7 +560,7 @@ Zotero.MarkDBconnect = {
                     const re_title = new RegExp(/^@([^\s]+)/);
                     entry_res.citekey_title = name.match(re_title)[1].trim();
                 } catch (e) {
-                    Zotero.debug("Error in scanVault: " + e);
+                    Zotero.debug("MarkDBconnect: Error in scanVault(): " + e);
                 }
             }
 
@@ -575,7 +578,7 @@ Zotero.MarkDBconnect = {
                     }
                 }
             } catch (e) {
-                Zotero.debug("Error in scanVault: " + e);
+                Zotero.debug("MarkDBconnect: Error in scanVault(): " + e);
             }
 
             entry_res.citekey = entry_res.citekey_metadata || entry_res.citekey_title;
@@ -588,7 +591,7 @@ Zotero.MarkDBconnect = {
         if (reserrs.length > 0) {
             this.cleanrun = false;
             const nerr = reserrs.length;
-            Zotero.debug(`${nerr} MarkDBconnect Read Errors`);
+            Zotero.debug(`MarkDBconnect: ${nerr} Read Errors`);
 
             if (promptSaveErrors) {
                 const dataErrors = JSON.stringify(reserrs, null, 1);
@@ -651,7 +654,7 @@ Zotero.MarkDBconnect = {
                     const re_title = new RegExp(/^@([^\s]+)/);
                     entry_res.citekey_title = name.match(re_title)[1].trim();
                 } catch (e) {
-                    Zotero.debug("Error in scanVaultCustomRegex: " + e);
+                    Zotero.debug("MarkDBconnect: Error in scanVaultCustomRegex(): " + e);
                 }
             }
 
@@ -674,10 +677,10 @@ Zotero.MarkDBconnect = {
                 //         }
                 //     }
                 // } catch (e) {
-                //     Zotero.debug("Error in scanVaultCustomRegex: " + e);
+                //     Zotero.debug("MarkDBconnect: Error in scanVaultCustomRegex: " + e);
                 // }
             } catch (e) {
-                Zotero.debug("Error in scanVaultCustomRegex: " + e);
+                Zotero.debug("MarkDBconnect: Error in scanVaultCustomRegex(): " + e);
             }
 
             // entry_res.citekey = entry_res.citekey_metadata || entry_res.citekey_title;
@@ -690,7 +693,7 @@ Zotero.MarkDBconnect = {
         if (reserrs.length > 0) {
             this.cleanrun = false;
             const nerr = reserrs.length;
-            Zotero.debug(`${nerr} MarkDBconnect Read Errors`);
+            Zotero.debug(`MarkDBconnect: ${nerr} Read Errors`);
 
             if (promptSaveErrors) {
                 const dataErrors = JSON.stringify(reserrs, null, 1);
@@ -733,8 +736,8 @@ Zotero.MarkDBconnect = {
         if (keymaperr.length > 0) {
             this.cleanrun = false;
             const nerr = keymaperr.length;
-            Zotero.debug(`${nerr} mapZoteroIDkeysInternalSearch Errors`);
-            Zotero.debug(`${keymaperr[0]}`);
+            Zotero.debug(`MarkDBconnect: ${nerr} mapZoteroIDkeysInternalSearch Errors`);
+            Zotero.debug(`MarkDBconnect: ${keymaperr[0]}`);
             this.showNotification("mapZoteroIDkeysInternalSearch", "Error: " + nerr.toString() + ".", false);
         }
         return keymap;
@@ -836,7 +839,7 @@ Zotero.MarkDBconnect = {
         if (reserr.length > 0) {
             this.cleanrun = false;
             const nerr = reserr.length;
-            Zotero.debug(`${nerr} MarkDBconnect Read Errors`);
+            Zotero.debug(`MarkDBconnect: ${nerr} Read Errors`);
 
             if (promptSaveErrors) {
                 const dataErrors = JSON.stringify(reserr, null, 1);
@@ -876,7 +879,7 @@ Zotero.MarkDBconnect = {
         if (reserr.length > 0) {
             this.cleanrun = false;
             const nerr = reserr.length;
-            Zotero.debug(`${nerr} MarkDBconnect Read Errors`);
+            Zotero.debug(`MarkDBconnect: ${nerr} Read Errors`);
 
             if (promptSaveErrors) {
                 const dataErrors = JSON.stringify(reserr, null, 1);
@@ -1075,6 +1078,9 @@ Zotero.MarkDBconnect = {
         };
         let notifData = ["MarkDBConnect Syncing Error", "Some Error Occurred", false];
         if (await this.checkSettings()) {
+
+            Zotero.debug("MarkDBconnect: checkSettings() passed, continuing runSync()");
+
             trace.checkSetting = 'pass';
             await this.processData(promptSaveErrors, debug);
             trace.processData = 'pass';
@@ -1093,6 +1099,9 @@ Zotero.MarkDBconnect = {
                 message = "Found " + this.dataKeys.length.toString() + " notes.";
                 notifData = ["MarkDBConnect", message, false];
             }
+
+            Zotero.debug("MarkDBconnect: runSync() complete");
+
         } else {
             const failedSetting = JSON.stringify(this.debugSettingsFail);
             trace.checkSetting = 'fail';
@@ -1100,6 +1109,7 @@ Zotero.MarkDBconnect = {
             const debuglog = await this.runDebug(includeResults);
             this.addDebugLog('trace', trace);
             this.addDebugLog('failedSetting', JSON.parse(failedSetting));
+            Zotero.debug("MarkDBconnect: checkSettings() failed in runSync()");
         }
         return notifData;
     },
@@ -1107,12 +1117,21 @@ Zotero.MarkDBconnect = {
     ////////////
 
     startupDependencyCheck: async function () {
+
+        Zotero.debug("MarkDBconnect: beginning startupDependencyCheck()");
+
         const configuration = this.getPref('configuration');
         if (configuration === 'false') {
+            
+            Zotero.debug("MarkDBconnect: configuration not found");
+
             /// check if there are preexisting preferences
             const old_source_dir = Zotero.Prefs.get('extensions.obscite.source_dir', true);
             let old_prefs_found = (typeof old_source_dir === 'string' && old_source_dir.length > 0) ? true : false;
             if (old_prefs_found === true) {
+
+                Zotero.debug("MarkDBconnect: obscite configuration found");
+
                 for (let pref of ['matchstrategy', 'source_dir', 'filefilterstrategy', 'filepattern', 'zotkeyregex', 'metadatakeyword', 'grouplibraries', 'tagstr', 'vaultresolution', 'vaultname', 'logseqgraphname']) {
                     let prefval = Zotero.Prefs.get('extensions.obscite.' + pref, true);
                     if (typeof prefval === 'string' && prefval.length > 0) {
@@ -1131,8 +1150,11 @@ Zotero.MarkDBconnect = {
             } else {
                 /// don't run sync if plugin has yet to be configured
                 this.showNotification(...["MarkDBConnect", "Please configure MarkDBConnect preferences", true]);
+                Zotero.debug("MarkDBconnect: configuration not found - aborting");
                 return;
             }
+        } else {
+            Zotero.debug("MarkDBconnect: configuration found - continuing");
         }
         const promptSaveErrors = false;
         const syncTags = true; // syncOnStart
@@ -1261,7 +1283,7 @@ Zotero.MarkDBconnect = {
         const file = new FileUtils.File(OS.Path.normalize(entry_res.path));
         if (file.exists()) {
             try {
-                Zotero.debug("Revealing " + file.path);
+                Zotero.debug("MarkDBconnect: Revealing " + file.path);
                 file.reveal();
             } catch (e) {
                 // On platforms that don't support nsIFile.reveal() (e.g. Linux),
