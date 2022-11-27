@@ -20,6 +20,7 @@
 <!ENTITY mdbconnect.preferences.filepattern-label "regex (case insensitive): /">
 <!ENTITY mdbconnect.preferences.filepattern-label-end "/i">
 <!ENTITY mdbconnect.preferences.filefilterstrategy-customfileregex-desc "Default pattern is:   ^@.+\.md$">
+<!ENTITY mdbconnect.preferences.filefilterstrategy-customfileregex-desc "NB this option requires that you specify a yaml keyword or regex filter below.">
 
 <!ENTITY mdbconnect.preferences.matchstrategy-bbtcitekey-title "Use BetterBibTeX citekeys to link markdown files to Zotero items (Option 1)">
 <!ENTITY mdbconnect.preferences.matchstrategy-bbtcitekey-label "Match notes based on BetterBibTeX citekey">

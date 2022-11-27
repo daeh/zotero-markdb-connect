@@ -14,7 +14,7 @@ if (typeof Zotero === 'undefined') {
 
 
 Zotero.MarkDBconnect = {
-    version: '0.0.19',
+    version: '0.0.20',
     folderSep: null,
     cleanrun: true,
     suppressNotifications: false,
@@ -1122,7 +1122,7 @@ Zotero.MarkDBconnect = {
 
         const configuration = this.getPref('configuration');
         if (configuration === 'false') {
-            
+
             Zotero.debug("MarkDBconnect: configuration not found");
 
             /// check if there are preexisting preferences
@@ -1146,7 +1146,7 @@ Zotero.MarkDBconnect = {
                         this.showNotification(...["MarkDBConnect", "ZotObsCite has been renamed. Please remove 'ZoteroObsidianCitations' from your Extensions", false]);
                         return;
                     }
-                } catch (error) {}
+                } catch (error) { }
             } else {
                 /// don't run sync if plugin has yet to be configured
                 this.showNotification(...["MarkDBConnect", "Please configure MarkDBConnect preferences", true]);
