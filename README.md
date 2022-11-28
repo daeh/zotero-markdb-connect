@@ -55,7 +55,7 @@ NOTE: multiple markdown files can point to the same Zotero item. But a given mar
 
 ### Option 1: Using BetterBibTeX citekeys
 
-_MarkDB-Connect_ can extract the BetterBibTeX citekey that specifies which Zotero Item a markdown note corresponds to. The BetterBibTeX citekey can be taken from the markdown filename or yaml metadata.
+_MarkDB-Connect_ can extract the BetterBibTeX citekey that specifies which Zotero Item a markdown note corresponds to. The BetterBibTeX citekey can be taken from the markdown filename or [yaml metadata](https://help.obsidian.md/Advanced+topics/YAML+front+matter).
 
 -   In `MarkDBConnect Preferences...` (under the `Tools` menu),
 
@@ -68,9 +68,9 @@ _MarkDB-Connect_ can extract the BetterBibTeX citekey that specifies which Zoter
 
         -   By default, _MarkDB-Connect_ expects that the filenames of your markdown reading note files begin with `@mycitekey` but can include extra information after it (e.g. a reading note with the BetterBibTeX citekey `shepard1987science` could have the file name `@shepard1987science.md` or `@shepard1987science Toward a universal law of generalization for psychological science.md`).
 
-    -   Optionally, you can have _MarkDB-Connect_ read the metadata of your markdown notes and extract the citekey from one of the fields. To enable this, specify the metadata ID (`citekey` is a common value).
+    -   Optionally, you can have _MarkDB-Connect_ read the metadata (aka front matter) of your markdown notes and extract the citekey from one of the fields. To enable this, specify the metadata ID (`citekey` is a common value). For info metadata syntax, see [YAML front matter](https://help.obsidian.md/Advanced+topics/YAML+front+matter).
 
-        -   This is necessary if the file names do not begin with the correct citekey, which may happen if the citekeys include special characters (e.g. if a citekey contains `:`, it will probably need to be taken from the yaml metadata rather than the filename).
+        -   This is necessary if the file names do not begin with the correct citekey, which may happen if the citekeys include special characters (e.g. if your citekeys contain `:`, the citekeys will probably need to be taken from the yaml metadata rather than the filename).
 
 -   Run the synchronization function from `Tools -> MarkDBConnect Sync Tags`.
     -   This will add a tag (`ObsCite`) to every Zotero item for which there exists a reading note in the external folder you specified.
