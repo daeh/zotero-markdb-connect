@@ -6,6 +6,7 @@ pref("extensions.mdbconnect.metadatakeyword", "");
 pref("extensions.mdbconnect.filefilterstrategy", "default");
 pref("extensions.mdbconnect.filepattern", "^@.+\\.md$");
 pref("extensions.mdbconnect.grouplibraries", "user");
+pref("extensions.mdbconnect.removetags", "keepsynced");
 pref("extensions.mdbconnect.tagstr", "ObsCite");
 pref("extensions.mdbconnect.vaultresolution", "path");
 pref("extensions.mdbconnect.vaultname", "");

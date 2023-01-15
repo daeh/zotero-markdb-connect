@@ -19,14 +19,14 @@
 <!ENTITY mdbconnect.preferences.filefilterstrategy-customfileregex-label "Custom File Filter: recursively find files matching this RegEx pattern">
 <!ENTITY mdbconnect.preferences.filepattern-label "regex (case insensitive): /">
 <!ENTITY mdbconnect.preferences.filepattern-label-end "/i">
-<!ENTITY mdbconnect.preferences.filefilterstrategy-customfileregex-desc "Default pattern is:   ^@.+\.md$">
-<!ENTITY mdbconnect.preferences.filefilterstrategy-customfileregex-desc "NB this option requires that you specify a yaml keyword or regex filter below.">
+<!ENTITY mdbconnect.preferences.filefilterstrategy-customfileregex-desc "Default pattern is:   ^@.+\.md$  . NB optional first capturing group used as BBT citekey.">
+<!ENTITY mdbconnect.preferences.filefilterstrategy-customfileregex-desc2 "N.B. this option requires that you specify a yaml keyword or regex filter below.">
 
 <!ENTITY mdbconnect.preferences.matchstrategy-bbtcitekey-title "Use BetterBibTeX citekeys to link markdown files to Zotero items (Option 1)">
 <!ENTITY mdbconnect.preferences.matchstrategy-bbtcitekey-label "Match notes based on BetterBibTeX citekey">
 <!ENTITY mdbconnect.preferences.matchstrategy-bbtcitekey-desc "MarkDBConnect will search for a BetterBibTeX citekey in the filename and/or metadata.">
 
-<!ENTITY mdbconnect.preferences.metadata-keyword-title "(Optional) Markdown Metadata Keyword">
+<!ENTITY mdbconnect.preferences.metadata-keyword-title "Markdown Metadata Keyword (optional if BBT citkey is in title, required otherwise)">
 <!ENTITY mdbconnect.preferences.metadata-keyword-label "yaml keyword:">
 <!ENTITY mdbconnect.preferences.metadata-keyword-desc1 "If you want to extract the citekey from a markdown note's metadata, indicate the keyword here. A common value is: 'citekey'.">
 <!ENTITY mdbconnect.preferences.metadata-keyword-desc2 "If no value is given, the citekey will be taken from the filename.">
@@ -50,6 +50,12 @@
 <!ENTITY mdbconnect.preferences.grouplibraries-user-label "Only match items in User Library.">
 <!ENTITY mdbconnect.preferences.grouplibraries-group-label "Also match items in Group Libraries.">
 <!ENTITY mdbconnect.preferences.grouplibraries-subdesc "NB you will need to assign a color to the ObsCite tag in each Group Library.">
+
+<!ENTITY mdbconnect.preferences.removetags-title "Remove tags from unmatched Zotero items">
+<!ENTITY mdbconnect.preferences.removetags-desc "Whether to remove tags from Zotero items when no Markdown file is found.">
+<!ENTITY mdbconnect.preferences.removetags-sync-label "Keep Zotero tags synced with Markdown Database (recommended).">
+<!ENTITY mdbconnect.preferences.removetags-addonly-label "Do not remove tags from Zotero items (add tags only).">
+<!ENTITY mdbconnect.preferences.removetags-subdesc "Certain special use cases may prefer to not remove tags from Zotero items.">
 
 <!ENTITY mdbconnect.preferences.customtag-title "Specify a Custom Tag Name">
 <!ENTITY mdbconnect.preferences.customtag-desc "The default Zotero tag is 'ObsCite'. If would prefer the tag to be something else, specify the tag name here.">

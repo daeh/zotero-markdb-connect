@@ -31,7 +31,7 @@ Opens an existing markdown note in [Obsidian](https://obsidian.md), [logseq](htt
 -   Run Zotero (version 5.x or 6.x)
 -   Go to `Tools -> Add-ons`
 -   `Install Add-on From File`
--   Choose the file `MarkDBConnect-0.0.20.xpi`
+-   Choose the file `MarkDBConnect-0.0.21.xpi`
 -   Restart Zotero
 
 ## Setup
@@ -63,6 +63,7 @@ _MarkDB-Connect_ can extract the BetterBibTeX citekey that specifies which Zoter
 
         -   The default behavior is to search for markdown files beginning with `@`.
         -   Alternatively, you can specify a RegEx pattern to match your reading note files.
+            -   You include a capturing group in this RegEx pattern to extract the BetterBibTeX citekey from the filename.
 
     -   Select the `Match notes based on BetterBibTeX citekey` option.
 
@@ -111,7 +112,7 @@ Zotero automatically generates Item Keys, they take the form of `ABCD1234`, as i
 
 ## Example Markdown Note
 
-In this example markdown note (`@saxe2017emobtom.md`), the _MarkDB-Connect_ will use the yaml metadata keyword `citekey` to find the BetterBibTeX citekey (`saxe2017emobtom`) that determines which Zotero item to associate with the markdown file. Notice that the markdown file can include other BetterBibTeX citekeys and Zotero-Item-Keys, which are ignored by the plugin.
+In this example markdown note (`@saxe2017emobtom.md`), the _MarkDB-Connect_ will use the [yaml metadata](https://help.obsidian.md/Advanced+topics/YAML+front+matter) keyword `citekey` to find the BetterBibTeX citekey (`saxe2017emobtom`) that determines which Zotero item to associate with the markdown file. Notice that the markdown file can include other BetterBibTeX citekeys and Zotero-Item-Keys, which are ignored by the plugin.
 
 ```markdown
 ---
@@ -123,8 +124,8 @@ doi: 10.1016/j.copsyc.2017.04.019
 
 # Formalizing emotion concepts within a Bayesian model of theory of mind
 
-The body of notes can include references to other Zotero items. The _MarkDB-Connect_
-plugin will only link this file to one Zotero item.
+The body of notes can include references to other Zotero items. The _MarkDB-Connect_ plugin
+will only link this file to one Zotero item.
 
 Here are links to other papers.
 

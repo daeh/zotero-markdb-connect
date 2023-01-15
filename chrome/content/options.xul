@@ -21,6 +21,7 @@
       <preference id="pref-mdbconnect-metadatakeyword" name="extensions.mdbconnect.metadatakeyword" type="string"/>
       <preference id="pref-mdbconnect-tagstr" name="extensions.mdbconnect.tagstr" type="string"/>
       <preference id="pref-mdbconnect-grouplibraries" name="extensions.mdbconnect.grouplibraries" type="string"/>
+      <preference id="pref-mdbconnect-removetags" name="extensions.mdbconnect.removetags" type="string"/>
       <preference id="pref-mdbconnect-vaultresolution" name="extensions.mdbconnect.vaultresolution" type="string"/>
       <preference id="pref-mdbconnect-vaultname" name="extensions.mdbconnect.vaultname" type="string"/>
       <preference id="pref-mdbconnect-logseqgraph" name="extensions.mdbconnect.logseqgraph" type="string"/>
@@ -189,6 +190,17 @@
               <radio label="&mdbconnect.preferences.grouplibraries-group-label;" value="group" />
             </radiogroup>
             <label style="font-size: 10px" value="&mdbconnect.preferences.grouplibraries-subdesc;"/>
+          </groupbox>
+
+          <!-- remove tag from Zotero items without notes -->
+          <groupbox>
+            <caption label="&mdbconnect.preferences.removetags-title;"/>
+            <description style="width: 420px">&mdbconnect.preferences.removetags-desc;</description>
+            <radiogroup preference="pref-mdbconnect-removetags">
+              <radio label="&mdbconnect.preferences.removetags-sync-label;" value="keepsynced" />
+              <radio label="&mdbconnect.preferences.removetags-addonly-label;" value="addonly" />
+            </radiogroup>
+            <label style="font-size: 10px" value="&mdbconnect.preferences.removetags-subdesc;"/>
           </groupbox>
 
           <!-- generate debugging log -->

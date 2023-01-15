@@ -14,7 +14,7 @@ if (typeof Zotero === 'undefined') {
 
 
 Zotero.MarkDBconnect = {
-    version: '0.0.20',
+    version: '0.0.21',
     folderSep: null,
     cleanrun: true,
     suppressNotifications: false,
@@ -253,6 +253,16 @@ Zotero.MarkDBconnect = {
         }
     },
 
+    _getParam_removetags: function () {
+        const removetags = this.getPref('removetags');
+        if (['keepsynced', 'addonly'].includes(removetags)) {
+            return removetags;
+        } else {
+            this.setPref('removetags', 'keepsynced');
+            return 'keepsynced';
+        }
+    },
+
     _getParam_vaultresolution: function () {
         const vaultresolution = this.getPref('vaultresolution');
         if (['path', 'file', 'logseq', 'default'].includes(vaultresolution)) {
@@ -440,8 +450,6 @@ Zotero.MarkDBconnect = {
         }
     },
 
-    ///////////////
-
 
     /*
      * Zotero utility functions
@@ -527,21 +535,32 @@ Zotero.MarkDBconnect = {
 
         /// pattern to match MD files
         const filefilterstrategy = this._getParam_filefilterstrategy();
+
         let re_file;
         if (filefilterstrategy === 'default') {
             re_file = new RegExp(/^@.+\.md$/, 'i');
         } else {
             re_file = RegExp(this._getParam_filepattern(), 'i');
         }
+
         /// pattern to trim extension from filename
         const re_suffix = /\.md$/i;
 
-        const allFiles = await this.getFilesRecursively(vaultpath);
-        const mdFiles = allFiles.filter(file => re_file.test(file.name));
+        /// pattern to match citekey in MD file name
+        let re_title;
+        if (filefilterstrategy === 'default') {
+            re_title = new RegExp(/^@([^\s]+)/);
+        } else {
+            re_title = RegExp(this._getParam_filepattern(), 'i');
+        }
 
-        await Zotero.Promise.all(mdFiles.map(async (entry) => {
+        const allFiles = await this.getFilesRecursively(vaultpath);
+        const filteredFiles = allFiles.filter(file => re_file.test(file.name));
+
+        await Zotero.Promise.all(filteredFiles.map(async (entry) => {
             // const name = entry.name.split('.').slice(0, -1).join('.');
-            const name = entry.name.replace(re_suffix, '');
+            const namefull = entry.name;
+            const namebase = namefull.replace(re_suffix, '');
             const path = entry.path;
             let entry_res = {
                 citekey: null,
@@ -549,19 +568,15 @@ Zotero.MarkDBconnect = {
                 citekey_title: null,
                 zotkeys: [],
                 zotids: [],
-                name: name,
+                name: namebase,
                 path: path
             };
 
-            if (filefilterstrategy === 'default') {
-                /// get citekey from filename
-                try {
-                    /// pattern to match citekey in MD file name
-                    const re_title = new RegExp(/^@([^\s]+)/);
-                    entry_res.citekey_title = name.match(re_title)[1].trim();
-                } catch (e) {
-                    Zotero.debug("MarkDBconnect: Error in scanVault(): " + e);
-                }
+            /// get citekey from filename
+            try {
+                entry_res.citekey_title = namefull.match(re_title)[1].trim();
+            } catch (e) {
+                Zotero.debug("MarkDBconnect: Error in scanVault(): " + e);
             }
 
             /// get citekey from metadata
@@ -601,7 +616,7 @@ Zotero.MarkDBconnect = {
                 const filenamesuggest = 'MarkDBConnect-md-parsing-errors.json';
                 await this.offerToSaveErrors(dataErrors, warningTitle, warningMessage, saveDialogTitle, filenamesuggest);
             } else {
-                this.showNotification("scanVault", "Unable to parse " + nerr.toString() + " of " + mdFiles.length.toString() + " notes.", false);
+                this.showNotification("scanVault", "Unable to parse " + nerr.toString() + " of " + filteredFiles.length.toString() + " notes.", false);
             }
         }
         return res;
@@ -614,27 +629,28 @@ Zotero.MarkDBconnect = {
 
         const vaultpath = this._getParam_vaultpath();
         const zotkeyregex = this._getParam_zotkeyregex();
-        // const metadatakeyword = this._getParam_metadatakeyword();
 
         /// pattern to match MD files
         const filefilterstrategy = this._getParam_filefilterstrategy();
+
         let re_file;
         if (filefilterstrategy === 'default') {
             re_file = new RegExp(/^@.+\.md$/, 'i');
         } else {
             re_file = RegExp(this._getParam_filepattern(), 'i');
         }
+
         /// pattern to trim extension from filename
         const re_suffix = /\.md$/i;
         /// pattern to match ZoteroKey in MD file contents
         const re_contents = new RegExp(zotkeyregex, 'm');
 
         const allFiles = await this.getFilesRecursively(vaultpath);
-        const mdFiles = allFiles.filter(file => re_file.test(file.name));
+        const filteredFiles = allFiles.filter(file => re_file.test(file.name));
 
-        await Zotero.Promise.all(mdFiles.map(async (entry) => {
+        await Zotero.Promise.all(filteredFiles.map(async (entry) => {
             // const name = entry.name.split('.').slice(0, -1).join('.');
-            const name = entry.name.replace(re_suffix, '');
+            const namebase = entry.name.replace(re_suffix, '');
             const path = entry.path;
             let entry_res = {
                 citekey: null,
@@ -642,51 +658,18 @@ Zotero.MarkDBconnect = {
                 citekey_title: null,
                 zotkeys: [],
                 zotids: [],
-                name: name,
+                name: namebase,
                 path: path
             };
-
-            /// optional for custom regex
-            if (filefilterstrategy === 'default') {
-                /// get citekey from filename
-                try {
-                    /// pattern to match citekey in MD file name
-                    const re_title = new RegExp(/^@([^\s]+)/);
-                    entry_res.citekey_title = name.match(re_title)[1].trim();
-                } catch (e) {
-                    Zotero.debug("MarkDBconnect: Error in scanVaultCustomRegex(): " + e);
-                }
-            }
 
             try {
                 /// get the ZoteroKey from the contents
                 const contents = await Zotero.File.getContentsAsync(path);
                 entry_res.zotkeys.push(contents.match(re_contents)[1].trim());
-
-                /// optional for custom regex
-                /// get citekey from metadata
-                // try {
-                //     if (metadatakeyword.length > 0) {
-                //         /// pattern to match citekey in MD file metadata
-                //         const re_metadata = new RegExp("^" + metadatakeyword + "\: *([^s].+)", 'm');
-                //         /// get metadata
-                //         const contentSections = contents.split('\n---');
-                //         const metadata = contentSections[0];
-                //         if (contentSections.length > 1 && metadata.startsWith('---')) {
-                //             entry_res.citekey_metadata = metadata.match(re_metadata)[1].trim();
-                //         }
-                //     }
-                // } catch (e) {
-                //     Zotero.debug("MarkDBconnect: Error in scanVaultCustomRegex: " + e);
-                // }
             } catch (e) {
                 Zotero.debug("MarkDBconnect: Error in scanVaultCustomRegex(): " + e);
             }
 
-            // entry_res.citekey = entry_res.citekey_metadata || entry_res.citekey_title;
-            // if (entry_res.zotkey == null) {
-            //     reserrs.push(entry_res);
-            // }
             res.push(entry_res);
         }));
 
@@ -703,7 +686,7 @@ Zotero.MarkDBconnect = {
                 const filenamesuggest = 'MarkDBConnect-md-parsing-errors.json';
                 await this.offerToSaveErrors(dataErrors, warningTitle, warningMessage, saveDialogTitle, filenamesuggest);
             } else {
-                this.showNotification("scanVaultCustomRegex", "Unable to parse " + nerr.toString() + " of " + mdFiles.length.toString() + " notes.", false);
+                this.showNotification("scanVaultCustomRegex", "Unable to parse " + nerr.toString() + " of " + filteredFiles.length.toString() + " notes.", false);
             }
         }
         return res;
@@ -1027,7 +1010,10 @@ Zotero.MarkDBconnect = {
         let items_totag = items_withnotes.filter(x => !items_withtags.includes(x));
 
         /// find items that should not be tagged
-        let items_removetag = items_withtags.filter(x => !items_withnotes.includes(x));
+        let items_removetag = [];
+        if (this._getParam_removetags() === 'keepsynced') {
+            items_removetag = items_withtags.filter(x => !items_withnotes.includes(x));
+        }
 
         /// find items that cannot be located in library
         const nitems_notlocatable = citekeyids.length - items_withnotes.length;
@@ -1132,7 +1118,7 @@ Zotero.MarkDBconnect = {
 
                 Zotero.debug("MarkDBconnect: obscite configuration found");
 
-                for (let pref of ['matchstrategy', 'source_dir', 'filefilterstrategy', 'filepattern', 'zotkeyregex', 'metadatakeyword', 'grouplibraries', 'tagstr', 'vaultresolution', 'vaultname', 'logseqgraphname']) {
+                for (let pref of ['matchstrategy', 'source_dir', 'filefilterstrategy', 'filepattern', 'zotkeyregex', 'metadatakeyword', 'grouplibraries', 'removetags', 'tagstr', 'vaultresolution', 'vaultname', 'logseqgraphname']) {
                     let prefval = Zotero.Prefs.get('extensions.obscite.' + pref, true);
                     if (typeof prefval === 'string' && prefval.length > 0) {
                         this.setPref(pref, prefval);
@@ -1364,7 +1350,7 @@ Zotero.MarkDBconnect = {
         this.addDebugLog('prefs', prefs);
 
         let config = {};
-        for (let pref of ['matchstrategy', 'source_dir', 'filefilterstrategy', 'filepattern', 'zotkeyregex', 'metadatakeyword', 'grouplibraries', 'tagstr', 'vaultresolution', 'vaultname', 'logseqgraphname']) {
+        for (let pref of ['matchstrategy', 'source_dir', 'filefilterstrategy', 'filepattern', 'zotkeyregex', 'metadatakeyword', 'grouplibraries', 'removetags', 'tagstr', 'vaultresolution', 'vaultname', 'logseqgraphname']) {
             try {
                 switch (pref) {
                     case 'matchstrategy':
@@ -1387,6 +1373,9 @@ Zotero.MarkDBconnect = {
                         break;
                     case 'grouplibraries':
                         config[pref] = this._getParam_grouplibraries();
+                        break;
+                    case 'removetags':
+                        config[pref] = this._getParam_removetags();
                         break;
                     case 'tagstr':
                         config[pref] = this._getParam_tagstr();
