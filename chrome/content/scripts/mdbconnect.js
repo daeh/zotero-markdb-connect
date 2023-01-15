@@ -14,7 +14,7 @@ if (typeof Zotero === 'undefined') {
 
 
 Zotero.MarkDBconnect = {
-    version: '0.0.21',
+    version: '0.0.22',
     folderSep: null,
     cleanrun: true,
     suppressNotifications: false,
@@ -549,7 +549,7 @@ Zotero.MarkDBconnect = {
         /// pattern to match citekey in MD file name
         let re_title;
         if (filefilterstrategy === 'default') {
-            re_title = new RegExp(/^@([^\s]+)/);
+            re_title = new RegExp(/^@([^\s]+)\.md$/, 'i');
         } else {
             re_title = RegExp(this._getParam_filepattern(), 'i');
         }

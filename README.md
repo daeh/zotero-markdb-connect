@@ -31,7 +31,7 @@ Opens an existing markdown note in [Obsidian](https://obsidian.md), [logseq](htt
 -   Run Zotero (version 5.x or 6.x)
 -   Go to `Tools -> Add-ons`
 -   `Install Add-on From File`
--   Choose the file `MarkDBConnect-0.0.21.xpi`
+-   Choose the file `MarkDBConnect-0.0.22.xpi`
 -   Restart Zotero
 
 ## Setup
