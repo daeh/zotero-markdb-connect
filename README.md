@@ -22,13 +22,11 @@ Supports multiple markdown files for a single Zotero item.
 
 Opens an existing markdown note in [Obsidian](https://obsidian.md), [logseq](https://logseq.com), or the system's default markdown note editor (e.g. [Zettlr](https://www.zettlr.com), [Typora](https://typora.io)) from the contextual menu of a Zotero item.
 
-![MarkDBConnectMenu](MarkDBConnectMenu.png)
-
 ## Instalation
 
 -   Download the plugin (the .xpi file) from the latest release: https://github.com/daeh/zotero-markdb-connect/releases
 -   To download the .xpi file, right click it and select 'Save link as'
--   Run Zotero (version 5.x or 6.x)
+-   Open Zotero (version 6.x)
 -   Go to `Tools -> Add-ons`
 -   `Install Add-on From File`
 -   Choose the file `MarkDBConnect-0.0.22.xpi`
@@ -61,17 +59,19 @@ _MarkDB-Connect_ can extract the BetterBibTeX citekey that specifies which Zoter
 
     -   Specify the location of the folder that contains your markdown reading notes (e.g. `/Users/me/Documents/ObsVault/ReadingNotes/`). The _MarkDB-Connect_ plugin will recursively search this path for markdown files.
 
-        -   The default behavior is to search for markdown files beginning with `@`.
-        -   Alternatively, you can specify a RegEx pattern to match your reading note files.
-            -   You include a capturing group in this RegEx pattern to extract the BetterBibTeX citekey from the filename.
-
     -   Select the `Match notes based on BetterBibTeX citekey` option.
+
+    -   Specify how the plugin should identify the desired markdown reading notes and extract the BetterBibTeX citekeys.
 
         -   By default, _MarkDB-Connect_ expects that the filenames of your markdown reading note files begin with `@mycitekey` but can include extra information after it (e.g. a reading note with the BetterBibTeX citekey `shepard1987science` could have the file name `@shepard1987science.md` or `@shepard1987science Toward a universal law of generalization for psychological science.md`).
 
-    -   Optionally, you can have _MarkDB-Connect_ read the metadata (aka front matter) of your markdown notes and extract the citekey from one of the fields. To enable this, specify the metadata ID (`citekey` is a common value). For info metadata syntax, see [YAML front matter](https://help.obsidian.md/Advanced+topics/YAML+front+matter).
+        -   If your reading notes use a different filenaming convention, you can specify a RegEx pattern to match the files.
+            -   You can include a capturing group in this RegEx pattern to extract the BetterBibTeX citekey from the filename.
 
-        -   This is necessary if the file names do not begin with the correct citekey, which may happen if the citekeys include special characters (e.g. if your citekeys contain `:`, the citekeys will probably need to be taken from the yaml metadata rather than the filename).
+    -   Optionally, _MarkDB-Connect_ can extract the citekey from the metadata (aka front matter) of your markdown notes. To enable this, specify the metadata ID (`citekey` is a common value).
+
+        -   This is necessary if the filenames do not contain the citekeys, or if citekeys in the filenames are incorrect, which can happen if citekeys include special characters. (E.g. if citekeys contain `:`, they will probably need to be taken from the yaml metadata rather than the filenames.)
+        -   For info on metadata syntax, see [YAML front matter](https://help.obsidian.md/Advanced+topics/YAML+front+matter).
 
 -   Run the synchronization function from `Tools -> MarkDBConnect Sync Tags`.
     -   This will add a tag (`ObsCite`) to every Zotero item for which there exists a reading note in the external folder you specified.
