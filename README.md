@@ -29,7 +29,7 @@ Opens an existing markdown note in [Obsidian](https://obsidian.md), [logseq](htt
 -   Open Zotero (version 6.x)
 -   Go to `Tools -> Add-ons`
 -   `Install Add-on From File`
--   Choose the file `MarkDBConnect-0.0.23.xpi`
+-   Choose the file `MarkDBConnect-0.0.24.xpi`
 -   Restart Zotero
 
 ## Setup
@@ -175,4 +175,4 @@ Distributed under the MIT License.
 
 ## Author
 
-[![Personal Website](https://img.shields.io/badge/personal%20website-daeh.info-orange?style=for-the-badge)](https://daeh.info) [![Twitter](https://img.shields.io/badge/mastodon-@dae@mastodon.online-purple?style=for-the-badge&logo=mastodon)](https://mastodon.online/@dae) [![Twitter](https://img.shields.io/badge/twitter-@DaeHoulihan-blue?style=for-the-badge&logo=twitter)](https://twitter.com/DaeHoulihan)
+[![Personal Website](https://img.shields.io/badge/personal%20website-daeh.info-orange?style=for-the-badge)](https://daeh.info) [![Mastodon](https://img.shields.io/badge/mastodon-@dae@mastodon.online-purple?style=for-the-badge&logo=mastodon)](https://mastodon.online/@dae) [![Twitter](https://img.shields.io/badge/twitter-@DaeHoulihan-blue?style=for-the-badge&logo=twitter)](https://twitter.com/DaeHoulihan)

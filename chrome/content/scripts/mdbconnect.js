@@ -14,7 +14,7 @@ if (typeof Zotero === 'undefined') {
 
 
 Zotero.MarkDBconnect = {
-    version: '0.0.23',
+    version: '0.0.24',
     folderSep: null,
     cleanrun: true,
     suppressNotifications: false,
@@ -127,7 +127,7 @@ Zotero.MarkDBconnect = {
         const tagstr = this.getPref('tagstr');
         if (typeof tagstr === 'string' && tagstr.length > 0) {
             let found = [];
-            const notallowed = ["'", '"', ":", "\n", "/", "\\", "?", "*", "|", ">", "<", ",", ";", "=", "`", "~", "!", "#", "$", "%", "^", "&", "(", ")", "[", "]", "{", "}", " "];
+            const notallowed = ["'", '"', ":", "\n", "\\", "?", "*", "|", ">", "<", ",", ";", "=", "`", "~", "!", "#", "$", "%", "^", "&", "(", ")", "[", "]", "{", "}", " "]; // "/", 
             notallowed.forEach(char => {
                 if (tagstr.includes(char)) {
                     found.push(char);
@@ -583,7 +583,8 @@ Zotero.MarkDBconnect = {
             try {
                 if (metadatakeyword.length > 0) {
                     /// pattern to match citekey in MD file metadata
-                    const re_metadata = new RegExp("^" + metadatakeyword + "\: *([^s].+)", 'm');
+                    // const re_metadata = new RegExp("^" + metadatakeyword + "\: *([^s].+)", 'm');
+                    const re_metadata = new RegExp(`^${metadatakeyword}: *(?:['"])?(\\S+?)(?:['"]|\\s|$)`, 'm');
                     const contents = await Zotero.File.getContentsAsync(path);
                     /// get metadata
                     const contentSections = contents.split('\n---');
