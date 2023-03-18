@@ -924,7 +924,7 @@ Zotero.MarkDBconnect = {
             }
 
             /// get zoteroKeys and zoteroIDs for every item in Zotero library
-            const citekeymap = await this.mapCitekeysBBTquery(res); /// returns dict mapping citekey => [zoteroID_1, zoteroID_2, ...]
+            const citekeymap = await this.mapCitekeysBBTquery(); /// returns dict mapping citekey => [zoteroID_1, zoteroID_2, ...]
             if (debug) {
                 this.addDebugLog('mapCitekeysBBTquery', JSON.parse(JSON.stringify(citekeymap)));
             }
