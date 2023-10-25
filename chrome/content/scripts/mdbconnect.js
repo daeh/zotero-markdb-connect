@@ -747,20 +747,37 @@ Zotero.MarkDBconnect = {
         return deferred.promise;
     },
 
-    _getBBTkeyData: async function () {
-        Components.utils.import('resource://gre/modules/AddonManager.jsm');
-        return new Promise(function (resolve) {
-            AddonManager.getAddonByID("better-bibtex@iris-advies.com", async function (addon) {
-                if (addon === null || !addon.isActive) {
-                    return;
-                }
+    // _getBBTkeyData: async function () {
+    //     Components.utils.import('resource://gre/modules/AddonManager.jsm');
+    //     return new Promise(function (resolve) {
+    //         AddonManager.getAddonByID("better-bibtex@iris-advies.com", async function (addon) {
+    //             if (addon === null || !addon.isActive) {
+    //                 return;
+    //             }
 
-                let win = Services.wm.getMostRecentWindow("navigator:browser");
-                resolve(win.Zotero.BetterBibTeX.ready.then(function () {
-                    return win.Zotero.BetterBibTeX.KeyManager.keys.data;
-                }));
-            });
-        });
+    //             let win = Services.wm.getMostRecentWindow("navigator:browser");
+    //             resolve(win.Zotero.BetterBibTeX.ready.then(function () {
+    //                 return win.Zotero.BetterBibTeX.KeyManager.keys.data;
+    //             }));
+    //         });
+    //     });
+    // },
+
+    _getBBTkeyData: async function () {
+        try {
+            if (
+                Zotero.BetterBibTeX &&
+                typeof Zotero.BetterBibTeX === 'object' &&
+                Zotero.BetterBibTeX !== null
+            ) {
+                await Zotero.BetterBibTeX.ready;
+                return Zotero.BetterBibTeX.KeyManager.all();
+            }
+        }
+        catch (e) {
+            Zotero.debug(`MarkDBconnect: Error: ${e}`);
+        }
+        return [];
     },
 
     mapCitekeysBBTquery: async function () {
@@ -783,10 +800,10 @@ Zotero.MarkDBconnect = {
             /// check if zotid is in main library
             if (itemIDs.includes(item.itemID)) {
                 /// allow for duplicate citekeys; add zotero item id to list if BBT citekey exists
-                if (Object.keys(citekeymap).includes(item.citekey)) {
-                    citekeymap[item.citekey].push(item.itemID);
+                if (Object.keys(citekeymap).includes(item.citationKey)) {
+                    citekeymap[item.citationKey].push(item.itemID);
                 } else { /// otherwise make array with zotero item id
-                    citekeymap[item.citekey] = [item.itemID];
+                    citekeymap[item.citationKey] = [item.itemID];
                 }
             }
         });
