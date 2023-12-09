@@ -3,8 +3,8 @@
     "dev@daeh.info": {
       "updates": [
         {
-          "version": "0.1.0-alpha0",
-          "update_link": "https://github.com/daeh/zotero-markdb-connect/releases/latest/download/zotero-addon-template.xpi/download/v0.1.0-alpha0/markdb-connect.xpi",
+          "version": "0.1.0-rc.0",
+          "update_link": "https://github.com/daeh/zotero-markdb-connect/releases/latest/download/zotero-addon-template.xpi/download/v0.1.0-rc.0/markdb-connect.xpi",
           "applications": {
             "zotero": {
               "strict_min_version": "6.999"

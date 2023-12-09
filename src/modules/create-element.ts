@@ -14,6 +14,7 @@ export class Elements {
   static removeAll(): void {
     for (const eltRef of this.all) {
       try {
+        // @ts-ignore
         eltRef.deref()?.remove()
       } catch (err) {}
     }
