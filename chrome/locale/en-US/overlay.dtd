@@ -1,8 +1,0 @@
-<!ENTITY mdbconnect.tools-menu.syncdb-label "MarkDBConnect Sync Tags">
-<!ENTITY mdbconnect.tools-menu.preferences-label "MarkDBConnect Preferences…">
-
-<!ENTITY mdbconnect.item-menu.open-obsidian-label "Open Markdown Note">
-<!ENTITY mdbconnect.item-menu.show-md-label "Show Markdown File">
-
-<!ENTITY mdbconnect.item-menu.list-obsidian-label "Open Markdown Note">
-<!ENTITY mdbconnect.item-menu.list-md-label "Show Markdown File">

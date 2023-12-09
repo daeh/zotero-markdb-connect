@@ -1,0 +1,8 @@
+**/.git
+**/.github
+**/.vscode
+**/.idea
+**/build
+**/package-lock.json
+**/*.lock
+**/ignores

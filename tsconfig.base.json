@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "module": "commonjs",
+    "target": "ES2016",
+    "resolveJsonModule": true,
+    "strict": true,
+    "noEmit": true
+  },
+  "include": [
+    "src",
+    "typing" //"node_modules/zotero-types"
+  ],
+  "exclude": ["build", "addon", "scripts", "ignores", "**/*lintignore*"]
+}

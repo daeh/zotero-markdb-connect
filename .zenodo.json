@@ -1,16 +1,12 @@
 {
-    "creators": [
-        {
-            "affiliation": "Massachusetts Institute of Technology",
-            "name": "Houlihan, Dae",
-            "orcid": "0000-0001-5003-9278"
-        }
-    ],
-    "keywords": [
-        "Zotero",
-        "plugin",
-        "zotero obsidian citations"
-    ],
-    "license": "MIT License",
-    "upload_type": "software"
+  "creators": [
+    {
+      "affiliation": "Massachusetts Institute of Technology",
+      "name": "Houlihan, Dae",
+      "orcid": "0000-0001-5003-9278"
+    }
+  ],
+  "keywords": ["Zotero", "plugin", "zotero obsidian citations"],
+  "license": "MIT License",
+  "upload_type": "software"
 }

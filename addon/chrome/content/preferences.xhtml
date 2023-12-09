@@ -1,0 +1,514 @@
+<!--https://www.oreilly.com/library/view/creating-applications-with/9780596000523/07_chapter-03.html-->
+
+<linkset>
+  <html:link
+    rel="localization"
+    href="__addonRef__-preferences.ftl" />
+  <html:link
+    rel="stylesheet"
+    type="text/css"
+    href="chrome://__addonRef__/content/preferences.css" />
+</linkset>
+<vbox
+  id="zotero-prefpane-__addonRef__"
+  onload="Zotero.__addonInstance__.hooks.onPrefsEvent('load', {window})">
+  <groupbox>
+    <label class="mdbc-pref-text-center"><html:h1 data-l10n-id="pref-title"></html:h1></label>
+
+    <!--<label><html:h2 data-l10n-id="pref-locate-mdfiles"></html:h2></label>-->
+    <!--<label><html:h2 data-l10n-id="pref-locate-mdfiles-desc"></html:h2></label>-->
+    <!--<label><html:h2 data-l10n-id="pref-vault-source-folder"></html:h2></label>-->
+
+    <!-- Locating MD Files Section -->
+    <!--Location of Markdown Reading Notes-->
+
+    <!-- Source Folder -->
+    <!--Location of Markdown Reading Notes-->
+
+    <!--Folder Containing Markdown Reading Notes-->
+    <!--<html:label for="zotero-prefpane-__addonRef__-source_dir" data-l10n-id="pref-vault-source-folder"></html:label>-->
+
+    <!--<html:input type="text" id="zotero-prefpane-__addonRef__-source_dir" preference="__prefsPrefix__.source_dir"></html:input>-->
+    <!--<hbox>-->
+    <!--  <html:label for="zotero-prefpane-__addonRef__-source_dir" data-l10n-id="pref-vault-source-folder"></html:label-->
+    <!--  >&lt;!&ndash;Folder Containing Markdown Reading Notes&ndash;&gt;-->
+    <!--  <html:input type="text" id="zotero-prefpane-__addonRef__-source_dir" preference="__prefsPrefix__.source_dir"></html:input>-->
+    <!--</hbox>-->
+
+    <!--<hbox>-->
+    <!--  <html:label for="zotero-prefpane-__addonRef__-source_dir" data-l10n-id="pref-vault-source-folder"></html:label>-->
+    <!--  <html:input type="text" id="zotero-prefpane-__addonRef__-source_dir" preference="__prefsPrefix__.source_dir"></html:input>-->
+    <!--</hbox>-->
+
+    <!--<checkbox id="zotero-prefpane-__addonRef__-enable" preference="__prefsPrefix__.enable" data-l10n-id="pref-enable" />-->
+    <!--<hbox>-->
+    <!--  <html:label for="zotero-prefpane-__addonRef__-input" data-l10n-id="pref-input"></html:label>-->
+    <!--  <html:input type="text" id="zotero-prefpane-__addonRef__-input" preference="__prefsPrefix__.input"></html:input>-->
+    <!--</hbox>-->
+    <!--<hbox class="virtualized-table-container" flex="1" height="300px">-->
+    <!--  <html:div id="__addonRef__-table-container" />-->
+    <!--</hbox>-->
+  </groupbox>
+
+  <groupbox class="mdbc-pref-section-box">
+    <caption class="mdbc-pref-section-title">
+      <html:span data-l10n-id="pref-locate-mdfiles"> </html:span>
+    </caption>
+
+    <separator />
+
+    <groupbox>
+      <label><html:span data-l10n-id="pref-vault-source-folder"> </html:span></label>
+      <hbox class="mdbc-pref-width-full">
+        <html:input
+          type="text"
+          id="zotero-prefpane-__addonRef__-source_dir"
+          preference="__prefsPrefix__.source_dir"
+          readonly="true"
+          class="mdbc-pref-textbox-flex1" />
+        <button
+          label="Choose"
+          oncommand="return Zotero.__addonInstance__.hooks.onPrefsEvent('chooseVaultFolder');" />
+      </hbox>
+      <label>__addonName__ will search this directory recursively for markdown files.</label>
+    </groupbox>
+
+    <separator />
+    <html:hr class="mdbc-pref-hr" />
+
+    <radiogroup
+      id="zotero-prefpane-__addonRef__-filefilterstrategy"
+      preference="__prefsPrefix__.filefilterstrategy">
+      <radio
+        id="zotero-prefpane-__addonRef__-filefilterstrategy-default"
+        value="default"
+        label="Default File Filter"
+        class="mdbc-pref-radio-main"
+        oncommand="document.getElementById('zotero-prefpane-__addonRef__-filefilterstrategy-custom-options').setAttribute('style', 'opacity: 30%;'); document.getElementById('zotero-prefpane-__addonRef__-filefilterstrategy-default-options').setAttribute('style', 'opacity: 100%;');" />
+      <html:div
+        class="mdbc-pref-options-div"
+        id="zotero-prefpane-__addonRef__-filefilterstrategy-default-options">
+        <description>Recursively find markdown files beginning with @ .</description>
+        <description data-l10n-id="pref-filefilterstrategy-default-desc1"> </description>
+        <description data-l10n-id="pref-filefilterstrategy-default-desc2"> </description>
+      </html:div>
+
+      <!--<separator />-->
+
+      <radio
+        id="zotero-prefpane-__addonRef__-filefilterstrategy-custom"
+        value="customfileregex"
+        label="Custom File Filter"
+        class="mdbc-pref-radio-main"
+        oncommand="document.getElementById('zotero-prefpane-__addonRef__-filefilterstrategy-custom-options').setAttribute('style', 'opacity: 100%;'); document.getElementById('zotero-prefpane-__addonRef__-filefilterstrategy-default-options').setAttribute('style', 'opacity: 30%;');" />
+      <html:div
+        class="mdbc-pref-options-div"
+        id="zotero-prefpane-__addonRef__-filefilterstrategy-custom-options">
+        <description>Recursively find files matching this RegExp pattern.</description>
+        <hbox class="mdbc-pref-hbox-indent">
+          <html:span
+            data-l10n-id="pref-filefilterstrategy-custom-desc1"
+            class="mdbc-pref-options-span-first">
+          </html:span
+          ><html:span class="mdbc-pref-options-span-left mdbc-pref-options-code-span">/</html:span
+          ><html:input
+            type="text"
+            id="zotero-prefpane-__addonRef__-filepattern"
+            preference="__prefsPrefix__.filepattern"
+            class="mdbc-pref-textbox-partialwidth"
+            onchange="return Zotero.__addonInstance__.hooks.onPrefsEvent('checkRegExpValid', {value: this.value})" /><html:span class="mdbc-pref-options-span-right mdbc-pref-options-code-span"
+            >/i</html:span
+          >
+        </hbox>
+        <description class="mdbc-pref-explication-minor">The default file filter looks for Markdown files beginning with '@' : ^@.+\.md$ </description>
+        <description>N.B. If the BBT citekey is present in the filename pattern, you can include one capturing group to match it.</description>
+        <description>E.g. the default citekey-capturing RegExp uses the non-whitespace characters after the leading '@' as the BBT citekey:</description>
+        <label>^@(\S+).*\.md$</label>
+      </html:div>
+    </radiogroup>
+  </groupbox>
+
+  <separator />
+
+  <groupbox class="mdbc-pref-section-box">
+    <caption class="mdbc-pref-section-title">
+      Match Markdown Files to Zotero Items using:
+    </caption>
+
+    <radiogroup
+      id="zotero-prefpane-__addonRef__-matchstrategy"
+      preference="__prefsPrefix__.matchstrategy">
+      <groupbox>
+        <radio
+          id="zotero-prefpane-__addonRef__-matchstrategy-bbtcitekey"
+          value="bbtcitekey"
+          label="BetterBibTeX citekey - taken from YAML metadata"
+          class="mdbc-pref-radio-main"
+          oncommand="document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-bbtcitekey-options').setAttribute('style', 'opacity: 100%;'); document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-bbtcitekeyregexp-options').setAttribute('style', 'opacity: 30%;'); document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-zotid-options').setAttribute('style', 'opacity: 30%;');" />
+
+        <html:div
+          class="mdbc-pref-options-div"
+          id="zotero-prefpane-__addonRef__-matchstrategy-bbtcitekey-options">
+          <label>__addonName__ will search for a BetterBibTeX citekey in the YAML metadata.</label>
+
+          <!--<separator />-->
+
+          <description>Markdown YAML Metadata Keyword (optional if BBT citkey is in title, required otherwise)</description>
+          <hbox class="mdbc-pref-hbox-indent">
+            <html:span class="mdbc-pref-options-span-first">YAML keyword: </html:span
+            ><html:input
+              type="text"
+              id="zotero-prefpane-__addonRef__-metadatakeyword"
+              preference="__prefsPrefix__.metadatakeyword"
+              class="mdbc-pref-textbox-partialwidth"
+              onchange="Zotero.__addonInstance__.hooks.onPrefsEvent('checkMetadataFormat', {value: this.value})" /><html:span class="mdbc-pref-options-span-right"> </html:span>
+          </hbox>
+          <description>If you want to extract the citekey from a markdown note's metadata, indicate the keyword here. A common value is: 'citekey'.</description>
+          <description>If the specified keyword is not found in the YAML header, MDBC will fallback to searching the filename for a BBT citekey.</description>
+          <description>If no YAML keyword is given, the citekey will be taken from the filename. </description>
+        </html:div>
+      </groupbox>
+
+      <!--<separator />-->
+
+      <groupbox>
+        <radio
+          id="zotero-prefpane-__addonRef__-matchstrategy-bbtcitekeyregexp"
+          value="bbtcitekeyregexp"
+          label="BetterBibTeX citekey - captured with custom RegExp"
+          class="mdbc-pref-radio-main"
+          oncommand="document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-bbtcitekey-options').setAttribute('style', 'opacity: 30%;'); document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-bbtcitekeyregexp-options').setAttribute('style', 'opacity: 100%;'); document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-zotid-options').setAttribute('style', 'opacity: 30%;');" />
+
+        <html:div
+          class="mdbc-pref-options-div"
+          id="zotero-prefpane-__addonRef__-matchstrategy-bbtcitekeyregexp-options">
+          <label>__addonName__ will search for a BetterBibTeX citekey using a custom RegExp.</label>
+
+          <!--<separator />-->
+
+          <description>RegExp to match BBT citekey in file content (optional if BBT citkey is in title, required otherwise)</description>
+          <hbox class="mdbc-pref-hbox-indent">
+            <html:span class="mdbc-pref-options-span-first">RegExp:</html:span><html:span class="mdbc-pref-options-span-left mdbc-pref-options-code-span">/</html:span
+            ><html:input
+              type="text"
+              id="zotero-prefpane-__addonRef__-bbtcitekeyregexpattern"
+              preference="__prefsPrefix__.bbtcitekeyregexpattern"
+              class="mdbc-pref-textbox-partialwidth"
+              onchange="return Zotero.__addonInstance__.hooks.onPrefsEvent('checkRegExpValid', {value: this.value})" /><html:span class="mdbc-pref-options-span-right mdbc-pref-options-code-span"
+              >/m</html:span
+            >
+          </hbox>
+          <description>If you want to extract the citekey from a markdown file's contents, specify a RegExp with one capturing group here. It should return exactly one match per file.</description>
+          <description
+            >If more than one match is returned only the first will be used. If the RegExp does not return any matches, MDBC will fallback to searching the filename for a BBT citekey.</description
+          >
+          <description>If no pattern is given, the citekey will be taken from the filename. </description>
+        </html:div>
+      </groupbox>
+
+      <!--<separator />-->
+
+      <groupbox>
+        <radio
+          id="zotero-prefpane-__addonRef__-matchstrategy-zotid"
+          value="zotitemkey"
+          label="Zotero-Item-Key - captured with custom RegExp"
+          class="mdbc-pref-radio-main"
+          oncommand="document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-bbtcitekey-options').setAttribute('style', 'opacity: 30%;'); document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-bbtcitekeyregexp-options').setAttribute('style', 'opacity: 30%;'); document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-zotid-options').setAttribute('style', 'opacity: 100%;');" />
+
+        <html:div
+          class="mdbc-pref-options-div"
+          id="zotero-prefpane-__addonRef__-matchstrategy-zotid-options">
+          <label>__addonName__ will search for a Zotero-Item-Key in the file's contents. </label>
+
+          <!--<separator />-->
+
+          <label>Required: Specify a RegExp to match the Zotero-Item-Key from the markdown contents</label>
+          <label>(e.g. match 'ABCD1234' in 'zotero://select/library/items/ABCD1234')</label>
+          <hbox class="mdbc-pref-hbox-indent">
+            <html:span class="mdbc-pref-options-span-first">RegExp:</html:span><html:span class="mdbc-pref-options-span-left mdbc-pref-options-code-span">/</html:span
+            ><html:input
+              type="text"
+              id="zotero-prefpane-__addonRef__-zotkeyregex"
+              preference="__prefsPrefix__.zotkeyregex"
+              class="mdbc-pref-textbox-partialwidth"
+              onchange="return Zotero.__addonInstance__.hooks.onPrefsEvent('checkRegExpValid', {value: this.value})" /><html:span class="mdbc-pref-options-span-right mdbc-pref-options-code-span"
+              >/m</html:span
+            >
+          </hbox>
+          <description>N.B. The Zotero-Item-Key is assigned automatically by Zotero. It is not the same as the BetterBibTeX citekey.</description>
+        </html:div>
+      </groupbox>
+    </radiogroup>
+  </groupbox>
+
+  <separator />
+
+  <!-- LAUNCHING MD FILES SETTINGS -->
+  <groupbox class="mdbc-pref-section-box">
+    <caption class="mdbc-pref-section-title">
+      Open Markdown Files using:
+    </caption>
+
+    <radiogroup
+      id="zotero-prefpane-__addonRef__-vaultresolution"
+      preference="__prefsPrefix__.vaultresolution">
+      <!-- obsidian file resolution -->
+      <groupbox>
+        <radio
+          id="zotero-prefpane-__addonRef__-vaultresolution-path"
+          value="path"
+          label="Obsidian"
+          class="mdbc-pref-radio-main"
+          oncommand="document.getElementById('zotero-prefpane-__addonRef__-vaultresolution-path-options').setAttribute('style', 'opacity: 100%;'); document.getElementById('zotero-prefpane-__addonRef__-vaultresolution-logseq-options').setAttribute('style', 'opacity: 30%;'); document.getElementById('zotero-prefpane-__addonRef__-vaultresolution-system-options').setAttribute('style', 'opacity: 30%;');" />
+
+        <html:div
+          class="mdbc-pref-options-div"
+          id="zotero-prefpane-__addonRef__-vaultresolution-path-options">
+          <groupbox>
+            <description>If you use multiple Vaults, you can specify which Vault should open your markdown reading notes.</description>
+            <hbox class="mdbc-pref-hbox-indent">
+              <html:span class="mdbc-pref-options-span-first">Obsidian Vault name (optional):</html:span
+              ><html:input
+                type="text"
+                id="zotero-prefpane-__addonRef__-vaultname"
+                preference="__prefsPrefix__.vaultname"
+                class="mdbc-pref-textbox-partialwidth" /><html:span class="mdbc-pref-options-span-right"> </html:span>
+            </hbox>
+            <label
+              class="mdbc-pref-explication-minor"
+              value="The Vault name replaces {{vault}} in obsidian://open?vault={{vault}}&amp;path={{filepath}}" />
+          </groupbox>
+
+          <separator />
+
+          <groupbox>
+            <!-- filename or file path -->
+            <label>Use filename rather than full path to open note in Obsidian</label>
+            <checkbox
+              label="Use filename instead of path in URI"
+              id="zotero-prefpane-__addonRef__-obsidianresolvewithfile"
+              preference="__prefsPrefix__.obsidianresolvewithfile" />
+            <description class="mdbc-pref-explication-minor">Use only the filename in the URI rather than using the full file path. This is only advised if the default is not working.</description>
+          </groupbox>
+        </html:div>
+      </groupbox>
+
+      <!--<separator />-->
+
+      <!-- use logseq -->
+      <groupbox>
+        <radio
+          id="zotero-prefpane-__addonRef__-vaultresolution-logseq"
+          value="logseq"
+          label="logseq"
+          class="mdbc-pref-radio-main"
+          oncommand="document.getElementById('zotero-prefpane-__addonRef__-vaultresolution-path-options').setAttribute('style', 'opacity: 30%;'); document.getElementById('zotero-prefpane-__addonRef__-vaultresolution-logseq-options').setAttribute('style', 'opacity: 100%;'); document.getElementById('zotero-prefpane-__addonRef__-vaultresolution-system-options').setAttribute('style', 'opacity: 30%;');" />
+
+        <html:div
+          class="mdbc-pref-options-div"
+          id="zotero-prefpane-__addonRef__-vaultresolution-logseq-options">
+          <groupbox>
+            <hbox class="mdbc-pref-hbox-indent">
+              <html:span class="mdbc-pref-options-span-first">logseq graph name:</html:span
+              ><html:input
+                type="text"
+                id="zotero-prefpane-__addonRef__-logseqgraph"
+                preference="__prefsPrefix__.logseqgraph"
+                class="mdbc-pref-textbox-partialwidth" /><html:span class="mdbc-pref-options-span-right"> </html:span>
+            </hbox>
+            <label
+              class="mdbc-pref-explication-minor"
+              value="The graph name replaces {{graph}} in logseq://graph/{{graph}}?page={{prefix}}{{title}}" />
+
+            <hbox class="mdbc-pref-hbox-indent">
+              <html:span class="mdbc-pref-options-span-first">logseq page prefix (optional):</html:span
+              ><html:input
+                type="text"
+                id="zotero-prefpane-__addonRef__-logseqprefix"
+                preference="__prefsPrefix__.logseqprefix"
+                class="mdbc-pref-textbox-partialwidth" /><html:span class="mdbc-pref-options-span-right"> </html:span>
+            </hbox>
+            <label
+              class="mdbc-pref-explication-minor"
+              value="The page prefix replaces {{prefix}} in logseq://graph/{{graph}}?page={{prefix}}{{title}}" />
+          </groupbox>
+        </html:div>
+      </groupbox>
+
+      <!--<separator />-->
+
+      <!-- use system default -->
+      <groupbox>
+        <radio
+          id="zotero-prefpane-__addonRef__-vaultresolution-system"
+          value="default"
+          label="System's Default Editor"
+          class="mdbc-pref-radio-main"
+          oncommand="document.getElementById('zotero-prefpane-__addonRef__-vaultresolution-path-options').setAttribute('style', 'opacity: 30%;'); document.getElementById('zotero-prefpane-__addonRef__-vaultresolution-logseq-options').setAttribute('style', 'opacity: 30%;'); document.getElementById('zotero-prefpane-__addonRef__-vaultresolution-system-options').setAttribute('style', 'opacity: 100%;');" />
+
+        <html:div
+          class="mdbc-pref-options-div"
+          id="zotero-prefpane-__addonRef__-vaultresolution-system-options">
+          <description value="Enables support for databases like Zettlr or manually organized file structures." />
+        </html:div>
+      </groupbox>
+    </radiogroup>
+  </groupbox>
+
+  <separator />
+
+  <!-- ADVANCED SETTINGS -->
+  <groupbox class="mdbc-pref-section-box">
+    <caption class="mdbc-pref-section-title">
+      Advanced Settings
+    </caption>
+
+    <!-- tag name -->
+    <label class="mdbc-pref-subsection-title">Specify a Custom Tag Name?</label>
+    <html:div class="mdbc-pref-options-div">
+      <groupbox>
+        <description>The default Zotero tag is 'ObsCite'. If you would prefer the tag to be something else, specify the tag name here.</description>
+        <hbox class="mdbc-pref-hbox-indent">
+          <html:span class="mdbc-pref-options-span-first">tag:</html:span
+          ><html:input
+            type="text"
+            id="zotero-prefpane-__addonRef__-tagstr"
+            preference="__prefsPrefix__.tagstr"
+            class="mdbc-pref-textbox-partialwidth"
+            onchange="Zotero.__addonInstance__.hooks.onPrefsEvent('checkTagStr', {value: this.value})" /><html:span class="mdbc-pref-options-span-right"> </html:span>
+        </hbox>
+      </groupbox>
+    </html:div>
+
+    <!--<separator />-->
+
+    <!-- include group libraries -->
+    <label class="mdbc-pref-subsection-title">Include Group Libraries?</label>
+    <html:div class="mdbc-pref-options-div">
+      <groupbox>
+        <description>Whether to include items in Group Libraries when matching MD files, or only search for matches in the User Library.</description>
+        <radiogroup
+          id="zotero-prefpane-__addonRef__-grouplibraries"
+          preference="__prefsPrefix__.grouplibraries">
+          <radio
+            label="Only match items in User Library."
+            value="user" />
+          <radio
+            label="Also match items in Group Libraries."
+            value="group" />
+        </radiogroup>
+        <description>N.B. you will need to assign a color to the ObsCite tag in each Group Library.</description>
+      </groupbox>
+    </html:div>
+
+    <!--<separator />-->
+
+    <!-- remove tag from Zotero items without notes -->
+    <label class="mdbc-pref-subsection-title">Remove tags from unmatched Zotero items?</label>
+    <html:div class="mdbc-pref-options-div">
+      <groupbox>
+        <description>Whether to remove tags from Zotero items when no Markdown file is found.</description>
+        <radiogroup
+          id="zotero-prefpane-__addonRef__-removetags"
+          preference="__prefsPrefix__.removetags">
+          <radio
+            label="Keep Zotero tags synced with Markdown Database (recommended)."
+            value="keepsynced" />
+          <radio
+            label="Do not remove tags from Zotero items (add tags only)."
+            value="addonly" />
+        </radiogroup>
+        <description>Certain special use cases may prefer to not remove tags from Zotero items.</description>
+      </groupbox>
+    </html:div>
+
+    <!--<separator />-->
+  </groupbox>
+
+  <separator />
+
+  <!-- TROUBLESHOOTING -->
+  <groupbox class="mdbc-pref-section-box">
+    <caption class="mdbc-pref-section-title">
+      Troubleshooting
+    </caption>
+
+    <!-- generate debugging log -->
+    <label class="mdbc-pref-subsection-title">Save Debugging Log</label>
+    <html:div class="mdbc-pref-options-div">
+      <groupbox>
+        <description>If you're encountering errors, you can generate a debugging file to examine yourself and/or to include in a GitHub issue.</description>
+        <button
+          id="zotero-prefpane-__addonRef__-rundebug-button"
+          label="Generate Debugging File"
+          oncommand="Zotero.__addonInstance__.hooks.onPrefsEvent('syncMarkDBSaveDebug')" />
+      </groupbox>
+    </html:div>
+
+    <!--<separator />-->
+
+    <!-- open github issues -->
+    <label class="mdbc-pref-subsection-title">Git Help</label>
+    <html:div class="mdbc-pref-options-div">
+      <groupbox class="mdbc-pref-width-full">
+        <description>Open Issue on GitHub</description>
+        <button
+          id="zotero-prefpane-__addonRef__-gitissue-button"
+          label="Open Issue on GitHub"
+          oncommand="Zotero.launchURL('https://github.com/daeh/zotero-markdb-connect/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc');" />
+      </groupbox>
+    </html:div>
+
+    <!-- debug log level -->
+    <label class="mdbc-pref-subsection-title">Debug Log Level</label>
+    <html:div class="mdbc-pref-options-div">
+      <groupbox>
+        <description
+          >This changes what message are stored in the __addonName__ logger. It doesn't affect the exported Debugging File. Leave this at "Minimal" unless you are developing the addon.</description
+        >
+        <groupbox>
+          <hbox>
+            <hbox align="center">
+              <label value="Debug Log Level" />
+              <menulist
+                id="zotero-prefpane-__addonRef__-debugmode"
+                preference="__prefsPrefix__.debugmode"
+                native="true">
+                <menupopup>
+                  <menuitem
+                    label="Minimal"
+                    value="minimal" />
+                  <menuitem
+                    label="Maximal"
+                    value="maximal" />
+                </menupopup>
+              </menulist>
+            </hbox>
+          </hbox>
+        </groupbox>
+      </groupbox>
+    </html:div>
+  </groupbox>
+
+  <!--<separator />-->
+</vbox>
+
+<!--<vbox style="border: 1px solid black">-->
+<!--  <label><html:h1>Another Thing</html:h1></label>-->
+<!--  <radiogroup id="data-dir" preference="extensions.zotero.useDataDir">-->
+<!--    <radio id="default-data-dir" label="&zotero.preferences.dataDir.useProfile;" value="false" />-->
+<!--    <hbox>-->
+<!--      <radio label="&zotero.preferences.dataDir.custom;" value="true" />-->
+<!--      <html:input type="text" id="data-dir-path" preference="extensions.zotero.dataDir" readonly="true" style="-moz-box-flex: 1" />-->
+<!--      <button label="&zotero.preferences.dataDir.choose;" oncommand="return Zotero_Preferences.Advanced.chooseDataDir(event)" />-->
+<!--    </hbox>-->
+<!--  </radiogroup>-->
+<!--</vbox>-->
+
+<vbox>
+  <html:label
+    data-l10n-id="pref-help"
+    data-l10n-args='{"time": "__buildTime__","name": "__addonName__","version":"__buildVersion__"}'>
+  </html:label>
+</vbox>
