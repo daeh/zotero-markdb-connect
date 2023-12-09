@@ -1,10 +1,4 @@
-.project
-*.xpi
-.vscode
-*_gitignore
-*-gitignore
-*_gitignore.*
-*-gitignore.*
+**/build
 node_modules
-package-lock.json
-package.json
+zotero-cmd.json
+eslint.config.js
