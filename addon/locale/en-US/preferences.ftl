@@ -3,8 +3,6 @@ pref-enable =
     .label = Enable
 pref-help = { $name } Build { $version } { $time }
 
-pref-input = SOMETHING
-
 pref-locating-settings = Locating MD Files
 pref-launching-settings = Launching MD Files
 pref-advanced-settings = Advanced
@@ -28,7 +26,3 @@ pref-matchstrategy-bbt-desc = MarkDB-Connect will search for a BetterBibTeX cite
 calendar-view-toggle-day = Day
     .title = Switch to day view
 
-pref-vaultresolution-path-label = path (recommended)
-pref-vaultresolution-file-label = name (only advised if 'path' option is not working)
-
-pref-vaultresolution-label = Launch MD Notes in Obsidian, using the MD file's …

@@ -180,16 +180,7 @@ const config = [
     },
   },
   {
-    ignores: [
-      '**/build/**',
-      '**/dist/**',
-      '**/node_modules/**',
-      '**/scripts/**',
-      '**/*.js',
-      '**/*.bak',
-      '**/ignores/**',
-      '**/*lintignore*',
-    ],
+    ignores: ['**/build/**', '**/scripts/**', '**/*.js', '**/*.bak'],
   },
 ]
 

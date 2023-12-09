@@ -10,23 +10,6 @@ import { patch as $patch$, unpatch as $unpatch$, Trampoline } from './monkey-pat
 // Components.utils.import('resource://gre/modules/FileUtils.jsm')
 // declare const FileUtils: any
 
-// type QueryPrimitive = number | boolean | string | undefined
-// type Query =
-//   | Record<string, { $eq: QueryPrimitive }>
-//   | Record<string, { $ne: QueryPrimitive }>
-//   | Record<string, { $in: QueryPrimitive[] }>
-//   | { $and: Query[] }
-//
-// function $and(query): Query {
-//   let and: Query = {
-//     $and: Object.entries(query).map(([k, v]: [string, QueryPrimitive | Query]) => ({
-//       [k]: typeof v === 'object' ? v : { $eq: v },
-//     })) as Query[],
-//   }
-//   if (and.$and.length === 1) and = and.$and[0]
-//   return and
-// }
-
 interface BBTCitekeyRecord {
   itemID: number
   libraryID: number
@@ -49,17 +32,19 @@ interface BetterBibTeX {
 
 const _paramVals_DebugMode = ['minimal' as DebugMode, 'maximal' as DebugMode] as const
 
-const _paramVals_filefilterstrategy = ['default', 'customfileregex'] as const
+const _paramVals_filefilterstrategy = ['default', 'customfileregexp'] as const
 declare type _param_filefilterstrategy = (typeof _paramVals_filefilterstrategy)[number]
 
-const _paramVals_matchstrategy = ['bbtcitekey', 'bbtcitekeyregexp', 'zotitemkey'] as const
+const _paramVals_matchstrategy = ['bbtcitekeyyaml', 'bbtcitekeyregexp', 'zotitemkey'] as const
 declare type _param_matchstrategy = (typeof _paramVals_matchstrategy)[number]
 
-const _paramVals_mdreader = ['system', 'obsidian', 'logseq'] as const
-declare type _param_mdreader = (typeof _paramVals_mdreader)[number]
+const _paramVals_mdeditor = ['system', 'obsidian', 'logseq'] as const
+declare type _param_mdeditor = (typeof _paramVals_mdeditor)[number]
 
-const _paramVals_vaultresolution = ['path', 'file', 'logseq', 'default'] as const
-declare type _param_vaultresolution = (typeof _paramVals_vaultresolution)[number]
+const _paramVals_obsidianresolvewithfile = [false, true] as const
+declare type _param_obsidianresolvewithfile = (typeof _paramVals_obsidianresolvewithfile)[number]
+const _paramVals_obsidianresolve = ['path', 'file'] as const
+declare type _param_obsidianresolve = (typeof _paramVals_obsidianresolvewithfile)[number]
 
 const _paramVals_grouplibraries = ['user', 'group'] as const
 declare type _param_grouplibraries = (typeof _paramVals_grouplibraries)[number]
@@ -112,21 +97,6 @@ export class Notifier {
         progress: 100,
       }
       popupWin.createLine(lineOptions)
-
-      // if (data.type) {
-      //   lineOptions.type = data.type
-      // }
-      // let icon: ZoteroIconURI
-      // if (data.iconURI) {
-      //   icon = data.iconURI
-      // } else if (data.iconFile) {
-      //   icon = `chrome://zotero/skin/${data.iconFile}`
-      // } else if (data.mdbctype) {
-      //   icon = `chrome://zotero/skin/${customTypes[data.mdbctype]}`
-      // }
-      // if (icon) {
-      //   lineOptions.icon = icon
-      // }
     }
 
     popupWin.show()
@@ -134,56 +104,6 @@ export class Notifier {
 }
 
 export class BBTHelper {
-  /*
-  const script = `
-  (async () => {
-    Services.obs.notifyObservers(null, "startupcache-invalidate", null);
-    const { AddonManager } = ChromeUtils.import("resource://gre/modules/AddonManager.jsm");
-    const addon = await AddonManager.getAddonByID("${addonID}");
-    await addon.reload();
-    const progressWindow = new Zotero.ProgressWindow({ closeOnClick: true });
-    progressWindow.changeHeadline("${addonName} Hot Reload");
-    progressWindow.progress = new progressWindow.ItemProgress(
-      "chrome://zotero/skin/tick.png",
-      "VERSION=${version}, BUILD=${new Date().toLocaleString()}. By zotero-plugin-toolkit"
-    );
-    progressWindow.progress.setProgress(100);
-    progressWindow.show();
-    progressWindow.startCloseTimer(5000);
-  })()`;
-   */
-
-  // @log
-  // private static async _check_alt() {
-  //
-  //   const deferred = Zotero.Promise.defer()
-  //
-  //   const checkBTT = addon => {
-  //     let res = false
-  //     if (addon === null || !addon.isActive) {
-  //       res = false
-  //     }
-  //     else {
-  //       const win = Services.wm.getMostRecentWindow('navigator:browser')
-  //       // win.Zotero.BetterBibTeX.ready.then(() => {
-  //       //   res = true
-  //       // })
-  //       try {
-  //         win.Zotero.BetterBibTeX.isPending()
-  //         res = true
-  //       }
-  //       catch (e) {
-  //         Zotero.debug(`${config.addonName.replace("-", "")}: Error: ${e}`)
-  //       }
-  //     }
-  //     deferred.resolve(res)
-  //   }
-  //
-  //   const { AddonManager } = ChromeUtils.import("resource://gre/modules/AddonManager.jsm")
-  //   const bbt = await AddonManager.getAddonByID('better-bibtex@iris-advies.com')
-  //   return deferred.promise
-  // }
-
   @trace
   private static BBTReady() {
     if (
@@ -227,6 +147,26 @@ export class BBTHelper {
     return true
   }
 
+  @trace
+  private static _fetchBBTdata(BetterBibTeX: BetterBibTeX): BBTCitekeyRecord[] {
+    try {
+      return BetterBibTeX.KeyManager.all()
+    } catch (err) {
+      Logger.log('bbt-bridge', `_fetchBBTdata: KeyManager failed: ${err}`, false, 'error')
+      DataManager.markFail()
+    }
+    return []
+  }
+
+  @trace
+  static async getBBTdata(): Promise<BBTCitekeyRecord[]> {
+    if (await this._check()) {
+      return this._fetchBBTdata(Zotero.BetterBibTeX as BetterBibTeX)
+    } else {
+      return []
+    }
+  }
+
   // private static async _fetchBBTkeyData(BetterBibTeX): Promise<BBTItem[]> {
   //   try {
   //       if (BetterBibTeX.KeyManager.keys.count() > 0) {
@@ -248,75 +188,84 @@ export class BBTHelper {
   //   }
   // }
 
-  @trace
-  private static _fetchBBTdata(BetterBibTeX: BetterBibTeX): BBTCitekeyRecord[] {
-    try {
-      return BetterBibTeX.KeyManager.all()
-    } catch (err) {
-      Logger.log('bbt-bridge', `_fetchBBTdata: KeyManager failed: ${err}`, false, 'error')
-      DataManager.markFail()
-    }
-    return []
-  }
+  /*
+const script = `
+(async () => {
+  Services.obs.notifyObservers(null, "startupcache-invalidate", null);
+  const { AddonManager } = ChromeUtils.import("resource://gre/modules/AddonManager.jsm");
+  const addon = await AddonManager.getAddonByID("${addonID}");
+  await addon.reload();
+  const progressWindow = new Zotero.ProgressWindow({ closeOnClick: true });
+  progressWindow.changeHeadline("${addonName} Hot Reload");
+  progressWindow.progress = new progressWindow.ItemProgress(
+    "chrome://zotero/skin/tick.png",
+    "VERSION=${version}, BUILD=${new Date().toLocaleString()}. By zotero-plugin-toolkit"
+  );
+  progressWindow.progress.setProgress(100);
+  progressWindow.show();
+  progressWindow.startCloseTimer(5000);
+})()`;
+ */
 
-  @trace
-  static async getBBTdata(): Promise<BBTCitekeyRecord[]> {
-    if (await this._check()) {
-      return this._fetchBBTdata(Zotero.BetterBibTeX as BetterBibTeX)
-    } else {
-      return []
-    }
-  }
+  // @log
+  // private static async _check_alt() {
+  //
+  //   const deferred = Zotero.Promise.defer()
+  //
+  //   const checkBTT = addon => {
+  //     let res = false
+  //     if (addon === null || !addon.isActive) {
+  //       res = false
+  //     }
+  //     else {
+  //       const win = Services.wm.getMostRecentWindow('navigator:browser')
+  //       // win.Zotero.BetterBibTeX.ready.then(() => {
+  //       //   res = true
+  //       // })
+  //       try {
+  //         win.Zotero.BetterBibTeX.isPending()
+  //         res = true
+  //       }
+  //       catch (e) {
+  //         Zotero.debug(`${config.addonName.replace("-", "")}: Error: ${e}`)
+  //       }
+  //     }
+  //     deferred.resolve(res)
+  //   }
+  //
+  //   const { AddonManager } = ChromeUtils.import("resource://gre/modules/AddonManager.jsm")
+  //   const bbt = await AddonManager.getAddonByID('better-bibtex@iris-advies.com')
+  //   return deferred.promise
+  // }
 }
-
-// let aaa = Zotero.File.pathToFile("~/Desktop/IMG_7839.JPG")
-// aaa.normalize()
-// aaa.path
-// >> "/Users/dae/Desktop/IMG_7839.JPG"
-
-// const path = require('path');
-// const fs = require('fs-extra');
-
-// async function read(path: string): Promise<string> {
-//   try {
-//     const stat = await OS.File.stat(cmd)
-//     if (stat.isDir) continue
-//     const cmd: string = OS.Path.join(path, bin + pathext)
-//     return (await OS.File.exists(path)) ? (await OS.File.read(path, { encoding: 'utf-8' }) as unknown as string) : ''
-//   }
-//   catch (err) {
-//     log.error('csv.read', path, 'error:', err)
-//     return ''
-//   }
-// }
 
 export class getParam {
   @trace
-  static vaultpath(): prefParam {
-    const name = 'source_dir'
+  static sourcedir(): prefParam {
+    const name = 'sourcedir'
     const defaultValue = ''
     const valid = false
     const param: prefParam = { name: name, value: defaultValue, valid: valid }
     try {
-      const value = getPref('source_dir') as string
+      const value = getPref(name) as string
       if (typeof value !== 'string') throw new Error('Vault Path Not Found')
       if (value.length === 0) throw new Error('Vault Path Not Found')
 
-      const vaultpathObj = Zotero.File.pathToFile(value)
-      vaultpathObj.normalize()
-      const vaultpath = vaultpathObj.path
+      const sourcedirpathObj = Zotero.File.pathToFile(value)
+      sourcedirpathObj.normalize()
+      const sourcedirpath = sourcedirpathObj.path
       if (
-        typeof vaultpath === 'string' &&
-        vaultpath.length > 0 &&
-        vaultpathObj.exists() &&
-        vaultpathObj.isDirectory()
+        typeof sourcedirpath === 'string' &&
+        sourcedirpath.length > 0 &&
+        sourcedirpathObj.exists() &&
+        sourcedirpathObj.isDirectory()
       ) {
-        param.value = vaultpath
+        param.value = sourcedirpath
         param.valid = true
       }
     } catch (e) {
       // TODO only show notification if user sync run manually (not run on startup)
-      Logger.log('getParam', `ERROR: vaultpath :: ${e}`, false, 'error')
+      Logger.log('getParam', `ERROR: sourcedirpath :: ${e}`, false, 'error')
       Notifier.notify({
         title: 'Warning',
         body: `Vault Path Not Found. Set the path to your notes in the ${config.addonName} preferences.`,
@@ -389,8 +338,8 @@ export class getParam {
   }
 
   @trace
-  static metadatakeyword() {
-    const name = 'metadatakeyword'
+  static bbtyamlkeyword() {
+    const name = 'bbtyamlkeyword'
     const defaultValue = ''
     const valid = false
     const param = { name: name, value: defaultValue, valid: valid }
@@ -401,8 +350,8 @@ export class getParam {
       param.valid = true
     } else {
       if (value !== '' && value !== defaultValue) {
-        Logger.log('getParam', `ERROR: metadatakeyword: invalid param :: ${value}`, false, 'error')
-        Logger.log('getParam', `metadatakeyword: set to default :: ${defaultValue}`, false, 'error')
+        Logger.log('getParam', `ERROR: bbtyamlkeyword: invalid param :: ${value}`, false, 'error')
+        Logger.log('getParam', `bbtyamlkeyword: set to default :: ${defaultValue}`, false, 'error')
         setPref(name, defaultValue)
       }
     }
@@ -411,8 +360,8 @@ export class getParam {
   }
 
   @trace
-  static bbtcitekeyregexpattern() {
-    const name = 'bbtcitekeyregexpattern'
+  static bbtregexp() {
+    const name = 'bbtregexp'
     const defaultValue = ''
     const defaultRegExp = new RegExp(defaultValue, 'm')
     const valid = false
@@ -423,8 +372,8 @@ export class getParam {
       param.valid = true
     } else {
       if (value !== '' && value !== defaultValue) {
-        Logger.log('getParam', `ERROR: bbtcitekeyregexpattern: invalid RegExp :: ${value}`, false, 'error')
-        Logger.log('getParam', `bbtcitekeyregexpattern: set to default :: ${defaultRegExp.toString()}`, false, 'error')
+        Logger.log('getParam', `ERROR: bbtregexp: invalid RegExp :: ${value}`, false, 'error')
+        Logger.log('getParam', `bbtregexp: set to default :: ${defaultRegExp.toString()}`, false, 'error')
         setPref(name, defaultValue)
       }
     }
@@ -433,8 +382,8 @@ export class getParam {
   }
 
   @trace
-  static zotkeyregex() {
-    const name = 'zotkeyregex'
+  static zotkeyregexp() {
+    const name = 'zotkeyregexp'
     const param = { name: name, value: new RegExp(''), valid: false }
     const value = getPref(name) as string
 
@@ -456,24 +405,18 @@ export class getParam {
   }
 
   @trace
-  static vaultresolution() {
-    const name = 'vaultresolution'
-    const defaultValue = _paramVals_vaultresolution[0] as _param_vaultresolution
+  static mdeditor() {
+    const name = 'mdeditor'
+    const defaultValue = _paramVals_mdeditor[0] as _param_mdeditor
     const param = { name: name, value: defaultValue, valid: true }
 
-    let value = getPref(name) as _param_vaultresolution
-    if (_paramVals_vaultresolution.includes(value)) {
-      if (value === 'path') {
-        const value2 = getPref('obsidianresolvewithfile') as boolean
-        if (value2 === true) {
-          value = 'file'
-        }
-      }
+    let value = getPref(name) as _param_mdeditor
+    if (_paramVals_mdeditor.includes(value)) {
       param.value = value
       param.valid = true
     } else {
-      Logger.log('getParam', `ERROR: vaultresolution: invalid param :: ${value}`, false, 'error')
-      Logger.log('getParam', `vaultresolution: set to default :: ${defaultValue}`, false, 'error')
+      Logger.log('getParam', `ERROR: mdeditor: invalid param :: ${value}`, false, 'error')
+      Logger.log('getParam', `mdeditor: set to default :: ${defaultValue}`, false, 'error')
       setPref(name, defaultValue)
     }
     Logger.log(name, param, false, 'config')
@@ -481,34 +424,32 @@ export class getParam {
   }
 
   @trace
-  static mdreader() {
-    const vaultresolution = this.vaultresolution().value
-    const defaultValue = _paramVals_mdreader[0]
-    let protocol: _param_mdreader
-    switch (vaultresolution) {
-      case 'path':
-        protocol = 'obsidian' as _param_mdreader
-        break
-      case 'file':
-        protocol = 'obsidian' as _param_mdreader
-        break
-      case 'logseq':
-        protocol = 'logseq' as _param_mdreader
-        break
-      case 'default':
-        protocol = 'system' as _param_mdreader
-        break
-      default:
-        protocol = 'system' as _param_mdreader
-        break
+  static obsidianresolve() {
+    const name = 'obsidianresolvewithfile'
+    const defaultValue = _paramVals_obsidianresolvewithfile[0] as _param_obsidianresolvewithfile
+    const valid = true
+    const param = {
+      name: name,
+      value: defaultValue ? _paramVals_obsidianresolve[1] : _paramVals_obsidianresolve[0], //// if true use 'file', if false use 'path' (the default)
+      valid: valid,
     }
-    Logger.log('mdreader', { name: 'mdreader', value: protocol, valid: true }, false, 'config')
-    return protocol
+
+    const value = getPref('obsidianresolvewithfile') as _param_obsidianresolvewithfile
+    if (_paramVals_obsidianresolvewithfile.includes(value)) {
+      param.value = value ? _paramVals_obsidianresolve[1] : _paramVals_obsidianresolve[0]
+      param.valid = true
+    } else {
+      Logger.log('getParam', `ERROR: obsidianresolve: invalid param :: ${value}`, false, 'error')
+      Logger.log('getParam', `obsidianresolve: set to default :: ${defaultValue.toString()}`, false, 'error')
+      setPref(name, defaultValue)
+    }
+    Logger.log(name, param, false, 'config')
+    return param
   }
 
   @trace
-  static vaultname() {
-    const name = 'vaultname'
+  static obsidianvaultname() {
+    const name = 'obsidianvaultname'
     const defaultValue = ''
     const valid = false
     const param = { name: name, value: defaultValue, valid: valid }
@@ -518,8 +459,8 @@ export class getParam {
       param.valid = true
     } else {
       if (value !== '' && value !== defaultValue) {
-        Logger.log('getParam', `ERROR: vaultname: invalid param :: ${value}`, false, 'error')
-        Logger.log('getParam', `vaultname: set to default :: ${defaultValue}`, false, 'error')
+        Logger.log('getParam', `ERROR: obsidianvaultname: invalid param :: ${value}`, false, 'error')
+        Logger.log('getParam', `obsidianvaultname: set to default :: ${defaultValue}`, false, 'error')
         setPref(name, defaultValue)
       }
     }
@@ -528,8 +469,8 @@ export class getParam {
   }
 
   @trace
-  static logseqgraphname() {
-    const name = 'logseqgraphname'
+  static logseqgraph() {
+    const name = 'logseqgraph'
     const defaultValue = ''
     const valid = false
     const param = { name: name, value: defaultValue, valid: valid }
@@ -539,8 +480,8 @@ export class getParam {
       param.valid = true
     } else {
       if (value !== '' && value !== defaultValue) {
-        Logger.log('getParam', `ERROR: logseqgraphname: invalid param :: ${value}`, false, 'error')
-        Logger.log('getParam', `logseqgraphname: set to default :: ${defaultValue}`, false, 'error')
+        Logger.log('getParam', `ERROR: logseqgraph: invalid param :: ${value}`, false, 'error')
+        Logger.log('getParam', `logseqgraph: set to default :: ${defaultValue}`, false, 'error')
         setPref(name, defaultValue)
       }
     }
@@ -722,21 +663,19 @@ export class ScanMarkdownFiles {
     const res: Entry[] = []
     const reserr: Entry[] = []
 
-    const protocol = getParam.mdreader()
+    const protocol = getParam.mdeditor().value
 
     const matchstrategy = getParam.matchstrategy().value
 
-    const vaultpathParam = getParam.vaultpath()
-    if (!vaultpathParam.valid) return res
-    const vaultpath = vaultpathParam.value
+    const sourcedirParam = getParam.sourcedir()
+    if (!sourcedirParam.valid) return res
+    const sourcedir = sourcedirParam.value
 
-    const metadatakeywordParam =
-      matchstrategy === 'bbtcitekey' ? getParam.metadatakeyword() : { name: '', value: '', valid: false }
+    const bbtyamlkeywordParam =
+      matchstrategy === 'bbtcitekeyyaml' ? getParam.bbtyamlkeyword() : { name: '', value: '', valid: false }
 
-    const bbtcitekeyregexpatternParam =
-      matchstrategy === 'bbtcitekeyregexp'
-        ? getParam.bbtcitekeyregexpattern()
-        : { name: '', value: new RegExp(''), valid: false }
+    const bbtregexpParam =
+      matchstrategy === 'bbtcitekeyregexp' ? getParam.bbtregexp() : { name: '', value: new RegExp(''), valid: false }
 
     /// pattern to match MD files
     const filefilterstrategy = getParam.filefilterstrategy().value
@@ -744,7 +683,7 @@ export class ScanMarkdownFiles {
     /// pattern to match citekey in MD file name
     let re_file: RegExp = /^@.+\.md$/i
     let re_title: RegExp = /^@(\S+).*\.md$/i
-    if (filefilterstrategy === 'customfileregex') {
+    if (filefilterstrategy === 'customfileregexp') {
       re_file = re_title = getParam.filepattern().value
     }
     // if (filefilterstrategy === 'default && protocol === 'logseq') {
@@ -766,7 +705,7 @@ export class ScanMarkdownFiles {
       logseq_prefix_title = logseqprefixParam.value
     }
 
-    const allFiles = await Utils.getFilesRecursively(vaultpath)
+    const allFiles = await Utils.getFilesRecursively(sourcedir)
     const filteredFiles = allFiles.filter((file) => re_file.test(file.name))
 
     await Promise.all(
@@ -807,10 +746,10 @@ export class ScanMarkdownFiles {
 
         /// get citekey from metadata
         try {
-          if (matchstrategy === 'bbtcitekey') {
-            if (metadatakeywordParam.valid) {
+          if (matchstrategy === 'bbtcitekeyyaml') {
+            if (bbtyamlkeywordParam.valid) {
               /// pattern to match citekey in MD file metadata
-              const re_metadata = new RegExp(`^${metadatakeywordParam.value}: *(?:['"])?(\\S+?)(?:['"]|\\s|$)`, 'm')
+              const re_metadata = new RegExp(`^${bbtyamlkeywordParam.value}: *(?:['"])?(\\S+?)(?:['"]|\\s|$)`, 'm')
               const contents = (await Zotero.File.getContentsAsync(filepath)) as string
               /// get metadata
               const contentSections = contents.split('\n---')
@@ -823,9 +762,9 @@ export class ScanMarkdownFiles {
               }
             }
           } else if (matchstrategy === 'bbtcitekeyregexp') {
-            if (bbtcitekeyregexpatternParam.valid) {
+            if (bbtregexpParam.valid) {
               /// pattern to match citekey in MD file contents
-              const re_body = bbtcitekeyregexpatternParam.value
+              const re_body = bbtregexpParam.value
               const contents = (await Zotero.File.getContentsAsync(filepath)) as string
               const reBody_match_res = contents.match(re_body)
               if (reBody_match_res && reBody_match_res.length > 1) {
@@ -893,30 +832,27 @@ export class ScanMarkdownFiles {
     const res: Entry[] = []
     const reserr: Entry[] = []
 
-    // zotkeyregex
-    // zotitemkey
-
-    const protocol = getParam.mdreader()
+    const protocol = getParam.mdeditor().value
 
     const matchstrategy = getParam.matchstrategy().value
 
     if (matchstrategy !== 'zotitemkey') return res
 
-    const vaultpathParam = getParam.vaultpath()
-    if (!vaultpathParam.valid) return res
-    const vaultpath = vaultpathParam.value
+    const sourcedirParam = getParam.sourcedir()
+    if (!sourcedirParam.valid) return res
+    const sourcedir = sourcedirParam.value
 
-    const zotkeyregexParam = getParam.zotkeyregex()
+    const zotkeyregexpParam = getParam.zotkeyregexp()
 
     /// pattern to match MD files
     const filefilterstrategy = getParam.filefilterstrategy().value
 
     /// pattern to match citekey in MD file name
     let re_file: RegExp = /^@.+\.md$/i
-    if (filefilterstrategy === 'customfileregex') {
+    if (filefilterstrategy === 'customfileregexp') {
       re_file = getParam.filepattern().value
     }
-    const re_contents = zotkeyregexParam.valid ? new RegExp(zotkeyregexParam.value, 'm') : new RegExp('', 'm')
+    const re_contents = zotkeyregexpParam.valid ? new RegExp(zotkeyregexpParam.value, 'm') : new RegExp('', 'm')
 
     /// pattern to trim extension from filename
     const re_suffix = /\.md$/i
@@ -931,7 +867,7 @@ export class ScanMarkdownFiles {
       logseq_prefix_title = logseqprefixParam.value
     }
 
-    const allFiles = await Utils.getFilesRecursively(vaultpath)
+    const allFiles = await Utils.getFilesRecursively(sourcedir)
     const filteredFiles = allFiles.filter((file) => re_file.test(file.name))
 
     await Promise.all(
@@ -1263,7 +1199,7 @@ export class ScanMarkdownFiles {
     regex to extract the zotkey: regex
     */
 
-    if (matchstrategy === 'bbtcitekey' || matchstrategy === 'bbtcitekeyregexp') {
+    if (matchstrategy === 'bbtcitekeyyaml' || matchstrategy === 'bbtcitekeyregexp') {
       //// get BBT citekeys from markdown files ////
       res = await this.scanVault() /// returns data array containing BBT citekeys
 
@@ -1506,8 +1442,18 @@ export class ScanMarkdownFiles {
     /// TODO better error notification handling. Collect errors and show them at the end.
     /// TODO validate settings on preference window close.
 
-    const dryrun = false
+    let dryrun = false
     const debug = displayReport || saveLogs
+
+    const configPass = await wrappers.startupConfigCheck()
+    if (!configPass) {
+      Notifier.notify({
+        title: 'Configuration Invalid',
+        body: `Aborting. Check the ${config.addonName} preferences.`,
+        type: 'error',
+      })
+      return
+    }
 
     if (debug) {
       Logger.setDebugMode('maximal')
@@ -1526,6 +1472,10 @@ export class ScanMarkdownFiles {
     DataManager.initialize()
 
     await this.processData()
+
+    if (DataManager.numberRecords() === 0) {
+      dryrun = true
+    }
 
     let header: string = 'Syncing Error'
     let messageArray: notificationData['messageArray'] = [{ body: 'Some Error Occurred', type: 'error' }]
@@ -1766,27 +1716,378 @@ export class ScanMarkdownFiles {
 
 export class wrappers {
   @trace
-  static async startupDependencyCheck() {
-    const configurationVersionConfig = getPref('configuration') as string
-    if (configurationVersionConfig !== version) {
-      const version_re = /^(\d+)\.(\d+)\.(\d+)([-+]?[0-9A-Za-z]+)?$/
-      if (typeof version === 'string' && version_re.test(version) && __env__ === 'production') {
+  static findPreviousVersion() {
+    const version_re =
+      /^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)(?<release>[-+]?[0-9A-Za-z]+\.?[0-9A-Za-z]*[-+]?[0-9A-Za-z]*)?$/
+
+    const configurationVersionThis = { major: 0, minor: 0, patch: 0, release: '', str: version }
+    const versionThis_rematch = version.match(version_re)
+    if (versionThis_rematch?.groups) {
+      configurationVersionThis.major = parseInt(versionThis_rematch.groups.major)
+      configurationVersionThis.minor = parseInt(versionThis_rematch.groups.minor)
+      configurationVersionThis.patch = parseInt(versionThis_rematch.groups.patch)
+      configurationVersionThis.release = versionThis_rematch.groups.release ? versionThis_rematch.groups.release : ''
+    }
+
+    let configurationVersionPreviousStr: any = ''
+    let configurationVersionPrevious = { major: 0, minor: 0, patch: 0, release: '', str: '' }
+    try {
+      configurationVersionPreviousStr = getPref('configuration')
+      if (typeof configurationVersionPreviousStr === 'string') {
+        configurationVersionPrevious.str = configurationVersionPreviousStr
+      }
+      if (typeof configurationVersionPreviousStr === 'string' && version_re.test(configurationVersionPreviousStr)) {
+        const version_rematch = configurationVersionPreviousStr.match(version_re)
+        if (version_rematch?.groups) {
+          configurationVersionPrevious.major = parseInt(version_rematch.groups.major)
+          configurationVersionPrevious.minor = parseInt(version_rematch.groups.minor)
+          configurationVersionPrevious.patch = parseInt(version_rematch.groups.patch)
+          configurationVersionPrevious.release = version_rematch.groups.release ? version_rematch.groups.release : ''
+        }
+      }
+    } catch (e) {}
+
+    return { app: configurationVersionThis, config: configurationVersionPrevious }
+  }
+
+  @trace
+  static async startupVersionCheck() {
+    const versonParse = this.findPreviousVersion()
+
+    // Logger.log('startupVersionCheck - versonParse.app', versonParse.app, false, 'debug')
+    // Logger.log('startupVersionCheck - configurationVersionPrevious', versonParse.config, false, 'debug')
+
+    if (versonParse.config.str !== versonParse.app.str) {
+      let prezot7 = versonParse.config.major === 0 && versonParse.config.minor < 1
+      let preprerename1 =
+        versonParse.config.major === 0 &&
+        versonParse.config.minor === 1 &&
+        versonParse.config.patch < 1 &&
+        !['-rc.1'].includes(versonParse.config.release)
+
+      if (!preprerename1) {
+        let test0 = getPref('sourcedir')
+        // Logger.log('startupVersionCheck - preprerename1 - test0', test0, false, 'debug')
+        if (typeof test0 !== 'string' || test0 === '') {
+          let test1 = getPref('source_dir')
+          // Logger.log('startupVersionCheck - preprerename1 - test1', test1, false, 'debug')
+          if (test1 && typeof test1 === 'string' && test1.length > 0) {
+            // Logger.log('startupVersionCheck - preprerename1 - AMHERE0', test1, false, 'debug')
+            preprerename1 = true
+          }
+        }
+      }
+      if (!preprerename1 && !prezot7) {
+        let test0 = getPref('sourcedir')
+        if (typeof test0 !== 'string' || test0 === '') {
+          let test1 = Zotero.Prefs.get('extensions.mdbconnect.source_dir', true)
+          if (test1 && typeof test1 === 'string' && test1.length > 0) {
+            prezot7 = true
+          }
+        }
+      }
+
+      // Logger.log('startupVersionCheck - preprerename1', preprerename1, false, 'debug')
+
+      // Logger.log('startupVersionCheck - prezot7', prezot7, false, 'debug')
+
+      /// sourcedir
+      try {
+        if (preprerename1) {
+          const val = getPref('source_dir') as string
+          // Logger.log('startupVersionCheck - sourcedir - val', val, false, 'debug')
+          if (val) {
+            // Logger.log('startupVersionCheck - sourcedir - AMHERE', val, false, 'debug')
+            setPref('sourcedir', val)
+            getParam.sourcedir()
+          }
+        } else if (prezot7) {
+          const val = Zotero.Prefs.get('extensions.mdbconnect.source_dir', true) as string
+          // Logger.log('startupVersionCheck - sourcedir - val2', val, false, 'debug')
+          if (val) {
+            // Logger.log('startupVersionCheck - sourcedir - AMHERE2', val, false, 'debug')
+            setPref('sourcedir', val)
+            getParam.sourcedir()
+          }
+        }
+      } catch (e) {
+        Logger.log('startupDependencyCheck', `sourcedir ERROR: ${e}`, false, 'error')
+      }
+
+      /// filefilterstrategy
+      try {
+        if (preprerename1) {
+          const val = getPref('filefilterstrategy') as string
+          if (val === 'customfileregex') {
+            setPref('filefilterstrategy', 'customfileregexp')
+          } else if (_paramVals_filefilterstrategy.includes(val as _param_filefilterstrategy)) {
+            setPref('filefilterstrategy', val)
+          } else {
+            setPref('filefilterstrategy', _paramVals_filefilterstrategy[0])
+          }
+          getParam.filefilterstrategy()
+        } else if (prezot7) {
+          const val = Zotero.Prefs.get('extensions.mdbconnect.filefilterstrategy', true) as string
+          if (val === 'customfileregex') {
+            setPref('filefilterstrategy', 'customfileregexp')
+          } else if (_paramVals_filefilterstrategy.includes(val as _param_filefilterstrategy)) {
+            setPref('filefilterstrategy', val)
+          } else {
+            setPref('filefilterstrategy', _paramVals_filefilterstrategy[0])
+          }
+          getParam.filefilterstrategy()
+        }
+      } catch (e) {
+        Logger.log('startupDependencyCheck', `filefilterstrategy ERROR: ${e}`, false, 'error')
+      }
+
+      /// filepattern
+      try {
+        if (preprerename1) {
+          const val = getPref('filepattern') as string
+          if (val) setPref('filepattern', val)
+          getParam.filepattern()
+        } else if (prezot7) {
+          const val = Zotero.Prefs.get('extensions.mdbconnect.filepattern', true) as string
+          if (val) setPref('filepattern', val)
+          getParam.filepattern()
+        }
+      } catch (e) {
+        Logger.log('startupDependencyCheck', `filepattern ERROR: ${e}`, false, 'error')
+      }
+
+      /// matchstrategy
+      try {
+        if (preprerename1) {
+          const val = getPref('matchstrategy') as string
+          if (val === 'bbtcitekey') {
+            setPref('matchstrategy', 'bbtcitekeyyaml')
+          } else if (_paramVals_matchstrategy.includes(val as _param_matchstrategy)) {
+            setPref('matchstrategy', val)
+          } else {
+            setPref('matchstrategy', _paramVals_matchstrategy[0])
+          }
+          getParam.matchstrategy()
+        } else if (prezot7) {
+          const val = Zotero.Prefs.get('extensions.mdbconnect.matchstrategy', true) as string
+          if (val === 'bbtcitekey') {
+            setPref('matchstrategy', 'bbtcitekeyyaml')
+          } else if (_paramVals_matchstrategy.includes(val as _param_matchstrategy)) {
+            setPref('matchstrategy', val)
+          } else {
+            setPref('matchstrategy', _paramVals_matchstrategy[0])
+          }
+          getParam.matchstrategy()
+        }
+      } catch (e) {
+        Logger.log('startupDependencyCheck', `matchstrategy ERROR: ${e}`, false, 'error')
+      }
+
+      /// bbtyamlkeyword
+      try {
+        if (preprerename1) {
+          const val = getPref('metadatakeyword') as string
+          if (val) {
+            setPref('bbtyamlkeyword', val)
+          }
+          getParam.bbtyamlkeyword()
+        } else if (prezot7) {
+          const val = Zotero.Prefs.get('extensions.mdbconnect.metadatakeyword', true) as string
+          if (val) {
+            setPref('bbtyamlkeyword', val)
+          }
+          getParam.bbtyamlkeyword()
+        }
+      } catch (e) {
+        Logger.log('startupDependencyCheck', `bbtyamlkeyword ERROR: ${e}`, false, 'error')
+      }
+
+      /// zotkeyregexp
+      try {
+        if (preprerename1) {
+          const val = getPref('zotkeyregex') as string
+          if (val) {
+            setPref('zotkeyregexp', val)
+          }
+          getParam.zotkeyregexp()
+        } else if (prezot7) {
+          const val = Zotero.Prefs.get('extensions.mdbconnect.zotkeyregex', true) as string
+          if (val) {
+            setPref('zotkeyregexp', val)
+          }
+          getParam.zotkeyregexp()
+        }
+      } catch (e) {
+        Logger.log('startupDependencyCheck', `zotkeyregexp ERROR: ${e}`, false, 'error')
+      }
+
+      /// mdeditor
+      try {
+        if (preprerename1) {
+          const val = getPref('vaultresolution') as string
+          if (val === 'path') {
+            setPref('mdeditor', 'obsidian')
+            setPref('obsidianresolvewithfile', false)
+          } else if (val === 'file') {
+            setPref('mdeditor', 'obsidian')
+            setPref('obsidianresolvewithfile', true)
+            getParam.obsidianresolve()
+          } else if (val === 'logseq') {
+            setPref('mdeditor', 'logseq')
+          } else if (val === 'default') {
+            setPref('mdeditor', 'system')
+          } else {
+            setPref('mdeditor', 'system')
+          }
+          getParam.mdeditor()
+        } else if (prezot7) {
+          const val = Zotero.Prefs.get('extensions.mdbconnect.vaultresolution', true) as string
+          if (val === 'path') {
+            setPref('mdeditor', 'obsidian')
+            setPref('obsidianresolvewithfile', false)
+          } else if (val === 'file') {
+            setPref('mdeditor', 'obsidian')
+            setPref('obsidianresolvewithfile', true)
+            getParam.obsidianresolve()
+          } else if (val === 'logseq') {
+            setPref('mdeditor', 'logseq')
+          } else if (val === 'default') {
+            setPref('mdeditor', 'system')
+          } else {
+            setPref('mdeditor', 'system')
+          }
+          getParam.mdeditor()
+        }
+      } catch (e) {
+        Logger.log('startupDependencyCheck', `mdeditor ERROR: ${e}`, false, 'error')
+      }
+
+      /// obsidianvaultname
+      try {
+        if (preprerename1) {
+          const val = getPref('vaultname') as string
+          if (val) {
+            setPref('obsidianvaultname', val)
+          }
+          getParam.obsidianvaultname()
+        } else if (prezot7) {
+          const val = Zotero.Prefs.get('extensions.mdbconnect.vaultname', true) as string
+          if (val) {
+            setPref('obsidianvaultname', val)
+          }
+          getParam.obsidianvaultname()
+        }
+      } catch (e) {
+        Logger.log('startupDependencyCheck', `obsidianvaultname ERROR: ${e}`, false, 'error')
+      }
+
+      /// logseqgraph
+      try {
+        if (preprerename1) {
+          const val = getPref('logseqgraph') as string
+          if (val) {
+            setPref('logseqgraph', val)
+          }
+          getParam.logseqgraph()
+        } else if (prezot7) {
+          const val = Zotero.Prefs.get('extensions.mdbconnect.logseqgraph', true) as string
+          if (val) {
+            setPref('logseqgraph', val)
+          }
+          getParam.logseqgraph()
+        }
+      } catch (e) {
+        Logger.log('startupDependencyCheck', `logseqgraph ERROR: ${e}`, false, 'error')
+      }
+
+      /// grouplibraries
+      try {
+        if (preprerename1) {
+          const val = getPref('grouplibraries') as string
+          if (_paramVals_grouplibraries.includes(val as _param_grouplibraries)) {
+            setPref('grouplibraries', val)
+          } else setPref('grouplibraries', _paramVals_grouplibraries[0])
+          getParam.grouplibraries()
+        } else if (prezot7) {
+          const val = Zotero.Prefs.get('extensions.mdbconnect.grouplibraries', true) as string
+          if (_paramVals_grouplibraries.includes(val as _param_grouplibraries)) {
+            setPref('grouplibraries', val)
+          } else setPref('grouplibraries', _paramVals_grouplibraries[0])
+          getParam.grouplibraries()
+        }
+      } catch (e) {
+        Logger.log('startupDependencyCheck', `grouplibraries ERROR: ${e}`, false, 'error')
+      }
+
+      /// removetags
+      try {
+        if (preprerename1) {
+          const val = getPref('removetags') as string
+          if (_paramVals_removetags.includes(val as _param_removetags)) {
+            setPref('removetags', val)
+          } else if (val) {
+            setPref('removetags', _paramVals_removetags[0])
+          }
+          getParam.removetags()
+        } else if (prezot7) {
+          const val = Zotero.Prefs.get('extensions.mdbconnect.removetags', true) as string
+          if (_paramVals_removetags.includes(val as _param_removetags)) {
+            setPref('removetags', val)
+          } else if (val) {
+            setPref('removetags', _paramVals_removetags[0])
+          }
+        }
+      } catch (e) {
+        Logger.log('startupDependencyCheck', `removetags ERROR: ${e}`, false, 'error')
+      }
+
+      /// tagstr
+      try {
+        if (preprerename1) {
+          const val = getPref('tagstr') as string
+          if (val) {
+            setPref('tagstr', val)
+          }
+          getParam.tagstr()
+        } else if (prezot7) {
+          const val = Zotero.Prefs.get('extensions.mdbconnect.tagstr', true) as string
+          if (val) {
+            setPref('tagstr', val)
+          }
+          getParam.tagstr()
+        }
+      } catch (e) {
+        Logger.log('startupDependencyCheck', `tagstr ERROR: ${e}`, false, 'error')
+      }
+
+      if (addon.data.env === 'production') {
         setPref('configuration', version)
         Logger.log(
           'startupDependencyCheck',
-          `Configuration version set to ${version}. Was previously ${configurationVersionConfig}.`,
+          `Configuration version set to ${versonParse.app.str}. Was previously ${versonParse.config.str}.`,
           false,
           'debug',
         )
       } else {
         Logger.log(
           'startupDependencyCheck',
-          `ERROR: Configuration version ${version}. Was previously ${configurationVersionConfig}.`,
+          `Configuration version set to ${versonParse.app.str}. Was previously ${versonParse.config.str}.`,
           false,
-          'error',
+          'debug',
         )
       }
     }
+  }
+
+  @trace
+  static async startupConfigCheck() {
+    let success = true
+
+    if (!getParam.sourcedir().valid) {
+      success = false
+    }
+
+    return success
   }
 }
 
@@ -1926,8 +2227,8 @@ export class systemInterface {
   @trace
   static openObsidianURI(entry_res: Entry): void {
     try {
-      const uri_spec = getParam.vaultresolution().value
-      const vaultnameParam = getParam.vaultname()
+      const uri_spec = getParam.obsidianresolve().value
+      const vaultnameParam = getParam.obsidianvaultname()
       const vaultKey = vaultnameParam.valid ? `vault=${vaultnameParam.value}&` : ''
 
       const fileKey =
@@ -1951,7 +2252,7 @@ export class systemInterface {
   @trace
   static openLogseqURI(entry_res: Entry): void {
     try {
-      const graphNameParam = getParam.logseqgraphname()
+      const graphNameParam = getParam.logseqgraph()
       let graphName = ''
 
       const logseqprefixParam = getParam.logseqprefix()
@@ -2077,35 +2378,27 @@ export class UIHelpers {
             systemInterface.openFileSystemPath(entry)
           }
 
-          const protocol = getParam.mdreader()
+          const protocol = getParam.mdeditor().value
           switch (protocol) {
             case 'obsidian':
               menuitemopenlabel = getString('contextmenuitem-open-obsidian')
-              openfn = (entry: Entry) => {
-                systemInterface.openObsidianURI(entry)
-              }
+              openfn = (entry: Entry) => systemInterface.openObsidianURI(entry)
               break
             case 'logseq':
               menuitemopenlabel = getString('contextmenuitem-open-logseq')
-              openfn = (entry: Entry) => {
-                systemInterface.openLogseqURI(entry)
-              }
+              openfn = (entry: Entry) => systemInterface.openLogseqURI(entry)
               break
             case 'system':
               menuitemopenlabel = getString('contextmenuitem-open-default')
-              openfn = (entry: Entry) => {
-                systemInterface.openFileSystemPath(entry)
-              }
+              openfn = (entry: Entry) => systemInterface.openFileSystemPath(entry)
               break
             default:
               menuitemopenlabel = getString('contextmenuitem-open-default')
-              openfn = (entry: Entry) => {
-                systemInterface.openFileSystemPath(entry)
-              }
+              openfn = (entry: Entry) => systemInterface.openFileSystemPath(entry)
               break
           }
 
-          const elements = new Elements(document) ///dae debug
+          const elements = new Elements(document)
 
           const itemmenu = document.getElementById('zotero-itemmenu')
 
@@ -2117,8 +2410,8 @@ export class UIHelpers {
                 id: itemMenuOpenId,
                 label: menuitemopenlabel,
                 // class: 'menuitem-iconic',
-                // image: 'chrome://zotero-better-bibtex/content/skin/bibtex-menu.svg',
-                // oncommand: () => systemInterface.showSelectedItemMarkdownInFilesystem(entry_res_list[0]),
+                // image: 'chrome://.....svg',
+                // oncommand: () => openfn(entry_res_list[0]),systemInterface.showSelectedItemMarkdownInFilesystem(entry_res_list[0]),
                 oncommand: () => openfn(entry_res_list[0]),
               }),
             )
@@ -2127,8 +2420,6 @@ export class UIHelpers {
               elements.create('menuitem', {
                 id: itemMenuRevealId,
                 label: getString('contextmenuitem-reveal'),
-                // class: 'menuitem-iconic',
-                // image: 'chrome://zotero-better-bibtex/content/skin/bibtex-menu.svg',
                 oncommand: () => systemInterface.showSelectedItemMarkdownInFilesystem(entry_res_list[0]),
               }),
             )
@@ -2138,8 +2429,6 @@ export class UIHelpers {
                 elements.create('menu', {
                   id: itemMenuOpenId,
                   label: menuitemopenlabel,
-                  // class: 'menuitem-iconic',
-                  // image: 'chrome://zotero-better-bibtex/content/skin/bibtex-menu.svg',
                 }),
               )
               .appendChild(elements.create('menupopup'))
@@ -2149,8 +2438,6 @@ export class UIHelpers {
                 elements.create('menu', {
                   id: itemMenuRevealId,
                   label: getString('contextmenuitem-reveal'),
-                  // class: 'menuitem-iconic',
-                  // image: 'chrome://zotero-better-bibtex/content/skin/bibtex-menu.svg',
                 }),
               )
               .appendChild(elements.create('menupopup'))
@@ -2159,16 +2446,12 @@ export class UIHelpers {
               menupopupOpen.appendChild(
                 elements.create('menuitem', {
                   label: entry_res.name,
-                  // class: 'menuitem-iconic',
-                  // image: 'chrome://zotero-better-bibtex/content/skin/bibtex-menu.svg',
                   oncommand: () => openfn(entry_res),
                 }),
               )
               menupopupReveal.appendChild(
                 elements.create('menuitem', {
                   label: entry_res.name,
-                  // class: 'menuitem-iconic',
-                  // image: 'chrome://zotero-better-bibtex/content/skin/bibtex-menu.svg',
                   oncommand: () => systemInterface.showSelectedItemMarkdownInFilesystem(entry_res),
                 }),
               )
@@ -2248,7 +2531,7 @@ export class prefHelpers {
         vaultpathObj.exists() &&
         vaultpathObj.isDirectory()
       ) {
-        setPref('source_dir', vaultpath)
+        setPref('sourcedir', vaultpath)
       }
     } catch (e) {
       Logger.log('chooseVaultFolder', `ERROR chooseVaultFolder :: ${e}`, false, 'warn')

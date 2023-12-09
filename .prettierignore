@@ -5,4 +5,3 @@
 **/build
 **/package-lock.json
 **/*.lock
-**/ignores

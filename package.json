@@ -8,7 +8,7 @@
     "addonRef": "mdbc",
     "addonInstance": "MDBC",
     "prefsPrefix": "extensions.zotero.mdbc",
-    "releasePage": "https://github.com/daeh/zotero-markdb-connect/releases/latest/download/zotero-addon-template.xpi",
+    "releasePage": "https://github.com/daeh/zotero-markdb-connect/releases",
     "updateJSON": "https://github.com/daeh/zotero-markdb-connect/main/update.json",
     "updateBetaJSON": "https://github.com/daeh/zotero-markdb-connect/main/update-beta.json"
   },

@@ -21,7 +21,7 @@ async function onStartup() {
   await Promise.all([Zotero.initializationPromise, Zotero.unlockPromise, Zotero.uiReadyPromise])
   initLocale()
 
-  await wrappers.startupDependencyCheck()
+  await wrappers.startupVersionCheck()
 
   BasicExampleFactory.registerPrefs()
 

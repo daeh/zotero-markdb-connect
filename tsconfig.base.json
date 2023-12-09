@@ -12,5 +12,5 @@
     "src",
     "typing" //"node_modules/zotero-types"
   ],
-  "exclude": ["build", "addon", "scripts", "ignores", "**/*lintignore*"]
+  "exclude": ["build", "addon", "scripts"]
 }

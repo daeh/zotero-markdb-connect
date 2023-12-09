@@ -1,5 +1,15 @@
-**/build
+### Editor directories and files ###
+.vscode/*
+!.vscode/extensions.json
+# .idea
+.idea/workspace.xml
+
+### Building ###
 node_modules
-zotero-cmd.json
+dist/
+build/
+
+### Project ###
 eslint.config.js
+zotero-cmd.json
 

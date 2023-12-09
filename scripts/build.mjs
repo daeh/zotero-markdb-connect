@@ -15,13 +15,15 @@ const buildDir = 'build'
 
 const isPreRelease = version.includes('-')
 
+const filename = `${name}-${version}.xpi`
+
 // If it is a pre-release, use update-beta.json
 config.updateURL = isPreRelease ? config.updateBetaJSON : config.updateJSON
 
 const updateJSONFile = isPreRelease ? 'update-beta.json' : 'update.json'
 const updateLink = isPreRelease
-  ? `${config.releasePage}/download/v${version}/${name}.xpi`
-  : `${config.releasePage}/latest/download/${name}.xpi`
+  ? `${config.releasePage}/download/v${version}/${filename}`
+  : `${config.releasePage}/latest/download/${filename}`
 
 function copyFileSync(source, target) {
   var targetFile = target
@@ -229,7 +231,7 @@ async function main() {
 
   console.log('[Build] Addon prepare OK')
 
-  await zip.compressDir(path.join(buildDir, 'addon'), path.join(buildDir, `${name}.xpi`), {
+  await zip.compressDir(path.join(buildDir, 'addon'), path.join(buildDir, `${filename}`), {
     ignoreBase: true,
   })
 

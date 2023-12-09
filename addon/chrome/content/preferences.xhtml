@@ -14,40 +14,6 @@
   onload="Zotero.__addonInstance__.hooks.onPrefsEvent('load', {window})">
   <groupbox>
     <label class="mdbc-pref-text-center"><html:h1 data-l10n-id="pref-title"></html:h1></label>
-
-    <!--<label><html:h2 data-l10n-id="pref-locate-mdfiles"></html:h2></label>-->
-    <!--<label><html:h2 data-l10n-id="pref-locate-mdfiles-desc"></html:h2></label>-->
-    <!--<label><html:h2 data-l10n-id="pref-vault-source-folder"></html:h2></label>-->
-
-    <!-- Locating MD Files Section -->
-    <!--Location of Markdown Reading Notes-->
-
-    <!-- Source Folder -->
-    <!--Location of Markdown Reading Notes-->
-
-    <!--Folder Containing Markdown Reading Notes-->
-    <!--<html:label for="zotero-prefpane-__addonRef__-source_dir" data-l10n-id="pref-vault-source-folder"></html:label>-->
-
-    <!--<html:input type="text" id="zotero-prefpane-__addonRef__-source_dir" preference="__prefsPrefix__.source_dir"></html:input>-->
-    <!--<hbox>-->
-    <!--  <html:label for="zotero-prefpane-__addonRef__-source_dir" data-l10n-id="pref-vault-source-folder"></html:label-->
-    <!--  >&lt;!&ndash;Folder Containing Markdown Reading Notes&ndash;&gt;-->
-    <!--  <html:input type="text" id="zotero-prefpane-__addonRef__-source_dir" preference="__prefsPrefix__.source_dir"></html:input>-->
-    <!--</hbox>-->
-
-    <!--<hbox>-->
-    <!--  <html:label for="zotero-prefpane-__addonRef__-source_dir" data-l10n-id="pref-vault-source-folder"></html:label>-->
-    <!--  <html:input type="text" id="zotero-prefpane-__addonRef__-source_dir" preference="__prefsPrefix__.source_dir"></html:input>-->
-    <!--</hbox>-->
-
-    <!--<checkbox id="zotero-prefpane-__addonRef__-enable" preference="__prefsPrefix__.enable" data-l10n-id="pref-enable" />-->
-    <!--<hbox>-->
-    <!--  <html:label for="zotero-prefpane-__addonRef__-input" data-l10n-id="pref-input"></html:label>-->
-    <!--  <html:input type="text" id="zotero-prefpane-__addonRef__-input" preference="__prefsPrefix__.input"></html:input>-->
-    <!--</hbox>-->
-    <!--<hbox class="virtualized-table-container" flex="1" height="300px">-->
-    <!--  <html:div id="__addonRef__-table-container" />-->
-    <!--</hbox>-->
   </groupbox>
 
   <groupbox class="mdbc-pref-section-box">
@@ -62,8 +28,8 @@
       <hbox class="mdbc-pref-width-full">
         <html:input
           type="text"
-          id="zotero-prefpane-__addonRef__-source_dir"
-          preference="__prefsPrefix__.source_dir"
+          id="zotero-prefpane-__addonRef__-sourcedir"
+          preference="__prefsPrefix__.sourcedir"
           readonly="true"
           class="mdbc-pref-textbox-flex1" />
         <button
@@ -97,7 +63,7 @@
 
       <radio
         id="zotero-prefpane-__addonRef__-filefilterstrategy-custom"
-        value="customfileregex"
+        value="customfileregexp"
         label="Custom File Filter"
         class="mdbc-pref-radio-main"
         oncommand="document.getElementById('zotero-prefpane-__addonRef__-filefilterstrategy-custom-options').setAttribute('style', 'opacity: 100%;'); document.getElementById('zotero-prefpane-__addonRef__-filefilterstrategy-default-options').setAttribute('style', 'opacity: 30%;');" />
@@ -140,15 +106,15 @@
       preference="__prefsPrefix__.matchstrategy">
       <groupbox>
         <radio
-          id="zotero-prefpane-__addonRef__-matchstrategy-bbtcitekey"
-          value="bbtcitekey"
+          id="zotero-prefpane-__addonRef__-matchstrategy-bbtcitekeyyaml"
+          value="bbtcitekeyyaml"
           label="BetterBibTeX citekey - taken from YAML metadata"
           class="mdbc-pref-radio-main"
-          oncommand="document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-bbtcitekey-options').setAttribute('style', 'opacity: 100%;'); document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-bbtcitekeyregexp-options').setAttribute('style', 'opacity: 30%;'); document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-zotid-options').setAttribute('style', 'opacity: 30%;');" />
+          oncommand="document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-bbtcitekeyyaml-options').setAttribute('style', 'opacity: 100%;'); document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-bbtcitekeyregexp-options').setAttribute('style', 'opacity: 30%;'); document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-zotid-options').setAttribute('style', 'opacity: 30%;');" />
 
         <html:div
           class="mdbc-pref-options-div"
-          id="zotero-prefpane-__addonRef__-matchstrategy-bbtcitekey-options">
+          id="zotero-prefpane-__addonRef__-matchstrategy-bbtcitekeyyaml-options">
           <label>__addonName__ will search for a BetterBibTeX citekey in the YAML metadata.</label>
 
           <!--<separator />-->
@@ -158,8 +124,8 @@
             <html:span class="mdbc-pref-options-span-first">YAML keyword: </html:span
             ><html:input
               type="text"
-              id="zotero-prefpane-__addonRef__-metadatakeyword"
-              preference="__prefsPrefix__.metadatakeyword"
+              id="zotero-prefpane-__addonRef__-bbtyamlkeyword"
+              preference="__prefsPrefix__.bbtyamlkeyword"
               class="mdbc-pref-textbox-partialwidth"
               onchange="Zotero.__addonInstance__.hooks.onPrefsEvent('checkMetadataFormat', {value: this.value})" /><html:span class="mdbc-pref-options-span-right"> </html:span>
           </hbox>
@@ -177,7 +143,7 @@
           value="bbtcitekeyregexp"
           label="BetterBibTeX citekey - captured with custom RegExp"
           class="mdbc-pref-radio-main"
-          oncommand="document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-bbtcitekey-options').setAttribute('style', 'opacity: 30%;'); document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-bbtcitekeyregexp-options').setAttribute('style', 'opacity: 100%;'); document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-zotid-options').setAttribute('style', 'opacity: 30%;');" />
+          oncommand="document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-bbtcitekeyyaml-options').setAttribute('style', 'opacity: 30%;'); document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-bbtcitekeyregexp-options').setAttribute('style', 'opacity: 100%;'); document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-zotid-options').setAttribute('style', 'opacity: 30%;');" />
 
         <html:div
           class="mdbc-pref-options-div"
@@ -191,8 +157,8 @@
             <html:span class="mdbc-pref-options-span-first">RegExp:</html:span><html:span class="mdbc-pref-options-span-left mdbc-pref-options-code-span">/</html:span
             ><html:input
               type="text"
-              id="zotero-prefpane-__addonRef__-bbtcitekeyregexpattern"
-              preference="__prefsPrefix__.bbtcitekeyregexpattern"
+              id="zotero-prefpane-__addonRef__-bbtregexp"
+              preference="__prefsPrefix__.bbtregexp"
               class="mdbc-pref-textbox-partialwidth"
               onchange="return Zotero.__addonInstance__.hooks.onPrefsEvent('checkRegExpValid', {value: this.value})" /><html:span class="mdbc-pref-options-span-right mdbc-pref-options-code-span"
               >/m</html:span
@@ -214,7 +180,7 @@
           value="zotitemkey"
           label="Zotero-Item-Key - captured with custom RegExp"
           class="mdbc-pref-radio-main"
-          oncommand="document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-bbtcitekey-options').setAttribute('style', 'opacity: 30%;'); document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-bbtcitekeyregexp-options').setAttribute('style', 'opacity: 30%;'); document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-zotid-options').setAttribute('style', 'opacity: 100%;');" />
+          oncommand="document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-bbtcitekeyyaml-options').setAttribute('style', 'opacity: 30%;'); document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-bbtcitekeyregexp-options').setAttribute('style', 'opacity: 30%;'); document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-zotid-options').setAttribute('style', 'opacity: 100%;');" />
 
         <html:div
           class="mdbc-pref-options-div"
@@ -229,8 +195,8 @@
             <html:span class="mdbc-pref-options-span-first">RegExp:</html:span><html:span class="mdbc-pref-options-span-left mdbc-pref-options-code-span">/</html:span
             ><html:input
               type="text"
-              id="zotero-prefpane-__addonRef__-zotkeyregex"
-              preference="__prefsPrefix__.zotkeyregex"
+              id="zotero-prefpane-__addonRef__-zotkeyregexp"
+              preference="__prefsPrefix__.zotkeyregexp"
               class="mdbc-pref-textbox-partialwidth"
               onchange="return Zotero.__addonInstance__.hooks.onPrefsEvent('checkRegExpValid', {value: this.value})" /><html:span class="mdbc-pref-options-span-right mdbc-pref-options-code-span"
               >/m</html:span
@@ -251,28 +217,28 @@
     </caption>
 
     <radiogroup
-      id="zotero-prefpane-__addonRef__-vaultresolution"
-      preference="__prefsPrefix__.vaultresolution">
+      id="zotero-prefpane-__addonRef__-mdeditor"
+      preference="__prefsPrefix__.mdeditor">
       <!-- obsidian file resolution -->
       <groupbox>
         <radio
-          id="zotero-prefpane-__addonRef__-vaultresolution-path"
+          id="zotero-prefpane-__addonRef__-mdeditor-obsidian"
           value="path"
           label="Obsidian"
           class="mdbc-pref-radio-main"
-          oncommand="document.getElementById('zotero-prefpane-__addonRef__-vaultresolution-path-options').setAttribute('style', 'opacity: 100%;'); document.getElementById('zotero-prefpane-__addonRef__-vaultresolution-logseq-options').setAttribute('style', 'opacity: 30%;'); document.getElementById('zotero-prefpane-__addonRef__-vaultresolution-system-options').setAttribute('style', 'opacity: 30%;');" />
+          oncommand="document.getElementById('zotero-prefpane-__addonRef__-mdeditor-obsidian-options').setAttribute('style', 'opacity: 100%;'); document.getElementById('zotero-prefpane-__addonRef__-mdeditor-logseq-options').setAttribute('style', 'opacity: 30%;'); document.getElementById('zotero-prefpane-__addonRef__-mdeditor-system-options').setAttribute('style', 'opacity: 30%;');" />
 
         <html:div
           class="mdbc-pref-options-div"
-          id="zotero-prefpane-__addonRef__-vaultresolution-path-options">
+          id="zotero-prefpane-__addonRef__-mdeditor-obsidian-options">
           <groupbox>
             <description>If you use multiple Vaults, you can specify which Vault should open your markdown reading notes.</description>
             <hbox class="mdbc-pref-hbox-indent">
               <html:span class="mdbc-pref-options-span-first">Obsidian Vault name (optional):</html:span
               ><html:input
                 type="text"
-                id="zotero-prefpane-__addonRef__-vaultname"
-                preference="__prefsPrefix__.vaultname"
+                id="zotero-prefpane-__addonRef__-obsidianvaultname"
+                preference="__prefsPrefix__.obsidianvaultname"
                 class="mdbc-pref-textbox-partialwidth" /><html:span class="mdbc-pref-options-span-right"> </html:span>
             </hbox>
             <label
@@ -299,15 +265,15 @@
       <!-- use logseq -->
       <groupbox>
         <radio
-          id="zotero-prefpane-__addonRef__-vaultresolution-logseq"
+          id="zotero-prefpane-__addonRef__-mdeditor-logseq"
           value="logseq"
           label="logseq"
           class="mdbc-pref-radio-main"
-          oncommand="document.getElementById('zotero-prefpane-__addonRef__-vaultresolution-path-options').setAttribute('style', 'opacity: 30%;'); document.getElementById('zotero-prefpane-__addonRef__-vaultresolution-logseq-options').setAttribute('style', 'opacity: 100%;'); document.getElementById('zotero-prefpane-__addonRef__-vaultresolution-system-options').setAttribute('style', 'opacity: 30%;');" />
+          oncommand="document.getElementById('zotero-prefpane-__addonRef__-mdeditor-obsidian-options').setAttribute('style', 'opacity: 30%;'); document.getElementById('zotero-prefpane-__addonRef__-mdeditor-logseq-options').setAttribute('style', 'opacity: 100%;'); document.getElementById('zotero-prefpane-__addonRef__-mdeditor-system-options').setAttribute('style', 'opacity: 30%;');" />
 
         <html:div
           class="mdbc-pref-options-div"
-          id="zotero-prefpane-__addonRef__-vaultresolution-logseq-options">
+          id="zotero-prefpane-__addonRef__-mdeditor-logseq-options">
           <groupbox>
             <hbox class="mdbc-pref-hbox-indent">
               <html:span class="mdbc-pref-options-span-first">logseq graph name:</html:span
@@ -341,15 +307,15 @@
       <!-- use system default -->
       <groupbox>
         <radio
-          id="zotero-prefpane-__addonRef__-vaultresolution-system"
-          value="default"
+          id="zotero-prefpane-__addonRef__-mdeditor-system"
+          value="system"
           label="System's Default Editor"
           class="mdbc-pref-radio-main"
-          oncommand="document.getElementById('zotero-prefpane-__addonRef__-vaultresolution-path-options').setAttribute('style', 'opacity: 30%;'); document.getElementById('zotero-prefpane-__addonRef__-vaultresolution-logseq-options').setAttribute('style', 'opacity: 30%;'); document.getElementById('zotero-prefpane-__addonRef__-vaultresolution-system-options').setAttribute('style', 'opacity: 100%;');" />
+          oncommand="document.getElementById('zotero-prefpane-__addonRef__-mdeditor-obsidian-options').setAttribute('style', 'opacity: 30%;'); document.getElementById('zotero-prefpane-__addonRef__-mdeditor-logseq-options').setAttribute('style', 'opacity: 30%;'); document.getElementById('zotero-prefpane-__addonRef__-mdeditor-system-options').setAttribute('style', 'opacity: 100%;');" />
 
         <html:div
           class="mdbc-pref-options-div"
-          id="zotero-prefpane-__addonRef__-vaultresolution-system-options">
+          id="zotero-prefpane-__addonRef__-mdeditor-system-options">
           <description value="Enables support for databases like Zettlr or manually organized file structures." />
         </html:div>
       </groupbox>
