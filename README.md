@@ -5,6 +5,7 @@
 - **_Scans your Markdown database and adds a colored tag to associated Zotero items._**
 - **_Jump to Markdown notes from the contextual menu of Zotero items._**
 - **_Supports various Markdown databases, including [Obsidian](https://obsidian.md), [logseq](https://logseq.com), and [Zettlr](https://www.zettlr.com)_**
+- **_[Zotero 7](https://forums.zotero.org/discussion/105094/announcing-the-zotero-7-beta) compatible_**
 
 ![MarkDBConnectScreenshot](MarkDBConnectScreenshot.png)
 
@@ -26,10 +27,10 @@ Opens an existing markdown note in [Obsidian](https://obsidian.md), [logseq](htt
 
 - Download the plugin (the .xpi file) from the latest release: https://github.com/daeh/zotero-markdb-connect/releases/latest
 - To download the `.xpi` file, right click it and select 'Save link as'
-- Open Zotero (version 6.x)
+- Open Zotero (version 7.x; for Zotero 6 use [v0.0.25](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.0.25))
 - Go to `Tools -> Add-ons`
 - `Install Add-on From File`
-- Choose the file `.xpi` file (e.g. `markdb-connect-0.0.0.xpi`)
+- Choose the file `.xpi` file (e.g. `markdb-connect-0.1.0.xpi`)
 - Restart Zotero
 
 ## Setup
@@ -165,9 +166,11 @@ This one uses an Obsidian wiki link: [[@cusimano2018cogsci]]
 
 ## Notes
 
+
+
 [GitHub](https://github.com/daeh/zotero-markdb-connect): Source code repository
 
-Code for this extension is based on [ZotFile](https://github.com/jlegewie/zotfile) and [Zotero Citationcounts](https://github.com/eschnett/zotero-citationcounts) (which is based on [Zotero DOI Manager](https://github.com/bwiernik/zotero-shortdoi), which is based in part on [Zotero Google Scholar Citations](https://github.com/beloglazov/zotero-scholar-citations)).
+Code for this extension is based on [zotero-plugin-template](https://github.com/windingwind/zotero-plugin-template)
 
 ## License
 
@@ -175,4 +178,4 @@ Distributed under the MIT License.
 
 ## Author
 
-[![Personal Website](https://img.shields.io/badge/personal%20website-daeh.info-orange?style=for-the-badge)](https://daeh.info) [![Mastodon](https://img.shields.io/badge/mastodon-@dae@mastodon.online-purple?style=for-the-badge&logo=mastodon)](https://mastodon.online/@dae) [![Twitter](https://img.shields.io/badge/twitter-@DaeHoulihan-blue?style=for-the-badge&logo=twitter)](https://twitter.com/DaeHoulihan)
+[![Personal Website](https://img.shields.io/badge/personal%20website-daeh.info-orange?style=for-the-badge)](https://daeh.info) [![Mastodon](https://img.shields.io/badge/bsky-@dae.bsky.social-skyblue?style=for-the-badge&logo=mastodon)](https://bsky.app/profile/dae.bsky.social) [![Twitter](https://img.shields.io/badge/twitter-@DaeHoulihan-blue?style=for-the-badge&logo=twitter)](https://twitter.com/DaeHoulihan)

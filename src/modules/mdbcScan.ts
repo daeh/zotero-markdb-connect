@@ -1514,6 +1514,10 @@ export class ScanMarkdownFiles {
       Notifier.notify(notification)
     }
 
+    if (getPref('configuration') !== version) {
+      setPref('configuration', version)
+    }
+
     if (debug) {
       Logger.setDebugMode(getParam.debugmode().value)
     }
@@ -2317,27 +2321,6 @@ export class UIHelpers {
       oncommand: `Zotero.${config.addonInstance}.hooks.syncMarkDBReport();`,
     })
   }
-
-  // @log
-  // static registerRightClickMenuPopup() {
-  //   ztoolkit.Menu.register(
-  //     'item',
-  //     {
-  //       tag: 'menu',
-  //       label: getString('contextmenuitem-reveal'),
-  //       children: [
-  //         {
-  //           tag: 'menuitem',
-  //           label: getString('menuitem-submenulabel'),
-  //           oncommand: "alert('Hello World! Sub Menuitem.')",
-  //           // commandListener: (ev) => systemInterface.openMDfile()
-  //         },
-  //       ],
-  //     },
-  //     'after',
-  //     document.querySelector(`#${config.addonRef}-itemmenu-open`),
-  //   )
-  // }
 
   @trace
   static registerRightClickMenuItem() {

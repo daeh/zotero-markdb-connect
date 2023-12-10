@@ -2,6 +2,7 @@
 .vscode/*
 !.vscode/extensions.json
 # .idea
+!.idea
 .idea/workspace.xml
 
 ### Building ###
