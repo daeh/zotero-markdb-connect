@@ -1,12 +1,23 @@
 {
   "compilerOptions": {
-    "experimentalDecorators": true,
     "module": "commonjs",
-    "target": "ES2016",
+    "moduleResolution": "node",
+    "target": "es2017",
+    "lib": [
+      "es2017",
+      "dom",
+      // "dom.iterable",
+      "ES2021.WeakRef"
+      // "webworker",
+    ],
+    // "isolatedModules": true,
+    // "esModuleInterop": true,
+    ////
+    "noEmit": true,
     "resolveJsonModule": true,
     "strict": true,
-    "noEmit": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "experimentalDecorators": true
   },
   "include": [
     "src",

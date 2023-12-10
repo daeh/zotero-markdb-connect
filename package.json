@@ -15,7 +15,7 @@
   "main": "src/index.ts",
   "scripts": {
     "build-dev": "cross-env NODE_ENV=development node scripts/build.mjs",
-    "build-prod": "ESLINT_USE_FLAT_CONFIG=true prettier --write . && eslint --config eslint.config.mjs --fix . && tsc --project tsconfig.json --noEmit && cross-env NODE_ENV=production node scripts/build.mjs",
+    "build-prod": "ESLINT_USE_FLAT_CONFIG=true prettier --write . && eslint --config eslint.config.mjs --fix . && tsc --project tsconfig.prod.json --noEmit && cross-env NODE_ENV=production node scripts/build.mjs",
     "build": "concurrently -c auto npm:build-prod npm:tsc",
     "tsc": "tsc --noEmit",
     "start": "node scripts/start.mjs",

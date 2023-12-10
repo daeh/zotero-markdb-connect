@@ -46,7 +46,7 @@ export class Logger {
   private static updateTime() {
     const init = LogsStore.time.init
     const current = Date.now()
-    const last = LogsStore.time.last
+    // const last = LogsStore.time.last
     const delta = current - init
     LogsStore.time.last = current
     return delta

@@ -5,7 +5,7 @@ import { getPref, setPref } from '../utils/prefs'
 
 import { Elements } from './create-element'
 import { Logger, trace } from './mdbcLogger'
-import { patch as $patch$, unpatch as $unpatch$, Trampoline } from './monkey-patch'
+import { patch as $patch$ } from './monkey-patch'
 
 // Components.utils.import('resource://gre/modules/FileUtils.jsm')
 // declare const FileUtils: any
@@ -70,6 +70,7 @@ export class Notifier {
     let messageArray: notificationData['messageArray'] = []
     try {
       if (!('messageArray' in data) || !Array.isArray(data.messageArray) || data.messageArray.length === 0) {
+        if (!data.body || !data.type) return
         messageArray = [{ body: data.body, type: data.type }]
       } else {
         messageArray = data.messageArray
@@ -125,29 +126,6 @@ export class BBTHelper {
   }
 
   @trace
-  private static async _checkOld() {
-    // Zotero.BetterBibTeX &&
-    // typeof Zotero.BetterBibTeX === 'object'
-    if (!Zotero.BetterBibTeX) {
-      Logger.log('bbt-bridge', 'startup: BetterBibTeX not loaded', false, 'error')
-      return false
-    }
-    if (!Zotero.BetterBibTeX.ready) {
-      if (typeof Zotero.BetterBibTeX.ready === 'boolean') {
-        Logger.log('bbt-bridge', 'startup: BetterBibTeX initialization error', false, 'error')
-      } else {
-        Logger.log('bbt-bridge', 'startup: BetterBibTeX not initialized', false, 'error')
-      }
-      return false
-    }
-
-    Logger.log('bbt-bridge', 'startup: checking if BetterBibTeX ready', false, 'info')
-    await Zotero.BetterBibTeX.ready
-    Logger.log('bbt-bridge', 'startup: BetterBibTeX ready!', false, 'info')
-    return true
-  }
-
-  @trace
   private static _fetchBBTdata(BetterBibTeX: BetterBibTeX): BBTCitekeyRecord[] {
     try {
       return BetterBibTeX.KeyManager.all()
@@ -166,77 +144,6 @@ export class BBTHelper {
       return []
     }
   }
-
-  // private static async _fetchBBTkeyData(BetterBibTeX): Promise<BBTItem[]> {
-  //   try {
-  //       if (BetterBibTeX.KeyManager.keys.count() > 0) {
-  //         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  //         return BetterBibTeX.KeyManager.keys.data
-  //       }
-  //   }
-  //   catch (e) {
-  //     Zotero.debug(`${config.addonName.replace("-", "")}: Error: ${e}`)
-  //   }
-  //   return []
-  // }
-  //
-  // static async getBBTkeyData(): Promise<BBTItem[]> {
-  //   if (await this._check()) {
-  //     return this._fetchBBTkeyData(Zotero.BetterBibTeX as BetterBibTeX)
-  //   } else {
-  //     return []
-  //   }
-  // }
-
-  /*
-const script = `
-(async () => {
-  Services.obs.notifyObservers(null, "startupcache-invalidate", null);
-  const { AddonManager } = ChromeUtils.import("resource://gre/modules/AddonManager.jsm");
-  const addon = await AddonManager.getAddonByID("${addonID}");
-  await addon.reload();
-  const progressWindow = new Zotero.ProgressWindow({ closeOnClick: true });
-  progressWindow.changeHeadline("${addonName} Hot Reload");
-  progressWindow.progress = new progressWindow.ItemProgress(
-    "chrome://zotero/skin/tick.png",
-    "VERSION=${version}, BUILD=${new Date().toLocaleString()}. By zotero-plugin-toolkit"
-  );
-  progressWindow.progress.setProgress(100);
-  progressWindow.show();
-  progressWindow.startCloseTimer(5000);
-})()`;
- */
-
-  // @log
-  // private static async _check_alt() {
-  //
-  //   const deferred = Zotero.Promise.defer()
-  //
-  //   const checkBTT = addon => {
-  //     let res = false
-  //     if (addon === null || !addon.isActive) {
-  //       res = false
-  //     }
-  //     else {
-  //       const win = Services.wm.getMostRecentWindow('navigator:browser')
-  //       // win.Zotero.BetterBibTeX.ready.then(() => {
-  //       //   res = true
-  //       // })
-  //       try {
-  //         win.Zotero.BetterBibTeX.isPending()
-  //         res = true
-  //       }
-  //       catch (e) {
-  //         Zotero.debug(`${config.addonName.replace("-", "")}: Error: ${e}`)
-  //       }
-  //     }
-  //     deferred.resolve(res)
-  //   }
-  //
-  //   const { AddonManager } = ChromeUtils.import("resource://gre/modules/AddonManager.jsm")
-  //   const bbt = await AddonManager.getAddonByID('better-bibtex@iris-advies.com')
-  //   return deferred.promise
-  // }
 }
 
 export class getParam {
@@ -697,12 +604,12 @@ export class ScanMarkdownFiles {
 
     let logseq_prefix_valid = false
     let logseq_prefix_file = ''
-    let logseq_prefix_title = ''
+    // let logseq_prefix_title = ''
     if (protocol === 'logseq') {
       const logseqprefixParam = getParam.logseqprefix()
       logseq_prefix_valid = logseqprefixParam.valid
       logseq_prefix_file = logseqprefixParam.value
-      logseq_prefix_title = logseqprefixParam.value
+      // logseq_prefix_title = logseqprefixParam.value
     }
 
     const allFiles = await Utils.getFilesRecursively(sourcedir)
@@ -738,7 +645,7 @@ export class ScanMarkdownFiles {
         try {
           const reTitle_match_res = filename.match(re_title)
           if (reTitle_match_res && reTitle_match_res.length > 1) {
-            entry_res.citekey_title = filename.match(re_title)[1].trim()
+            entry_res.citekey_title = reTitle_match_res[1].trim()
           }
         } catch (e) {
           Logger.log('scanVault', `ERROR: get citekey from filename :: ${e}`, false, 'warn')
@@ -859,12 +766,12 @@ export class ScanMarkdownFiles {
 
     let logseq_prefix_valid = false
     let logseq_prefix_file = ''
-    let logseq_prefix_title = ''
+    // let logseq_prefix_title = ''
     if (protocol === 'logseq') {
       const logseqprefixParam = getParam.logseqprefix()
       logseq_prefix_valid = logseqprefixParam.valid
       logseq_prefix_file = logseqprefixParam.value
-      logseq_prefix_title = logseqprefixParam.value
+      // logseq_prefix_title = logseqprefixParam.value
     }
 
     const allFiles = await Utils.getFilesRecursively(sourcedir)
@@ -899,7 +806,11 @@ export class ScanMarkdownFiles {
         /// get the ZoteroKey from the contents
         try {
           const contents = (await Zotero.File.getContentsAsync(filepath)) as string
-          entry_res.zotkeys.push(contents.match(re_contents)[1].trim())
+
+          const reContents_match_res = contents.match(re_contents)
+          if (reContents_match_res && reContents_match_res.length > 1 && reContents_match_res[1].trim() !== '') {
+            entry_res.zotkeys.push(reContents_match_res[1].trim())
+          }
         } catch (e) {
           Logger.log('scanVaultCustomRegex', `ERROR: get zotid from contents :: ${e}`, false, 'warn')
         }
@@ -995,7 +906,7 @@ export class ScanMarkdownFiles {
      * make Record of zoteroKey -> zoteroID for every item in the library
      */
 
-    const keymaperr = []
+    // const keymaperr = []
 
     /// get all items in library
     const s = new Zotero.Search()
@@ -1007,14 +918,6 @@ export class ScanMarkdownFiles {
     const itemIds = await s.search()
 
     let ZotItems: Zotero.Item[] = await Zotero.Items.getAsync(itemIds)
-
-    // ZotItems.forEach((zotitem) => {
-    //   try {
-    //     keymap[zotitem.key] = zotitem.id
-    //   } catch (e) {
-    //     keymaperr.push(zotitem)
-    //   }
-    // })
 
     const keymap = ZotItems.reduce((accumulator: Record<string, number[]>, zotitem) => {
       if (!itemIds.includes(zotitem.id)) {
@@ -1175,7 +1078,7 @@ export class ScanMarkdownFiles {
   @trace
   static async processData(): Promise<void> {
     // debug = debug || false
-    let res: Entry[]
+    let res: Entry[] = []
 
     const matchstrategy = getParam.matchstrategy().value
 
@@ -1375,7 +1278,7 @@ export class ScanMarkdownFiles {
   }
 
   @trace
-  private static async updateItems(zotids: number[]): Promise<notificationData['messageArray']> {
+  private static async updateItems(zotids: number[]) {
     const tagstr = getParam.tagstr().value
 
     /// find all item already tagged
@@ -1412,8 +1315,9 @@ export class ScanMarkdownFiles {
     }
     /// TODO set color :: https://github.com/zotero/zotero/blob/52932b6eb03f72b5fb5591ba52d8e0f4c2ef825f/chrome/content/zotero/tagColorChooser.js
 
-    const messageArray: notificationData['messageArray'] = []
-    messageArray.push({ body: `Found ${items_withnotes.length} notes.`, type: zotids.length > 0 ? 'success' : 'warn' })
+    const messageArray: notificationData['messageArray'] = [
+      { body: `Found ${items_withnotes.length} notes.`, type: zotids.length > 0 ? 'success' : 'warn' },
+    ]
 
     if (nitems_notlocatable !== 0) {
       messageArray.push({
@@ -1477,16 +1381,37 @@ export class ScanMarkdownFiles {
       dryrun = true
     }
 
-    let header: string = 'Syncing Error'
-    let messageArray: notificationData['messageArray'] = [{ body: 'Some Error Occurred', type: 'error' }]
+    //////////////
+    // Promise<notificationData['messageArray']>
+
+    // let messageArray: notificationData['messageArray'] = [{ body: 'Some Error Occurred', type: 'error' }]
+    // if (!dryrun) {
+    // messageArray = await this.updateItems(DataManager.zotIds())
+    // } else {
+    // messageArray = [{ body: `Found ${DataManager.numberRecords()} notes.`, type: 'error' }]
+    // }
+    // let header = 'Synced'
+
+    // Object.values(messageArray).map((value) => `${value?.body}`)
+    // let aaa: string[] = []
+    // for (const msg of messageArray) {
+    //   aaa.push(msg.body)
+    // }
+    //
+    // const summaryMessages = Object.entries(messageArray).map(([key, value]) => `${value.body}`)
+
+    ////////////////
+
+    let messageArray: notificationData['messageArray']
     if (!dryrun) {
       messageArray = await this.updateItems(DataManager.zotIds())
     } else {
       messageArray = [{ body: `Found ${DataManager.numberRecords()} notes.`, type: 'error' }]
     }
-    header = 'Synced'
+    const header = 'Synced'
 
-    const summaryMessages = Object.entries(messageArray).map(([key, value]) => `${value.body}`)
+    const summaryMessages = messageArray.map((msg) => `${msg.body}`)
+
     const loggedMessages = Logger.getMessages()
 
     if (displayReport) {
@@ -1499,8 +1424,8 @@ export class ScanMarkdownFiles {
       for (const msg of loggedMessages) {
         if (msg.notification) {
           messageArray.push({
-            body: `${msg.notification.title}: ${msg.notification.body}`,
-            type: msg.notification.type,
+            body: `${msg.notification.title}: ${msg.notification.body || ''}`,
+            type: msg.notification.type || 'error',
           })
         }
       }
@@ -1652,9 +1577,9 @@ export class ScanMarkdownFiles {
                 type: 'click',
                 listener: (e: Event) => {
                   addon.hooks.saveJsonFile(
-                    msg.saveData?.dataGetter(),
-                    msg.saveData?.saveDialogTitle,
-                    msg.saveData?.fileNameSuggest,
+                    msg.saveData?.dataGetter() || '',
+                    msg.saveData?.saveDialogTitle || '',
+                    msg.saveData?.fileNameSuggest || '',
                   )
                 },
               },
@@ -2151,6 +2076,15 @@ export class systemInterface {
 
     // const filename = `${config.addonName.replace('-', '')}-logs.json`
 
+    if (!data) {
+      Logger.log(
+        'saveJsonFile',
+        `ERROR No data to save. \n  filename :: ${filename} \n  title :: ${title} \n  data :: ${data}`,
+        false,
+        'error',
+      )
+    }
+
     const filepathstr = await new ztoolkit.FilePicker(
       title,
       'save',
@@ -2171,22 +2105,6 @@ export class systemInterface {
     Logger.log('saveJsonFile', `Saving to ${filepathstr}`, false, 'info')
 
     await Zotero.File.putContentsAsync(filepathstr, data)
-  }
-
-  static _getSelectedEntry(idx: number): Entry {
-    // get all selected items
-    const items: number[] = this.expandSelection('selected')
-
-    // find first selected item with data associated
-    for (const itemId of items) {
-      if (DataManager.checkForZotId(itemId)) {
-        // get all associated entries
-        const entry_res_list: Entry[] = DataManager.getEntryList(itemId)
-        // ensure that requested idx is within range of associated entries
-        idx = idx < entry_res_list.length && idx >= 0 ? idx : 0
-        return entry_res_list[idx]
-      }
-    }
   }
 
   @trace
@@ -2260,9 +2178,9 @@ export class systemInterface {
       let graphName = ''
 
       const logseqprefixParam = getParam.logseqprefix()
-      const logseq_prefix_valid = logseqprefixParam.valid
+      // const logseq_prefix_valid = logseqprefixParam.valid
       const logseq_prefix_file = logseqprefixParam.value
-      const logseq_prefix_title = logseqprefixParam.value
+      // const logseq_prefix_title = logseqprefixParam.value
 
       if (graphNameParam.valid) {
         graphName = graphNameParam.value
@@ -2340,6 +2258,7 @@ export class UIHelpers {
           const itemMenuSeparatorId = '__addonRef__-itemmenu-separator'
           document.getElementById(itemMenuSeparatorId)?.remove()
 
+          //// this ~= Zotero.getActiveZoteroPane() ////
           const selectedItemIds: number[] = this.getSelectedItems(true)
 
           if (!selectedItemIds) return
@@ -2356,10 +2275,14 @@ export class UIHelpers {
 
           if (numEntries == 0) return
 
-          let menuitemopenlabel = getString('contextmenuitem-open-default')
-          let openfn = (entry: Entry) => {
-            systemInterface.openFileSystemPath(entry)
-          }
+          const elements = new Elements(document)
+
+          const itemmenu = document.getElementById('zotero-itemmenu')
+
+          if (!itemmenu) return
+
+          let menuitemopenlabel: string
+          let openfn: (entry: Entry) => void
 
           const protocol = getParam.mdeditor().value
           switch (protocol) {
@@ -2381,14 +2304,10 @@ export class UIHelpers {
               break
           }
 
-          const elements = new Elements(document)
-
-          const itemmenu = document.getElementById('zotero-itemmenu')
-
-          itemmenu.appendChild(elements.create('menuseparator', { id: itemMenuSeparatorId }))
+          itemmenu?.appendChild(elements.create('menuseparator', { id: itemMenuSeparatorId }))
 
           if (numEntries == 1) {
-            const menuitemopen = itemmenu.appendChild(
+            itemmenu.appendChild(
               elements.create('menuitem', {
                 id: itemMenuOpenId,
                 label: menuitemopenlabel,
@@ -2398,8 +2317,7 @@ export class UIHelpers {
                 oncommand: () => openfn(entry_res_list[0]),
               }),
             )
-
-            const menuitemreveal = itemmenu.appendChild(
+            itemmenu.appendChild(
               elements.create('menuitem', {
                 id: itemMenuRevealId,
                 label: getString('contextmenuitem-reveal'),
@@ -2442,64 +2360,13 @@ export class UIHelpers {
           }
         },
     )
-
-    // const mdreader = getParam.mdreader()
-    // let labelkey =  "contextmenuitem-open-default"
-    // if (mdreader === 'obsidian') {
-    //   labelkey = "contextmenuitem-open-obsidian"
-    // }
-    // if (mdreader === 'logseq') {
-    //   labelkey = "contextmenuitem-open-logseq"
-    // }
-    //
-    // const menuIcon = `chrome://${config.addonRef}/content/icons/favicon@0.5x.png`
-    // // item menuitem with icon
-    // ztoolkit.Menu.register("item", {
-    //   tag: "menuitem",
-    //   id: `${config.addonRef}-itemmenu-open`,
-    //   label: getString(labelkey),
-    //   // commandListener: (ev) => addon.hooks.onDialogEvents("filePickerExample"),
-    //   // commandListener: (ev) => {alert(`ev: ${ev}`)},
-    //   // oncommand: () => Zotero.BetterBibTeX.scanAUX('tag'),
-    //   icon: menuIcon,
-    // })
   }
-
-  //   addon.data
-  // .prefs!.window.document.querySelector(
-  // `#zotero-prefpane-${config.addonRef}-enable`,
-  // )
-  // ?.addEventListener("command", (e) => {
-  // ztoolkit.log(e);
-  // addon.data.prefs!.window.alert(
-  // `Successfully changed to ${(e.target as XUL.Checkbox).checked}!`,
-  // );
-  // });
-
-  // addon.data
-  // .prefs!.window.document.querySelector(
-  // `#zotero-prefpane-${config.addonRef}-input`,
-  // )
-  // ?.addEventListener("change", (e) => {
-  // ztoolkit.log(e);
-  // addon.data.prefs!.window.alert(
-  // `Successfully changed to ${(e.target as HTMLInputElement).value}!`,
-  // );
-  // });
 }
 
 export class prefHelpers {
   @trace
   static async chooseVaultFolder() {
-    const vaultpath = await new ztoolkit.FilePicker(
-      'Select Folder containing MD reading notes',
-      'folder',
-      // [
-      //   ['PNG File(*.png)', '*.png'],
-      //   ['Any', '*.*'],
-      // ],
-      // 'image.png',
-    ).open()
+    const vaultpath = await new ztoolkit.FilePicker('Select Folder containing MD reading notes', 'folder').open()
 
     try {
       if (!vaultpath) throw new Error('No folder selected')
@@ -2639,212 +2506,6 @@ export class prefHelpers {
     }
   }
 }
-
-/*
-class PatchZoteroPane {
-
-  private patched: Trampoline[] = []
-  private elements = []
-  private ZoteroPane: any
-  private window: any
-
-  public unloader(): void {
-    $unpatch$(this.patched)
-    this.elements.remove()
-  }
-
-  public async loader(win: Window) {
-
-    const doc = win.document
-    const elements = this.elements = new Elements(doc)
-    this.window = win
-    this.ZoteroPane = (this.window as any).ZoteroPane
-    this.ZoteroPane.BetterBibTeX = this
-
-    $patch$(this.ZoteroPane, 'buildItemContextMenu', original => async function ZoteroPane_buildItemContextMenu() {
-      await original.apply(this, arguments)
-
-      const id = 'better-bibtex-item-menu'
-      doc.getElementById(id)?.remove()
-
-      if (!this.getSelectedItems()) return
-
-      const menupopup = doc.getElementById('zotero-itemmenu')
-          .appendChild(elements.create('menu', {
-            id,
-            label: 'Better BibTeX',
-            class: 'menuitem-iconic',
-            image: 'chrome://zotero-better-bibtex/content/skin/bibtex-menu.svg',
-          }))
-          .appendChild(elements.create('menupopup'))
-
-      menupopup.appendChild(elements.create('menuitem', {
-        label: 'teteste',
-        oncommand: () => Zotero.BetterBibTeX.KeyManager.set(),
-      }))
-
-    })
-  }
-}
-*/
-
-// class ZoteroPane {
-//   private patched: Trampoline[] = []
-//   private elements: Elements
-//   private ZoteroPane: any
-//   private window: Window
-//
-//   public unload(): void {
-//     $unpatch$(this.patched)
-//     this.elements.remove()
-//   }
-//
-//   public async load(win: Window) {
-//     const doc = win.document
-//     const elements = this.elements = new Elements(doc)
-//     this.window = win
-//     this.ZoteroPane = (this.window as any).ZoteroPane
-//     this.ZoteroPane.BetterBibTeX = this
-//
-//     this.window.addEventListener('unload', () => { this.unload() })
-//
-//     const bbt_zotero_pane_helper = this // eslint-disable-line @typescript-eslint/no-this-alias
-//
-//     $patch$(this.ZoteroPane, 'buildItemContextMenu', original => async function ZoteroPane_buildItemContextMenu() {
-//       await original.apply(this, arguments) // eslint-disable-line prefer-rest-params
-//
-//       const id = 'better-bibtex-item-menu'
-//       doc.getElementById(id)?.remove()
-//
-//       if (!this.getSelectedItems()) return
-//
-//       const menupopup = doc.getElementById('zotero-itemmenu')
-//         .appendChild(elements.create('menu', {
-//           id,
-//           label: 'Better BibTeX',
-//           class: 'menuitem-iconic',
-//           image: 'chrome://zotero-better-bibtex/content/skin/bibtex-menu.svg',
-//         }))
-//         .appendChild(elements.create('menupopup'))
-//
-//       menupopup.appendChild(elements.create('menuitem', {
-//         label: l10n.localize('better-bibtex_citekey_set'),
-//         oncommand: () => Zotero.BetterBibTeX.KeyManager.set(),
-//       }))
-//       menupopup.appendChild(elements.create('menuitem', {
-//         label: l10n.localize('better-bibtex_citekey_pin'),
-//         oncommand: () => Zotero.BetterBibTeX.KeyManager.pin('selected'),
-//       }))
-//       menupopup.appendChild(elements.create('menuitem', {
-//         label: l10n.localize('better-bibtex_zotero-pane_citekey_pin_inspire-hep'),
-//         oncommand: () => Zotero.BetterBibTeX.KeyManager.pin('selected', true),
-//       }))
-//       menupopup.appendChild(elements.create('menuitem', {
-//         label: l10n.localize('better-bibtex_zotero-pane_citekey_unpin'),
-//         oncommand: () => Zotero.BetterBibTeX.KeyManager.unpin('selected'),
-//       }))
-//       menupopup.appendChild(elements.create('menuitem', {
-//         label: l10n.localize('better-bibtex_zotero-pane_citekey_refresh'),
-//         oncommand: () => Zotero.BetterBibTeX.KeyManager.refresh('selected', true),
-//       }))
-//
-//       menupopup.appendChild(elements.create('menuseparator'))
-//       menupopup.appendChild(elements.create('menuitem', {
-//         label: l10n.localize('better-bibtex_zotero-pane_patch-dates'),
-//         oncommand: () => { bbt_zotero_pane_helper.patchDates().catch(err => log.error('patchDates', err)) },
-//       }))
-//       menupopup.appendChild(elements.create('menuitem', {
-//         label: l10n.localize('better-bibtex_zotero-pane_sentence-case'),
-//         oncommand: () => { bbt_zotero_pane_helper.sentenceCase().catch(err => log.error('sentenceCase', err)) },
-//       }))
-//       menupopup.appendChild(elements.create('menuitem', {
-//         label: l10n.localize('better-bibtex_zotero-pane_add-citation-links'),
-//         oncommand: () => { bbt_zotero_pane_helper.addCitationLinks().catch(err => log.error('addCitationLinks', err)) },
-//       }))
-//
-//       if (TeXstudio.enabled) {
-//         menupopup.appendChild(elements.create('menuseparator', { class: 'bbt-texstudio' }))
-//         menupopup.appendChild(elements.create('menuitem', {
-//           class: 'bbt-texstudio',
-//           label: l10n.localize('better-bibtex_zotero-pane_tex-studio'),
-//           oncommand: () => { bbt_zotero_pane_helper.toTeXstudio().catch(err => log.error('toTeXstudio', err)) },
-//         }))
-//       }
-//
-//       menupopup.appendChild(elements.create('menuseparator'))
-//       menupopup.appendChild(elements.create('menuitem', {
-//         label: l10n.localize('better-bibtex_report-errors'),
-//         oncommand: () => { bbt_zotero_pane_helper.errorReport('items') },
-//       }))
-//     })
-//
-//     $patch$(this.ZoteroPane, 'buildCollectionContextMenu', original => async function() {
-//       // eslint-disable-next-line prefer-rest-params
-//       await original.apply(this, arguments)
-//
-//       const id = 'better-bibtex-collection-menu'
-//
-//       if (!doc.getElementById(id)) {
-//         const menupopup = doc.getElementById('zotero-collectionmenu')
-//           .appendChild(elements.create('menu', {
-//             id,
-//             label: 'Better BibTeX',
-//             class: 'menuitem-iconic',
-//             image: 'chrome://zotero-better-bibtex/content/skin/bibtex-menu.svg',
-//           }))
-//           .appendChild(elements.create('menupopup'))
-//
-//         menupopup
-//           .appendChild(elements.create('menu', {
-//             id: 'zotero-collectionmenu-bbt-autoexport',
-//             label: l10n.localize('better-bibtex_preferences_tab_auto-export.label'),
-//           }))
-//           .appendChild(elements.create('menupopup'))
-//
-//         menupopup.appendChild(elements.create('menuitem', {
-//           id: 'bbt-collectionmenu-pull-url',
-//           label: l10n.localize('better-bibtex_zotero-pane_show_collection-key'),
-//           oncommand: event => {
-//             event.stopPropagation();
-//             bbt_zotero_pane_helper.pullExport()
-//           },
-//           // class: 'menuitem-iconic',
-//           // image: 'chrome://zotero-better-bibtex/content/skin/bibtex-menu.svg',
-//         }))
-//
-//         menupopup.appendChild(elements.create('menuitem', {
-//           id: 'bbt-collectionmenu-scan-aux',
-//           label: l10n.localize('better-bibtex_aux-scanner'),
-//           oncommand: async event => {
-//             event.stopPropagation();
-//             await Zotero.BetterBibTeX.scanAUX('collection')
-//           },
-//           // class: 'menuitem-iconic',
-//           // image: 'chrome://zotero-better-bibtex/content/skin/bibtex-menu.svg',
-//         }))
-//
-//         menupopup.appendChild(elements.create('menuitem', {
-//           id: 'bbt-collectionmenu-tag-duplicates',
-//           label: l10n.localize('better-bibtex_zotero-pane_tag_duplicates'),
-//           oncommand: async event => {
-//             event.stopPropagation()
-//             await Zotero.BetterBibTeX.KeyManager.tagDuplicates(parseInt(event.target.getAttribute('libraryID')))
-//           },
-//         }))
-//
-//         menupopup.appendChild(elements.create('menuitem', {
-//           id: 'bbt-collectionmenu-report-errors',
-//           label: l10n.localize('better-bibtex_report-errors'),
-//           oncommand: event => {
-//             event.stopPropagation();
-//             bbt_zotero_pane_helper.errorReport('collection')
-//           },
-//         }))
-//       }
-//     }
-//   }
-//
-// }
 
 export class BasicExampleFactory {
   @trace

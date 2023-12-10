@@ -31,6 +31,7 @@ import { BasicTool, unregister } from 'zotero-plugin-toolkit/dist/basic'
 import { PreferencePaneManager } from 'zotero-plugin-toolkit/dist/managers/preferencePane'
 import { UITool } from 'zotero-plugin-toolkit/dist/tools/ui'
 
+// @ts-ignore
 class MyToolkit extends BasicTool {
   UI: UITool
   PreferencePane: PreferencePaneManager

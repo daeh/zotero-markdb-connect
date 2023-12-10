@@ -1,3 +1,5 @@
+//// Adapted from https://github.com/retorquere/zotero-better-bibtex/blob/master/content/create-element.ts ////
+
 // import { is7 } from './client'
 
 export const NAMESPACE = {
@@ -8,8 +10,8 @@ export const NAMESPACE = {
 type Handler = (event?: any) => void | Promise<void>
 
 export class Elements {
-  // static all: Set<WeakRef<HTMLElement>> = new Set
-  static all = new Set()
+  static all = new Set<WeakRef<HTMLElement>>()
+  // static all = new Set()
 
   static removeAll(): void {
     for (const eltRef of this.all) {
@@ -23,7 +25,7 @@ export class Elements {
 
   private className: string
   constructor(private document: Document) {
-    this.className = `better-bibtex-${Zotero.Utilities.generateObjectKey()}`
+    this.className = `mdbc-${Zotero.Utilities.generateObjectKey()}`
   }
 
   public serialize(node: HTMLElement): string {
@@ -35,16 +37,12 @@ export class Elements {
     const children: HTMLElement[] = (attrs.$ as unknown as HTMLElement[]) || []
     delete attrs.$
 
-    /// temp
-    const is7 = true
-
     const namespace = name.startsWith('html:') ? NAMESPACE.HTML : NAMESPACE.XUL
     name = name.replace('html:', '')
 
-    const elt: HTMLElement = is7
-      ? (this.document[namespace === NAMESPACE.XUL ? 'createXULElement' : 'createElement'](name) as HTMLElement)
-      : (this.document.createElementNS(namespace, name) as HTMLElement)
-    const aaa = attrs?.class || ''
+    const elt: HTMLElement = this.document[namespace === NAMESPACE.XUL ? 'createXULElement' : 'createElement'](
+      name,
+    ) as HTMLElement
     let attrsclass: string = ''
     try {
       attrsclass = attrs.class as string
@@ -69,7 +67,7 @@ export class Elements {
       elt.appendChild(child)
     }
 
-    // if (is7) Elements.all.add(new WeakRef(elt))
+    // Elements.all.add(new WeakRef(elt))
 
     return elt
   }

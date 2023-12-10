@@ -1,8 +1,22 @@
 {
   "extends": "./tsconfig.base",
   "compilerOptions": {
-    "strict": true,
+    // "strict": true,
+    "strict": false,
     "removeComments": true,
-    "forceConsistentCasingInFileNames": true
+    "sourceMap": false,
+    "forceConsistentCasingInFileNames": true,
+    //    "noUnusedLocals": false,
+    //    "noUnusedParameters": false,
+    //    "noImplicitAny": false,
+    //    "noFallthroughCasesInSwitch": false
+    "allowUnreachableCode": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": false,
+    "importHelpers": true,
+    "disableSizeLimit": true,
+    //    "noImplicitAny": false,
+    "preserveConstEnums": true,
+    "downlevelIteration": true
   }
 }

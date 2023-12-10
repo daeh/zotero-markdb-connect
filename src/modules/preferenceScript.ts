@@ -1,5 +1,5 @@
-import { config } from '../../package.json'
-import { getString } from '../utils/locale'
+// import { config } from '../../package.json'
+// import { getString } from '../utils/locale'
 
 export async function registerPrefsScripts(_window: Window) {
   // This function is called when the prefs window is opened
@@ -47,6 +47,7 @@ export async function registerPrefsScripts(_window: Window) {
   //TODO replace inline listeners with bindpreevents
 }
 
+/*
 async function updatePrefsUI() {
   // You can initialize some UI elements on prefs window
   // with addon.data.prefs.window.document
@@ -122,3 +123,4 @@ function bindPrefEvents() {
       addon.data.prefs.window.alert(`Successfully changed to ${(e.target as HTMLInputElement).value}!`)
     })
 }
+*/

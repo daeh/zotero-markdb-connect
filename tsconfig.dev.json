@@ -2,11 +2,15 @@
   "extends": "./tsconfig.base",
   "compilerOptions": {
     "strict": false,
+    "removeComments": false,
+    "sourceMap": true,
+    "forceConsistentCasingInFileNames": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noImplicitAny": false,
     "noFallthroughCasesInSwitch": false,
-    "sourceMap": true,
-    "removeComments": false
+    //
+    "allowUnreachableCode": false
+    ///
   }
 }
