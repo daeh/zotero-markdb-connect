@@ -1,4 +1,4 @@
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/daeh/zotero-markdb-connect?style=for-the-badge)](https://github.com/daeh/zotero-markdb-connect/releases/latest) ![GitHub all releases](https://img.shields.io/github/downloads/daeh/zotero-markdb-connect/total?style=for-the-badge)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/daeh/zotero-markdb-connect?style=for-the-badge)](https://github.com/daeh/zotero-markdb-connect/releases/latest) [![GitHub all releases](https://img.shields.io/github/downloads/daeh/zotero-markdb-connect/total?style=for-the-badge&color=forestgreen)](https://github.com/daeh/zotero-markdb-connect/releases/latest)
 
 # MarkDB-Connect (Zotero Markdown DataBase Connect)
 
@@ -24,12 +24,12 @@ Opens an existing markdown note in [Obsidian](https://obsidian.md), [logseq](htt
 
 ## Instalation
 
-- Download the plugin (the .xpi file) from the latest release: https://github.com/daeh/zotero-markdb-connect/releases
-- To download the .xpi file, right click it and select 'Save link as'
+- Download the plugin (the .xpi file) from the latest release: https://github.com/daeh/zotero-markdb-connect/releases/latest
+- To download the `.xpi` file, right click it and select 'Save link as'
 - Open Zotero (version 6.x)
 - Go to `Tools -> Add-ons`
 - `Install Add-on From File`
-- Choose the file `MarkDBConnect-0.0.25.xpi`
+- Choose the file `.xpi` file (e.g. `markdb-connect-0.0.0.xpi`)
 - Restart Zotero
 
 ## Setup

@@ -30,8 +30,6 @@ interface BetterBibTeX {
   ready: boolean | Promise<boolean>
 }
 
-const _paramVals_DebugMode = ['minimal' as DebugMode, 'maximal' as DebugMode] as const
-
 const _paramVals_filefilterstrategy = ['default', 'customfileregexp'] as const
 declare type _param_filefilterstrategy = (typeof _paramVals_filefilterstrategy)[number]
 
@@ -51,6 +49,8 @@ declare type _param_grouplibraries = (typeof _paramVals_grouplibraries)[number]
 
 const _paramVals_removetags = ['keepsynced', 'addonly'] as const
 declare type _param_removetags = (typeof _paramVals_removetags)[number]
+
+const _paramVals_DebugMode = ['minimal' as DebugMode, 'maximal' as DebugMode] as const
 
 export class Notifier {
   static readonly notificationTypes: Record<NotificationType, ZoteroIconURI> = {
