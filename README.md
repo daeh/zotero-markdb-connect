@@ -27,12 +27,11 @@ N.B. Beginning with `v0.1.0`, *MarkDB-Connect* will support Zotero 7 exclusively
 
 ## Instalation
 
-- Download the plugin (the .xpi file) from the latest release: https://github.com/daeh/zotero-markdb-connect/releases/latest
-- To download the `.xpi` file, right click it and select 'Save link as'
+- Download the plugin (the `.xpi` file) from the latest release: https://github.com/daeh/zotero-markdb-connect/releases/latest
 - Open Zotero (version 7.x; for Zotero 6 use [v0.0.25](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.0.25))
-- Go to `Tools -> Add-ons`
-- `Install Add-on From File`
-- Choose the file `.xpi` file (e.g. `markdb-connect-0.1.0.xpi`)
+- From `Tools -> Add-ons`
+- Select `Install Add-on From File...` from the gear icon
+- Choose the `.xpi` file (e.g. `markdb-connect-0.1.0.xpi`)
 - Restart Zotero
 
 ## Setup
@@ -61,33 +60,32 @@ NOTE: multiple markdown files can point to the same Zotero item. But a given mar
 
 _MarkDB-Connect_ can extract the BetterBibTeX citekey that specifies which Zotero Item a markdown note corresponds to. The BetterBibTeX citekey can be taken from a markdown file's filename, [YAML metadata](https://help.obsidian.md/Advanced+topics/YAML+front+matter), or elsewhere in the file's contents.
 
+<details>
+
+<summary>configuraton details</summary>
+
 - In Zotero's Settings, click the `MarkDB-Connect` preference pane.
 
   - Specify the location of the folder that contains your markdown reading notes (e.g. `/Users/me/Documents/ObsVault/ReadingNotes/`). The _MarkDB-Connect_ plugin will recursively search this path for markdown files.
 
   - By default, _MarkDB-Connect_ expects that the filenames of your markdown reading note files begin with `@mycitekey` but can include extra information after it (e.g. a reading note with the BetterBibTeX citekey `shepard1987science` could have the filename `@shepard1987science.md` or `@shepard1987science Toward a universal law of generalization for psychological science.md`).
+    - If your BetterBibTeX citekeys contain certain special characters (e.g. `:`, `/`), you will need to extract the citekeys from the markdown file's contents rather than its filename.
 
   - If the default does not match your use case, you can specify how to extract BetterBibTeX citekeys.
 
-    - A. **From filename** - Select `Custom File Filter` and define a RegExp with a single capturing group. 
+    - **A. filename** - Select `Custom File Filter` and define a RegExp with a single capturing group. 
       - E.g. the default is `^@(\S+).*\.md$`, which looks for files beginning with `@` and uses the first word as the BetterBibTeX citekey.
 
-    - B. **From the metadata** - Select `BetterBibTeX citekey - taken from YAML metadata` and specify a keyword from the notes' YAML frontmatter (here's an [example](##example-markdown-note)).
+    - **B. metadata** - Select `BetterBibTeX citekey - taken from YAML metadata` and specify a keyword from the notes' YAML frontmatter (here's an [example](#example-markdown-note)).
       - For info on metadata syntax, see [YAML front matter](https://help.obsidian.md/Advanced+topics/YAML+front+matter).
 
-    - C. **From the contents** - Select `BetterBibTeX citekey - captured with custom RegExp` and define a RegExp with a single capturing group to return exactly 1 match per file.
+    - **C. contents** - Select `BetterBibTeX citekey - captured with custom RegExp` and define a RegExp with a single capturing group to return exactly 1 match per file.
 
 - Run the synchronization function from `Tools -> MarkDB-Connect Sync Tags`.
 
   - This will add a tag (`ObsCite`) to every Zotero item for which there exists a reading note in the external folder you specified.
 
-- In the `Tags` plane of Zotero, right-click on the `ObsCite` tag and assign it a color, which will mark the tagged items in the preview plane of Zotero. (In the screenshot above, Zotero items associated with reading notes are marked with a blue tag.)
-
-<details>
-
-<summary>configuraton details</summary>
-
-If your BetterBibTeX citekeys contain certain special characters (e.g. `:`, `/`), you will need to extract the citekeys from the markdown file's contents rather than its filename.
+- In the `Tags` plane of Zotero, right-click on the `ObsCite` tag and assign it a color, which will mark the tagged items in the preview plane of Zotero. (In the screenshot above, Zotero items associated with reading notes are marked with a 🟦 blue tag.)
 
 </details>
 
@@ -95,9 +93,13 @@ If your BetterBibTeX citekeys contain certain special characters (e.g. `:`, `/`)
 
 ### Option 2: Using Zotero Item Keys
 
-_MarkDB-Connect_ can extract the Zotero-Item-Key that specifies which Zotero Item a markdown note corresponds to. The Zotero-Item-Key is taken from the markdown file contents using a custom RegEx pattern.
+_MarkDB-Connect_ can extract the Zotero-Item-Key that specifies which Zotero Item a markdown note corresponds to. The Zotero-Item-Key is taken from the markdown file contents using a custom RegExp pattern.
 
 Zotero automatically generates Item Keys, they take the form of `ABCD1234`, as in `zotero://select/library/items/ABCD1234`. NB this is not the same as the BetterBibTeX citekey you assigned an item (e.g. `mycitekey` in `zotero://select/items/@mycitekey`).
+
+<details>
+
+<summary>configuraton details</summary>
 
 - In Zotero's Settings, click the `MarkDB-Connect` preference pane.
 
@@ -115,7 +117,7 @@ Zotero automatically generates Item Keys, they take the form of `ABCD1234`, as i
 
     `- local:: [local zotero](zotero://select/library/items/GZ9DQ2AM)`
 
-    you could extract the Zotero key (`GZ9DQ2AM`) using this RegEx pattern:
+    you could extract the Zotero key (`GZ9DQ2AM`) using this RegExp pattern:
 
     `^- local::.+\/items\/(\w+)\)`
 
@@ -123,7 +125,9 @@ Zotero automatically generates Item Keys, they take the form of `ABCD1234`, as i
 
   - This will add a tag (`ObsCite`) to every Zotero item for which there exists a reading note in the external folder you specified.
 
-- In the `Tags` plane of Zotero, right-click on the `ObsCite` tag and assign it a color, which will mark the tagged items in the preview plane of Zotero. (In the screenshot above, Zotero items associated with reading notes are marked with a blue tag.)
+- In the `Tags` plane of Zotero, right-click on the `ObsCite` tag and assign it a color, which will mark the tagged items in the preview plane of Zotero. (In the screenshot above, Zotero items associated with reading notes are marked with a 🟦 blue tag.)
+
+</details>
 
 ---
 
