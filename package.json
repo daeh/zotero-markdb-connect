@@ -58,7 +58,7 @@
     "compressing": "^1.10.0",
     "concurrently": "^8.2.2",
     "cross-env": "^7.0.3",
-    "esbuild": "^0.19.8",
+    "esbuild": "^0.19.9",
     "eslint": "^8.55.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-import-resolver-typescript": "^3.6.1",
