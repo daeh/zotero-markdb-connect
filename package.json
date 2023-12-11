@@ -48,12 +48,12 @@
     "zotero-plugin-toolkit": "^2.3.11"
   },
   "devDependencies": {
-    "@stylistic/eslint-plugin": "^1.5.0",
+    "@stylistic/eslint-plugin": "^1.5.1",
     "@stylistic/eslint-plugin-js": "^1.4.1",
     "@stylistic/eslint-plugin-ts": "^1.4.1",
     "@types/node": "^20.10.4",
-    "@typescript-eslint/eslint-plugin": "^6.13.2",
-    "@typescript-eslint/parser": "^6.13.2",
+    "@typescript-eslint/eslint-plugin": "^6.14.0",
+    "@typescript-eslint/parser": "^6.14.0",
     "chokidar-cli": "^3.0.0",
     "compressing": "^1.10.0",
     "concurrently": "^8.2.2",
