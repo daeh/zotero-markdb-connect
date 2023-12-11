@@ -203,6 +203,7 @@ async function esbuild() {
     },
     bundle: true,
     target: 'firefox102',
+    tsconfig: env.NODE_ENV === 'production' ? 'tsconfig.prod.json' : 'tsconfig.dev.json',
     outfile: path.join(buildDir, `addon/chrome/content/scripts/${config.addonRef}.js`),
     // Don't turn minify on
     // minify: true,

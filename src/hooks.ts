@@ -12,7 +12,7 @@ import {
   UIHelpers,
   wrappers,
 } from './modules/mdbcScan'
-import { patch as $patch$, unpatch as $unpatch$ } from './modules/monkey-patch'
+import { unpatch as $unpatch$ } from './modules/monkey-patch'
 import { registerPrefsScripts } from './modules/preferenceScript'
 import { getString, initLocale } from './utils/locale'
 import { createZToolkit } from './utils/ztoolkit'
@@ -161,9 +161,6 @@ function DataStore() {
 function Logs() {
   return Logger.dump()
 }
-function Messages() {
-  return Logger.getMessages()
-}
 
 async function onMainWindowUnload(win: Window): Promise<void> {
   Elements.removeAll() // maybe?
@@ -235,5 +232,4 @@ export default {
   DataZotIds,
   saveLogs,
   saveJsonFile,
-  // Messages,
 }
