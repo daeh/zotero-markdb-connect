@@ -13,7 +13,7 @@ This is a plugin for [Zotero](https://www.zotero.org), a research source managem
 
 This plugin was initially designed with the [Obsidian](https://obsidian.md) markdown editor in mind, and was inspired by the [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin) workflow. It offers preliminary support for [logseq](https://logseq.com) and [Zettlr](https://www.zettlr.com). It can be adapted to other databases that store markdown files outside of Zotero, and to other workflows that generate markdown reading notes linked to Zotero items (such as Zotero's `Export Note` feature).
 
-Please post any bugs, questions, or feature requests in the Github repository.
+Please post any bugs, questions, or feature requests in the Github repository's [issues](https://github.com/daeh/zotero-markdb-connect/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc).
 
 ## Plugin Functions
 
@@ -23,14 +23,15 @@ Supports multiple markdown files for a single Zotero item.
 
 Opens an existing markdown note in [Obsidian](https://obsidian.md), [logseq](https://logseq.com), or the system's default markdown note editor (e.g. [Zettlr](https://www.zettlr.com), [Typora](https://typora.io)) from the contextual menu of a Zotero item.
 
+N.B. Beginning with `v0.1.0`, *MarkDB-Connect* will support Zotero 7 exclusively. The last release for Zotero 6 is [`v0.0.25`](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.0.25).
+
 ## Instalation
 
-- Download the plugin (the .xpi file) from the latest release: https://github.com/daeh/zotero-markdb-connect/releases/latest
-- To download the `.xpi` file, right click it and select 'Save link as'
+- Download the plugin (the `.xpi` file) from the latest release: https://github.com/daeh/zotero-markdb-connect/releases/latest
 - Open Zotero (version 7.x; for Zotero 6 use [v0.0.25](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.0.25))
-- Go to `Tools -> Add-ons`
-- `Install Add-on From File`
-- Choose the file `.xpi` file (e.g. `markdb-connect-0.1.0.xpi`)
+- From `Tools -> Add-ons`
+- Select `Install Add-on From File...` from the gear icon
+- Choose the `.xpi` file (e.g. `markdb-connect-0.1.0.xpi`)
 - Restart Zotero
 
 ## Setup
@@ -41,13 +42,14 @@ A markdown file can specify which Zotero item it's linked to using either a [Bet
 
    - This is recommended if you created the markdown notes with [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin), [BibNotes Formatter](https://github.com/stefanopagliari/bibnotes), or [Obsidian Zotero Integration](https://github.com/mgmeyers/obsidian-zotero-integration).
 
-   - The BetterBibTeX citekey needs to appear in the filename or the metadata of the markdown note.
+   - The BetterBibTeX citekey can be taken from the filename, YAML metadata, or body of the markdown note.
 
    - FYI There's a nice [configuration tutorial](https://publish.obsidian.md/history-notes/Option+-+Link+from+a+Zotero+item+back+to+related+notes+in+Obsidian) detailing a common use case (thanks to Prof. Elena Razlogova).
 
 2. Using **Zotero Item Keys** to link markdown files to Zotero items.
 
    - This is recommended if you created the markdown notes with the `Export Note` feature of Zotero.
+
    - The markdown note contents should include the Zotero-Item-Key in a consistent format.
 
 NOTE: multiple markdown files can point to the same Zotero item. But a given markdown file should only be linked to a single Zotero item. A markdown reading note can reference multiple Zotero items throughout the file, but _MarkDB-Connect_ will only link the markdown note to one BetterBibTeX-citekey / Zotero-Item-Key.
@@ -56,72 +58,82 @@ NOTE: multiple markdown files can point to the same Zotero item. But a given mar
 
 ### Option 1: Using BetterBibTeX citekeys
 
-_MarkDB-Connect_ can extract the BetterBibTeX citekey that specifies which Zotero Item a markdown note corresponds to. The BetterBibTeX citekey can be taken from the markdown filename or [yaml metadata](https://help.obsidian.md/Advanced+topics/YAML+front+matter).
+_MarkDB-Connect_ can extract the BetterBibTeX citekey that specifies which Zotero Item a markdown note corresponds to. The BetterBibTeX citekey can be taken from a markdown file's filename, [YAML metadata](https://help.obsidian.md/Advanced+topics/YAML+front+matter), or elsewhere in the file's contents.
 
-- In `MarkDBConnect Preferences...` (under the `Tools` menu),
+<details>
+
+<summary>configuraton details</summary>
+
+- In Zotero's Settings, click the `MarkDB-Connect` preference pane.
 
   - Specify the location of the folder that contains your markdown reading notes (e.g. `/Users/me/Documents/ObsVault/ReadingNotes/`). The _MarkDB-Connect_ plugin will recursively search this path for markdown files.
 
-  - Select the `Match notes based on BetterBibTeX citekey` option.
+  - By default, _MarkDB-Connect_ expects that the filenames of your markdown reading note files begin with `@mycitekey` but can include extra information after it (e.g. a reading note with the BetterBibTeX citekey `shepard1987science` could have the filename `@shepard1987science.md` or `@shepard1987science Toward a universal law of generalization for psychological science.md`).
+    - If your BetterBibTeX citekeys contain certain special characters (e.g. `:`, `/`), you will need to extract the citekeys from the markdown file's contents rather than its filename.
 
-  - Specify how the plugin should identify the desired markdown reading notes and extract the BetterBibTeX citekeys.
+  - If the default does not match your use case, you can specify how to extract BetterBibTeX citekeys.
 
-    - By default, _MarkDB-Connect_ expects that the filenames of your markdown reading note files begin with `@mycitekey` but can include extra information after it (e.g. a reading note with the BetterBibTeX citekey `shepard1987science` could have the filename `@shepard1987science.md` or `@shepard1987science Toward a universal law of generalization for psychological science.md`).
+    - **A. filename** - Select `Custom File Filter` and define a RegExp with a single capturing group. 
+      - E.g. the default is `^@(\S+).*\.md$`, which looks for files beginning with `@` and uses the first word as the BetterBibTeX citekey.
 
-    - If your reading notes use a different filenaming convention, you can specify a RegEx pattern to match the files.
+    - **B. metadata** - Select `BetterBibTeX citekey - taken from YAML metadata` and specify a keyword from the notes' YAML frontmatter (here's an [example](#example-markdown-note)).
+      - For info on metadata syntax, see [YAML front matter](https://help.obsidian.md/Advanced+topics/YAML+front+matter).
 
-      - You can include a capturing group in this RegEx pattern to extract the BetterBibTeX citekey from the filename.
+    - **C. contents** - Select `BetterBibTeX citekey - captured with custom RegExp` and define a RegExp with a single capturing group to return exactly 1 match per file.
 
-  - Optionally, _MarkDB-Connect_ can extract the citekey from the metadata (aka front matter) of your markdown notes. To enable this, specify the metadata ID (`citekey` is a common value).
-
-    - This is necessary if the filenames do not contain the citekeys, or if citekeys in the filenames are incorrect, which can happen if citekeys include special characters. (E.g. if citekeys contain `:`, they will probably need to be taken from the yaml metadata rather than the filenames.)
-    - For info on metadata syntax, see [YAML front matter](https://help.obsidian.md/Advanced+topics/YAML+front+matter).
-
-- Run the synchronization function from `Tools -> MarkDBConnect Sync Tags`.
+- Run the synchronization function from `Tools -> MarkDB-Connect Sync Tags`.
 
   - This will add a tag (`ObsCite`) to every Zotero item for which there exists a reading note in the external folder you specified.
 
-- In the `Tags` plane of Zotero, right-click on the `ObsCite` tag and assign it a color, which will mark the tagged items in the preview plane of Zotero. (In the screenshot above, Zotero items associated with reading notes are marked with a blue tag.)
+- In the `Tags` plane of Zotero, right-click on the `ObsCite` tag and assign it a color, which will mark the tagged items in the preview plane of Zotero. (In the screenshot above, Zotero items associated with reading notes are marked with a 🟦 blue tag.)
+
+</details>
 
 ---
 
 ### Option 2: Using Zotero Item Keys
 
-_MarkDB-Connect_ can extract the Zotero-Item-Key that specifies which Zotero Item a markdown note corresponds to. The Zotero-Item-Key is taken from the markdown file contents using a custom RegEx pattern.
+_MarkDB-Connect_ can extract the Zotero-Item-Key that specifies which Zotero Item a markdown note corresponds to. The Zotero-Item-Key is taken from the markdown file contents using a custom RegExp pattern.
 
 Zotero automatically generates Item Keys, they take the form of `ABCD1234`, as in `zotero://select/library/items/ABCD1234`. NB this is not the same as the BetterBibTeX citekey you assigned an item (e.g. `mycitekey` in `zotero://select/items/@mycitekey`).
 
-- In `MarkDBConnect Preferences...` (under the `Tools` menu),
+<details>
+
+<summary>configuraton details</summary>
+
+- In Zotero's Settings, click the `MarkDB-Connect` preference pane.
 
   - Specify the location of the folder that contains your markdown reading notes (e.g. `/Users/me/Documents/ObsVault/ReadingNotes/`). The _MarkDB-Connect_ plugin will recursively search this path for markdown files.
 
     - The default behavior is to search for markdown files beginning with `@`.
 
-    - Alternatively, you can specify a RegEx pattern to match your reading note files.
+    - Alternatively, you can define a custom RegExp pattern to match your reading note files.
 
-  - Select the `Match notes based on Zotero-Item-Key` option.
+  - Select the `Match Markdown Files to Zotero Items Using:` `Zotero-Item-Key - captured with cutom RegExp` option.
 
-  - Specify a RegEx pattern to extract the Zotero-Item-Key from the markdown contents.
+  - Specify a RegExp pattern to extract the Zotero-Item-Key from the markdown contents.
 
     E.g. if your note has the line
 
     `- local:: [local zotero](zotero://select/library/items/GZ9DQ2AM)`
 
-    you could extract the Zotero key (`GZ9DQ2AM`) using this RegEx pattern:
+    you could extract the Zotero key (`GZ9DQ2AM`) using this RegExp pattern:
 
     `^- local::.+\/items\/(\w+)\)`
 
-- Run the synchronization function from `Tools -> MarkDBConnect Sync Tags`.
+- Run the synchronization function from `Tools -> MarkDB-Connect Sync Tags`.
 
   - This will add a tag (`ObsCite`) to every Zotero item for which there exists a reading note in the external folder you specified.
 
-- In the `Tags` plane of Zotero, right-click on the `ObsCite` tag and assign it a color, which will mark the tagged items in the preview plane of Zotero. (In the screenshot above, Zotero items associated with reading notes are marked with a blue tag.)
+- In the `Tags` plane of Zotero, right-click on the `ObsCite` tag and assign it a color, which will mark the tagged items in the preview plane of Zotero. (In the screenshot above, Zotero items associated with reading notes are marked with a 🟦 blue tag.)
+
+</details>
 
 ---
 
 ## Example Markdown Note
 
-In this example markdown note (`@saxe2017emobtom.md`), the _MarkDB-Connect_ will use the [yaml metadata](https://help.obsidian.md/Advanced+topics/YAML+front+matter) keyword `citekey` to find the BetterBibTeX citekey (`saxe2017emobtom`) that determines which Zotero item to associate with the markdown file. Notice that the markdown file can include other BetterBibTeX citekeys and Zotero-Item-Keys, which are ignored by the plugin.
+In this example markdown note (`@saxe2017emobtom.md`), _MarkDB-Connect_ will use the [YAML metadata](https://help.obsidian.md/Advanced+topics/YAML+front+matter) keyword `citekey` to find the BetterBibTeX citekey (`saxe2017emobtom`) that determines which Zotero item to associate with the markdown file. Notice that the markdown file can include other BetterBibTeX citekeys and Zotero-Item-Keys, which are ignored by the plugin.
 
 ```markdown
 ---
@@ -166,11 +178,9 @@ This one uses an Obsidian wiki link: [[@cusimano2018cogsci]]
 
 ## Notes
 
-
-
 [GitHub](https://github.com/daeh/zotero-markdb-connect): Source code repository
 
-Code for this extension is based on [zotero-plugin-template](https://github.com/windingwind/zotero-plugin-template)
+This extension uses the [zotero-plugin-template](https://github.com/windingwind/zotero-plugin-template).
 
 ## License
 
@@ -178,4 +188,4 @@ Distributed under the MIT License.
 
 ## Author
 
-[![Personal Website](https://img.shields.io/badge/personal%20website-daeh.info-orange?style=for-the-badge)](https://daeh.info) [![Mastodon](https://img.shields.io/badge/bsky-@dae.bsky.social-skyblue?style=for-the-badge&logo=mastodon)](https://bsky.app/profile/dae.bsky.social) [![Twitter](https://img.shields.io/badge/twitter-@DaeHoulihan-blue?style=for-the-badge&logo=twitter)](https://twitter.com/DaeHoulihan)
+[![Personal Website](https://img.shields.io/badge/personal%20website-daeh.info-orange?style=for-the-badge)](https://daeh.info) [![Blue Sky](https://img.shields.io/badge/bsky-@dae.bsky.social-skyblue?style=for-the-badge&logo=mastodon)](https://bsky.app/profile/dae.bsky.social) [![Twitter](https://img.shields.io/badge/twitter-@DaeHoulihan-blue?style=for-the-badge&logo=twitter)](https://twitter.com/DaeHoulihan)
