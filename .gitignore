@@ -10,6 +10,12 @@ node_modules
 dist/
 build/
 
+### Editor directories and files ###
+# .vscode/*
+# !.vscode/extensions.json
+# .idea/
+.idea/workspace.xml
+
 ### Project ###
 eslint.config.js
 zotero-cmd.json

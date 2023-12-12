@@ -188,7 +188,7 @@ const config = [
     },
   },
   {
-    ignores: ['**/build/**', '**/scripts/**', '**/*.js', '**/*.bak'],
+    ignores: ['build', 'scripts', '**/*.js', '**/*.bak'],
   },
 ]
 

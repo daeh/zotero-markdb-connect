@@ -204,7 +204,7 @@ async function onPrefsEvent(type: string, data: Record<string, any>) {
       syncMarkDBSaveDebug()
       break
     default:
-      return
+      break
   }
 }
 

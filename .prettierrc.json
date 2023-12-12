@@ -47,7 +47,6 @@
       "files": ["*.code-workspace", ".vscode/*.json"],
       "options": {
         "parser": "json5",
-        "useTabs": true,
         "quoteProps": "preserve",
         "trailingComma": "none",
         "singleQuote": false,

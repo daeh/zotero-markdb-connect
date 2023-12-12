@@ -2,7 +2,16 @@ declare type DebugMode = 'minimal' | 'maximal'
 
 declare type LogType = 'error' | 'warn' | 'info' | 'debug' | 'trace' | 'config'
 
-declare type NotificationType = 'addon' | 'success' | 'error' | 'warn' | 'info' | 'debug' | 'config' | 'itemsadded'
+declare type NotificationType =
+  | 'addon'
+  | 'success'
+  | 'error'
+  | 'warn'
+  | 'info'
+  | 'debug'
+  | 'config'
+  | 'itemsadded'
+  | 'itemsremoved'
 
 declare type ZoteroIconFile = `${keyof typeof globalThis._ZoteroTypes.IconFile}`
 declare type ZoteroIconURI = globalThis._ZoteroTypes.IconURI

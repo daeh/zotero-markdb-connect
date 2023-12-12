@@ -9,29 +9,18 @@
     "addonInstance": "MDBC",
     "prefsPrefix": "extensions.zotero.mdbc",
     "releasePage": "https://github.com/daeh/zotero-markdb-connect/releases",
-    "updateJSON": "https://github.com/daeh/zotero-markdb-connect/main/update.json",
-    "updateBetaJSON": "https://github.com/daeh/zotero-markdb-connect/main/update-beta.json"
+    "updateJSON": "https://raw.githubusercontent.com/daeh/zotero-markdb-connect/main/update.json"
   },
   "main": "src/index.ts",
   "scripts": {
-    "build-dev": "cross-env NODE_ENV=development node scripts/build.mjs",
-    "build-prod": "export ESLINT_USE_FLAT_CONFIG=true && export NODE_ENV=production && prettier --write . && eslint --config eslint.config.mjs --fix . && tsc --project tsconfig.prod.json --noEmit && cross-env NODE_ENV=production node scripts/build.mjs",
-    "build": "concurrently -c auto npm:build-prod npm:tsc",
-    "tsc": "tsc --noEmit",
-    "start": "node scripts/start.mjs",
-    "start-watch": "npm run build-dev && concurrently -c auto npm:start npm:watch",
+    "start": "node scripts/server.mjs",
+    "build": "tsc --noEmit && node scripts/build.mjs production",
     "stop": "node scripts/stop.mjs",
-    "restart-dev": "npm run build-dev && npm run stop && npm run start",
-    "restart-prod": "npm run build-prod && npm run stop && npm run start",
-    "restart": "npm run restart-dev",
-    "reload": "npm run build-dev && node scripts/reload.mjs",
-    "watch": "chokidar \"src/**\" \"addon/**\" -c \"npm run reload\"",
-    "release": "release-it",
     "lint": "export ESLINT_USE_FLAT_CONFIG=true && export NODE_ENV=production && prettier --write . && eslint --config eslint.config.mjs --fix .",
     "lint-dry": "export ESLINT_USE_FLAT_CONFIG=true && export NODE_ENV=production && prettier --check . ; eslint --config eslint.config.mjs .",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "update-deps": "npm update --save && npm update --save-dev",
-    "rebuild-start": "npm run build-dev && npm run start",
+    "release": "release-it",
+    "update-deps": "npm update --save && npm update --save-dev && npm outdated --depth=0",
     "postinstall": "node ./scripts/linkconfig.mjs"
   },
   "repository": {
@@ -45,7 +34,7 @@
   },
   "homepage": "https://github.com/daeh/zotero-markdb-connect#readme",
   "dependencies": {
-    "zotero-plugin-toolkit": "^2.3.11"
+    "zotero-plugin-toolkit": "^2.3.12"
   },
   "devDependencies": {
     "@stylistic/eslint-plugin": "^1.5.1",
@@ -54,10 +43,8 @@
     "@types/node": "^20.10.4",
     "@typescript-eslint/eslint-plugin": "^6.14.0",
     "@typescript-eslint/parser": "^6.14.0",
-    "chokidar-cli": "^3.0.0",
+    "chokidar": "^3.5.3",
     "compressing": "^1.10.0",
-    "concurrently": "^8.2.2",
-    "cross-env": "^7.0.3",
     "esbuild": "^0.19.9",
     "eslint": "^8.55.0",
     "eslint-config-prettier": "^9.1.0",
@@ -70,5 +57,24 @@
     "replace-in-file": "^7.0.2",
     "typescript": "^5.3.3",
     "zotero-types": "^1.3.7"
+  },
+  "release-it": {
+    "git": {
+      "tagName": "v${version}"
+    },
+    "npm": {
+      "publish": false
+    },
+    "github": {
+      "release": true,
+      "assets": [
+        "build/*.xpi"
+      ]
+    },
+    "hooks": {
+      "before:init": "npm run lint",
+      "after:bump": "npm run build",
+      "after:release": "echo Successfully released ${name} v${version} to ${repo.repository}."
+    }
   }
 }

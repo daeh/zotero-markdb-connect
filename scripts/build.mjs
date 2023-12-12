@@ -1,94 +1,51 @@
-import { build } from 'esbuild'
+import details from '../package.json' assert { type: 'json' }
+import { Logger, clearFolder, copyFileSync, copyFolderRecursiveSync, dateFormat } from './utils.mjs'
 import { zip } from 'compressing'
+import { build } from 'esbuild'
+import { existsSync, readdirSync, renameSync } from 'fs'
 import path from 'path'
-import { existsSync, lstatSync, writeFileSync, readFileSync, mkdirSync, readdirSync, rmSync, renameSync } from 'fs'
 import { env, exit } from 'process'
 import replaceInFile from 'replace-in-file'
+
 const { replaceInFileSync } = replaceInFile
-import details from '../package.json' assert { type: 'json' }
 
-const { name, author, description, homepage, version, config } = details
+process.env.NODE_ENV = process.argv[2] === 'production' ? 'production' : 'development'
 
-const t = new Date()
-const buildTime = dateFormat('YYYY-mm-dd HH:MM:SS', new Date())
 const buildDir = 'build'
 
+const { name, author, description, homepage, version, config } = details
 const isPreRelease = version.includes('-')
 
-const filename = `${name}-${version}.xpi`
+function replaceString(buildTime) {
+  const replaceFrom = [/__author__/g, /__description__/g, /__homepage__/g, /__buildVersion__/g, /__buildTime__/g]
+  const replaceTo = [author, description, homepage, version, buildTime]
 
-// If it is a pre-release, use update-beta.json
-config.updateURL = isPreRelease ? config.updateBetaJSON : config.updateJSON
+  config.updateURL = isPreRelease ? config.updateJSON.replace('update.json', 'update-beta.json') : config.updateJSON
 
-const updateJSONFile = isPreRelease ? 'update-beta.json' : 'update.json'
-const updateLink = isPreRelease
-  ? `${config.releasePage}/download/v${version}/${filename}`
-  : `${config.releasePage}/latest/download/${filename}`
+  replaceFrom.push(...Object.keys(config).map((k) => new RegExp(`__${k}__`, 'g')))
+  replaceTo.push(...Object.values(config))
 
-function copyFileSync(source, target) {
-  var targetFile = target
+  const replaceResult = replaceInFileSync({
+    files: [
+      `${buildDir}/addon/**/*.xhtml`,
+      `${buildDir}/addon/**/*.json`,
+      `${buildDir}/addon/prefs.js`,
+      `${buildDir}/addon/manifest.json`,
+      `${buildDir}/addon/bootstrap.js`,
+    ],
+    from: replaceFrom,
+    to: replaceTo,
+    countMatches: true,
+  })
 
-  // If target is a directory, a new file with the same name will be created
-  if (existsSync(target)) {
-    if (lstatSync(target).isDirectory()) {
-      targetFile = path.join(target, path.basename(source))
-    }
-  }
-
-  writeFileSync(targetFile, readFileSync(source))
+  // Logger.debug(
+  //     "[Build] Run replace in ",
+  //     replaceResult.filter((f) => f.hasChanged).map((f) => `${f.file} : ${f.numReplacements} / ${f.numMatches}`),
+  // );
 }
 
-function copyFolderRecursiveSync(source, target) {
-  var files = []
-
-  // Check if folder needs to be created or integrated
-  var targetFolder = path.join(target, path.basename(source))
-  if (!existsSync(targetFolder)) {
-    mkdirSync(targetFolder)
-  }
-
-  // Copy
-  if (lstatSync(source).isDirectory()) {
-    files = readdirSync(source)
-    files.forEach(function (file) {
-      var curSource = path.join(source, file)
-      if (lstatSync(curSource).isDirectory()) {
-        copyFolderRecursiveSync(curSource, targetFolder)
-      } else {
-        copyFileSync(curSource, targetFolder)
-      }
-    })
-  }
-}
-
-function clearFolder(target) {
-  if (existsSync(target)) {
-    rmSync(target, { recursive: true, force: true })
-  }
-
-  mkdirSync(target, { recursive: true })
-}
-
-function dateFormat(fmt, date) {
-  let ret
-  const opt = {
-    'Y+': date.getFullYear().toString(),
-    'm+': (date.getMonth() + 1).toString(),
-    'd+': date.getDate().toString(),
-    'H+': date.getHours().toString(),
-    'M+': date.getMinutes().toString(),
-    'S+': date.getSeconds().toString(),
-  }
-  for (let k in opt) {
-    ret = new RegExp('(' + k + ')').exec(fmt)
-    if (ret) {
-      fmt = fmt.replace(ret[1], ret[1].length == 1 ? opt[k] : opt[k].padStart(ret[1].length, '0'))
-    }
-  }
-  return fmt
-}
-
-function renameLocaleFiles() {
+function prepareLocaleFiles() {
+  // Walk the builds/addon/locale folder's sub folders and rename *.ftl to addonRef-*.ftl
   const localeDir = path.join(buildDir, 'addon/locale')
   const localeFolders = readdirSync(localeDir, { withFileTypes: true })
     .filter((dirent) => dirent.isDirectory())
@@ -111,39 +68,6 @@ function renameLocaleFiles() {
       }
     }
   }
-}
-
-function replaceString() {
-  const replaceFrom = [
-    /__author__/g,
-    /__description__/g,
-    /__homepage__/g,
-    /__buildVersion__/g,
-    /__buildTime__/g,
-    /__updateLink__/g,
-  ]
-  const replaceTo = [author, description, homepage, version, buildTime, updateLink]
-
-  replaceFrom.push(...Object.keys(config).map((k) => new RegExp(`__${k}__`, 'g')))
-  replaceTo.push(...Object.values(config))
-
-  const optionsAddon = {
-    files: [
-      `${buildDir}/addon/**/*.xhtml`,
-      `${buildDir}/addon/**/*.html`,
-      `${buildDir}/addon/**/*.json`,
-      `${buildDir}/addon/prefs.js`,
-      `${buildDir}/addon/manifest.json`,
-      `${buildDir}/addon/bootstrap.js`,
-    ],
-    from: replaceFrom,
-    to: replaceTo,
-    countMatches: true,
-  }
-
-  optionsAddon.files.push(updateJSONFile)
-
-  const replaceResult = replaceInFileSync(optionsAddon)
 
   const localeMessage = new Set()
   const localeMessageMiss = new Set()
@@ -181,66 +105,92 @@ function replaceString() {
     },
   })
 
-  console.log(
-    '[Build] Run replace in ',
-    replaceResult.filter((f) => f.hasChanged).map((f) => `${f.file} : ${f.numReplacements} / ${f.numMatches}`),
-    replaceResultFlt.filter((f) => f.hasChanged).map((f) => `${f.file} : OK`),
-    replaceResultXhtml.filter((f) => f.hasChanged).map((f) => `${f.file} : OK`),
+  Logger.debug(
+    '[Build] Prepare locale files OK',
+    // replaceResultFlt.filter((f) => f.hasChanged).map((f) => `${f.file} : OK`),
+    // replaceResultXhtml.filter((f) => f.hasChanged).map((f) => `${f.file} : OK`),
   )
 
   if (localeMessageMiss.size !== 0) {
-    console.warn(
-      `[Build] [Warn] Fluent message [${new Array(...localeMessageMiss)}] do not exist in addon's locale files.`,
-    )
+    Logger.warn(`[Build] Fluent message [${new Array(...localeMessageMiss)}] do not exsit in addon's locale files.`)
   }
 }
 
-async function esbuild() {
-  await build({
-    entryPoints: ['src/index.ts'],
-    define: {
-      __env__: `"${env.NODE_ENV}"`,
-    },
-    bundle: true,
-    target: 'firefox102',
-    tsconfig: env.NODE_ENV === 'production' ? 'tsconfig.prod.json' : 'tsconfig.dev.json',
-    outfile: path.join(buildDir, `addon/chrome/content/scripts/${config.addonRef}.js`),
-    // Don't turn minify on
-    // minify: true,
-  }).catch(() => exit(1))
+function prepareUpdateJson() {
+  // If it is a pre-release, use update-beta.json
+  if (!isPreRelease) {
+    copyFileSync('scripts/update-template.json', 'update.json')
+  }
+  if (existsSync('update-beta.json') || isPreRelease) {
+    copyFileSync('scripts/update-template.json', 'update-beta.json')
+  }
+
+  const updateLink =
+    config.updateLink ?? isPreRelease
+      ? `${config.releasePage}/download/v${version}/${name}.xpi`
+      : `${config.releasePage}/latest/download/${name}.xpi`
+
+  const replaceResult = replaceInFileSync({
+    files: ['update-beta.json', isPreRelease ? 'pass' : 'update.json', `${buildDir}/addon/manifest.json`],
+    from: [/__addonID__/g, /__buildVersion__/g, /__updateLink__/g, /__updateURL__/g],
+    to: [config.addonID, version, updateLink, config.updateURL],
+    countMatches: true,
+  })
+
+  Logger.debug(
+    `[Build] Prepare Update.json for ${
+      isPreRelease ? '\u001b[31m Prerelease \u001b[0m' : '\u001b[32m Release \u001b[0m'
+    }`,
+    replaceResult.filter((f) => f.hasChanged).map((f) => `${f.file} : ${f.numReplacements} / ${f.numMatches}`),
+  )
 }
 
-async function main() {
-  console.log(`[Build] BUILD_DIR=${buildDir}, VERSION=${version}, BUILD_TIME=${buildTime}, ENV=${[env.NODE_ENV]}`)
+export const esbuildOptions = {
+  entryPoints: ['src/index.ts'],
+  define: {
+    __env__: `"${env.NODE_ENV}"`,
+  },
+  bundle: true,
+  target: 'firefox102',
+  outfile: path.join(buildDir, `addon/chrome/content/scripts/${config.addonRef}.js`),
+  // Don't turn minify on
+  minify: env.NODE_ENV === 'production',
+}
+
+export async function main() {
+  const t = new Date()
+  const buildTime = dateFormat('YYYY-mm-dd HH:MM:SS', new Date())
+
+  Logger.info(`[Build] BUILD_DIR=${buildDir}, VERSION=${version}, BUILD_TIME=${buildTime}, ENV=${[env.NODE_ENV]}`)
 
   clearFolder(buildDir)
 
   copyFolderRecursiveSync('addon', buildDir)
+  replaceString(buildTime)
+  Logger.debug('[Build] Replace OK')
 
-  copyFileSync('update-template.json', updateJSONFile)
+  prepareLocaleFiles()
 
-  await esbuild()
+  await build(esbuildOptions)
+  Logger.debug('[Build] Run esbuild OK')
 
-  console.log('[Build] Run esbuild OK')
+  Logger.debug('[Build] Addon prepare OK')
 
-  replaceString()
+  if (process.env.NODE_ENV === 'production') {
+    await zip.compressDir(path.join(buildDir, 'addon'), path.join(buildDir, `${name}.xpi`), {
+      ignoreBase: true,
+    })
+    Logger.debug('[Build] Addon pack OK')
 
-  console.log('[Build] Replace OK')
+    prepareUpdateJson()
 
-  // Walk the builds/addon/locale folder's sub folders and rename *.ftl to addonRef-*.ftl
-  renameLocaleFiles()
-
-  console.log('[Build] Addon prepare OK')
-
-  await zip.compressDir(path.join(buildDir, 'addon'), path.join(buildDir, `${filename}`), {
-    ignoreBase: true,
-  })
-
-  console.log('[Build] Addon pack OK')
-  console.log(`[Build] Finished in ${(new Date().getTime() - t.getTime()) / 1000} s.`)
+    Logger.debug(`[Build] Finished in ${(new Date().getTime() - t.getTime()) / 1000} s.`)
+  }
 }
 
-main().catch((err) => {
-  console.log(err)
-  exit(1)
-})
+if (process.env.NODE_ENV === 'production') {
+  main().catch((err) => {
+    Logger.error(err)
+    exit(1)
+  })
+}

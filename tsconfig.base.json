@@ -2,11 +2,11 @@
   "compilerOptions": {
     "module": "commonjs",
     "moduleResolution": "node",
-    "target": "es2017",
+    "target": "ES2017",
     "lib": [
-      "es2017",
-      "dom",
-      // "dom.iterable",
+      "ES2017",
+      "DOM",
+      "DOM.Iterable",
       "ES2021.WeakRef"
       // "webworker",
     ],
@@ -14,10 +14,17 @@
     // "esModuleInterop": true,
     ////
     "noEmit": true,
-    "resolveJsonModule": true,
-    "strict": true,
     "skipLibCheck": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "resolveJsonModule": true,
+    // "allowImportingTsExtensions": true,
+    // "allowSyntheticDefaultImports": false,
+    // "esModuleInterop": false,
+    // "isolatedModules": true, // for bundlers like vite. Setting the isolatedModules flag tells TypeScript to warn you if you write certain code that can’t be correctly interpreted by a single-file transpilation process.
+
+    /* Linting */
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true
   },
   "include": [
     "src",

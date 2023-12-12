@@ -52,16 +52,25 @@ declare type _param_removetags = (typeof _paramVals_removetags)[number]
 
 const _paramVals_DebugMode = ['minimal' as DebugMode, 'maximal' as DebugMode] as const
 
+const favIcon = [
+  `chrome://${config.addonRef}/content/icons/favicon.png`,
+  'chrome://zotero/skin/toolbar-item-add@2x.png',
+] as const
+declare type AddonIconURI = (typeof favIcon)[number]
+declare type IconURI = AddonIconURI | ZoteroIconURI
+
 export class Notifier {
-  static readonly notificationTypes: Record<NotificationType, ZoteroIconURI> = {
-    addon: 'chrome://zotero/skin/cog@2x.png',
+  static readonly notificationTypes: Record<NotificationType, IconURI> = {
+    addon: `chrome://${config.addonRef}/content/icons/favicon.png`,
     success: 'chrome://zotero/skin/tick@2x.png',
     error: 'chrome://zotero/skin/error@2x.png', //'cross@2x.png',
     warn: 'chrome://zotero/skin/warning@2x.png',
     info: 'chrome://zotero/skin/prefs-advanced.png',
     debug: 'chrome://zotero/skin/treeitem-patent@2x.png',
     config: 'chrome://zotero/skin/prefs-general.png',
-    itemsadded: 'chrome://zotero/skin/toolbar-item-add@2x',
+    itemsadded: 'chrome://zotero/skin/toolbar-item-add@2x.png',
+    itemsremoved: 'chrome://zotero/skin/minus@2x.png',
+    // xmark@2x.png
   }
 
   static notify(data: notificationData): void {
@@ -1316,25 +1325,27 @@ export class ScanMarkdownFiles {
     /// TODO set color :: https://github.com/zotero/zotero/blob/52932b6eb03f72b5fb5591ba52d8e0f4c2ef825f/chrome/content/zotero/tagColorChooser.js
 
     const messageArray: notificationData['messageArray'] = [
-      { body: `Found ${items_withnotes.length} notes.`, type: zotids.length > 0 ? 'success' : 'warn' },
+      { body: `Found ${items_withnotes.length} notes.`, type: nitems_notlocatable === 0 ? 'success' : 'info' },
     ]
 
     if (nitems_notlocatable !== 0) {
       messageArray.push({
         body: ` ${nitems_notlocatable} IDs could not be matched to items in the library.`,
-        type: zotids.length > 0 ? 'success' : 'warn',
+        type: 'warn',
       })
     }
+
     if (items_totag.length > 0) {
       messageArray.push({
         body: ` Added ${items_totag.length} tags.`,
-        type: zotids.length > 0 ? 'itemsadded' : 'info',
+        type: 'itemsadded',
       })
     }
+
     if (items_removetag.length > 0) {
       messageArray.push({
         body: ` Removed ${items_removetag.length} tags.`,
-        type: zotids.length > 0 ? 'success' : 'warn',
+        type: 'itemsremoved',
       })
     }
 
@@ -1343,7 +1354,6 @@ export class ScanMarkdownFiles {
 
   @trace
   static async runSync(displayReport = false, saveLogs = false) {
-    /// TODO better error notification handling. Collect errors and show them at the end.
     /// TODO validate settings on preference window close.
 
     let dryrun = false
@@ -1406,7 +1416,11 @@ export class ScanMarkdownFiles {
     if (!dryrun) {
       messageArray = await this.updateItems(DataManager.zotIds())
     } else {
-      messageArray = [{ body: `Found ${DataManager.numberRecords()} notes.`, type: 'error' }]
+      if (DataManager.numberRecords() === 0) {
+        messageArray = [{ body: `Found ${DataManager.numberRecords()} notes. Check your settings.`, type: 'error' }]
+      } else {
+        messageArray = [{ body: `Found ${DataManager.numberRecords()} notes.`, type: 'info' }]
+      }
     }
     const header = 'Synced'
 
