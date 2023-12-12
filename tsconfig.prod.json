@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "sourceMap": false,
+    "removeComments": true,
+    ////
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitAny": true,
+    ////
+    "alwaysStrict": true,
+    "strictNullChecks": true,
+    "exactOptionalPropertyTypes": true
+  }
+}

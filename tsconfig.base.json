@@ -1,0 +1,41 @@
+{
+  "compilerOptions": {
+    // "module": "commonjs",
+    // "moduleResolution": "node",
+    // "target": "es2017",
+    "module": "ESNext",
+    "target": "ES2017",
+    "moduleResolution": "bundler",
+    "lib": [
+      "es2017",
+      "dom",
+      // "dom.iterable",
+      "ES2021.WeakRef"
+      // "webworker",
+    ],
+    // "isolatedModules": true,
+    // "esModuleInterop": true,
+    ////
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "experimentalDecorators": true,
+    "types": ["zotero-types"],
+
+    /* Bundler Mode */
+    "allowImportingTsExtensions": true,
+    // "isolatedModules": true, // for bundlers like vite. Setting the isolatedModules flag tells TypeScript to warn you if you write certain code that can’t be correctly interpreted by a single-file transpilation process.
+    // "allowSyntheticDefaultImports": false,
+
+    /* Linting */
+    //"strict": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* Enable JavaScript Compilation */
+    "allowJs": true,
+    "checkJs": true
+  },
+  "include": ["**/*.ts", "**/*.mts", "**/*.cts", "**/*.tsx", "**/*.mtsx", "**/*.js", "**/*.mjs", "**/*.cjs", "**/*.jsx", "**/*.mjsx"],
+  "exclude": ["dist", "build"]
+}

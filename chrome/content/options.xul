@@ -38,6 +38,10 @@
       <tabpanels id="mdbconnect-tabpanels">
         <tabpanel orient="vertical">
 
+          <groupbox style="text-align: center; font-size: 14px; font-weight: 700;">
+            <description style="text-align: center; font-size: 14px; font-weight: 700;">&mdbconnect.preferences.zot7-announcement;</description>
+            <button label="Open GitHub to upgrade" oncommand="Zotero.launchURL('https://github.com/daeh/zotero-markdb-connect');" style="text-align: center; font-size: 12px;" />
+          </groupbox>
 
           <groupbox>
             <caption label="&mdbconnect.preferences.locate-mdfiles;"/>

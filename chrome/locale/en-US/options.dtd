@@ -5,6 +5,8 @@
 <!ENTITY launching-settings "Launching MD Files">
 <!ENTITY advanced-settings "Advanced">
 
+<!ENTITY mdbconnect.preferences.zot7-announcement "MarkDB-Connect now Zotero 7 Compatible">
+
 <!ENTITY mdbconnect.preferences.locate-mdfiles "Location of Markdown Reading Notes">
 <!ENTITY mdbconnect.preferences.locate-mdfiles-desc "Specify how MarkDBConnect should find the markdown files">
 

@@ -1,9 +1,9 @@
 #!/bin/sh
 
-version='0.0.25'
+version='0.0.26'
 
-rm -f MarkDBConnect-${version}.xpi
-zip -r MarkDBConnect-${version}.xpi chrome/* defaults/* chrome.manifest install.rdf -x "*.DS_Store"
+rm -f markdb-connect-${version}.xpi
+zip -r markdb-connect-${version}.xpi chrome/* defaults/* chrome.manifest install.rdf -x "*.DS_Store"
 
 # To release a new version:
 # - increase version number in all files (not just here)

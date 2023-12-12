@@ -1,17 +1,17 @@
 {
-    "esversion": 9,
-    "undef": true,
-    "unused": false,
-    "globals": {
-      "require": false,
-      "setTimeout": false,
-      "window": false,
-      "OS": false,
-      "Zotero": true,
-      "Components": false,
-      "FileUtils": false,
-      "ZoteroPane": false,
-      "AddonManager": false,
-      "Services": false
-    }
+  "esversion": 9,
+  "undef": true,
+  "unused": false,
+  "globals": {
+    "require": false,
+    "setTimeout": false,
+    "window": false,
+    "OS": false,
+    "Zotero": true,
+    "Components": false,
+    "FileUtils": false,
+    "ZoteroPane": false,
+    "AddonManager": false,
+    "Services": false
   }
+}

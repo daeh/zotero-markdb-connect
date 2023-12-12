@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
         xmlns:em="http://www.mozilla.org/2004/em-rdf#">
-    <rdf:Description about="urn:mozilla:extension:daeda@mit.edu">
+    <rdf:Description about="urn:mozilla:extension:dev@daeh.info">
         <em:updates>
             <rdf:Seq>
                 <rdf:li>
                     <rdf:Description>
-                        <em:version>0.0.25</em:version>
+                        <em:version>0.0.26</em:version>
                         <em:targetApplication>
                             <rdf:Description>
                                 <em:id>zotero@chnm.gmu.edu</em:id>
                                 <em:minVersion>5.0.0</em:minVersion>
                                 <em:maxVersion>6.0.*</em:maxVersion>
-                                <em:updateLink>https://github.com/daeh/zotero-markdb-connect/releases/download/v0.0.25/MarkDBConnect-0.0.25.xpi</em:updateLink>
+                                <em:updateLink>https://github.com/daeh/zotero-markdb-connect/releases/download/v0.0.26/markdb-connect-0.0.26.xpi</em:updateLink>
                             </rdf:Description>
                         </em:targetApplication> 
 
