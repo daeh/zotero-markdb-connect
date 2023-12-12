@@ -9,6 +9,7 @@
 node_modules
 dist/
 build/
+logs/
 
 ### Editor directories and files ###
 # .vscode/*
