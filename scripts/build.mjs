@@ -16,6 +16,8 @@ const buildDir = 'build'
 const { name, author, description, homepage, version, config } = details
 const isPreRelease = version.includes('-')
 
+const filename = `${name}-${version}.xpi`
+
 function replaceString(buildTime) {
   const replaceFrom = [/__author__/g, /__description__/g, /__homepage__/g, /__buildVersion__/g, /__buildTime__/g]
   const replaceTo = [author, description, homepage, version, buildTime]
@@ -127,8 +129,8 @@ function prepareUpdateJson() {
 
   const updateLink =
     config.updateLink ?? isPreRelease
-      ? `${config.releasePage}/download/v${version}/${name}.xpi`
-      : `${config.releasePage}/latest/download/${name}.xpi`
+      ? `${config.releasePage}/download/v${version}/${filename}`
+      : `${config.releasePage}/latest/download/${filename}`
 
   const replaceResult = replaceInFileSync({
     files: ['update-beta.json', isPreRelease ? 'pass' : 'update.json', `${buildDir}/addon/manifest.json`],
@@ -177,7 +179,7 @@ export async function main() {
   Logger.debug('[Build] Addon prepare OK')
 
   if (process.env.NODE_ENV === 'production') {
-    await zip.compressDir(path.join(buildDir, 'addon'), path.join(buildDir, `${name}.xpi`), {
+    await zip.compressDir(path.join(buildDir, 'addon'), path.join(buildDir, `${filename}`), {
       ignoreBase: true,
     })
     Logger.debug('[Build] Addon pack OK')
