@@ -19,7 +19,7 @@
     "lint": "export ESLINT_USE_FLAT_CONFIG=true && export NODE_ENV=production && prettier --write . && eslint --config eslint.config.mjs --fix .",
     "lint-dry": "export ESLINT_USE_FLAT_CONFIG=true && export NODE_ENV=production && prettier --check . ; eslint --config eslint.config.mjs .",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "release": "release-it",
+    "release": "DEBUG=release-it:* release-it",
     "update-deps": "npm update --save && npm update --save-dev && npm outdated --depth=0",
     "postinstall": "node ./scripts/linkconfig.mjs"
   },
