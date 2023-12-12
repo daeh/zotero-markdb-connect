@@ -6,7 +6,7 @@
       "orcid": "0000-0001-5003-9278"
     }
   ],
-  "keywords": ["Zotero", "plugin", "zotero obsidian citations"],
+  "keywords": ["Zotero", "plugin", "Markdown", "MarkDB-Connect", "Obsidian", "logseq"],
   "license": "MIT License",
   "upload_type": "software"
 }

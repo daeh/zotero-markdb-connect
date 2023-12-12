@@ -18,7 +18,15 @@ const allTsExtensionsArray = ['ts', 'mts', 'cts', 'tsx', 'mtsx']
 const allJsExtensionsArray = ['js', 'mjs', 'cjs', 'jsx', 'mjsx']
 const allTsExtensions = allTsExtensionsArray.join(',')
 const allJsExtensions = allJsExtensionsArray.join(',')
+// @ts-expect-error - ignore this local variable
 const allExtensions = [...allTsExtensionsArray, ...allJsExtensionsArray].join(',')
+
+const env = (() => {
+  if (typeof process.env.NODE_ENV === 'undefined') return 'base'
+  if (process.env.NODE_ENV === 'development') return 'development'
+  if (process.env.NODE_ENV === 'production') return 'production'
+  return 'error'
+})()
 
 const importRules = {
   'import/no-unresolved': 'error',
@@ -111,7 +119,7 @@ const config = [
       parserOptions: {
         ecmaVersion: 'latest', // 2024 sets the ecmaVersion parser option to 15
         tsconfigRootDir: resolve(projectDirname),
-        project: './tsconfig.json',
+        project: env === 'production' ? './tsconfig.prod.json' : './tsconfig.json',
       },
     },
   },
