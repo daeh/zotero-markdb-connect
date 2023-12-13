@@ -3,7 +3,7 @@
      xmlns:em="http://www.mozilla.org/2004/em-rdf#">
 
   <Description about="urn:mozilla:install-manifest">
-    <em:id>dev@daeh.info</em:id>
+    <em:id>daeda@mit.edu</em:id>
     <em:name>MarkDB-Connect</em:name>
     <em:version>0.0.26</em:version>
     <em:type>2</em:type>

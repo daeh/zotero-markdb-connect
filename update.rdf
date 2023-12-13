@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
         xmlns:em="http://www.mozilla.org/2004/em-rdf#">
-    <rdf:Description about="urn:mozilla:extension:dev@daeh.info">
+    <rdf:Description about="urn:mozilla:extension:daeda@mit.edu">
         <em:updates>
             <rdf:Seq>
                 <rdf:li>
