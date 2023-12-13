@@ -10,8 +10,8 @@ import {
   ScanMarkdownFiles,
   systemInterface,
   UIHelpers,
-  wrappers,
 } from './modules/mdbcScan'
+import { wrappers } from './modules/mdbcStartupHelpers'
 import { unpatch as $unpatch$ } from './modules/monkey-patch'
 import { registerPrefsScripts } from './modules/preferenceScript'
 import { getString, initLocale } from './utils/locale'

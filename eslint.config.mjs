@@ -14,19 +14,19 @@ import globals from 'globals'
 
 const projectDirname = dirname(fileURLToPath(import.meta.url))
 
-const allTsExtensionsArray = ['ts', 'mts', 'cts', 'tsx', 'mtsx']
-const allJsExtensionsArray = ['js', 'mjs', 'cjs', 'jsx', 'mjsx']
-const allTsExtensions = allTsExtensionsArray.join(',')
-const allJsExtensions = allJsExtensionsArray.join(',')
-// @ts-expect-error - ignore this local variable
-const allExtensions = [...allTsExtensionsArray, ...allJsExtensionsArray].join(',')
-
 const env = (() => {
   if (typeof process.env.NODE_ENV === 'undefined') return 'base'
   if (process.env.NODE_ENV === 'development') return 'development'
   if (process.env.NODE_ENV === 'production') return 'production'
   return 'error'
 })()
+
+const allTsExtensionsArray = ['ts', 'mts', 'cts', 'tsx', 'mtsx']
+const allJsExtensionsArray = ['js', 'mjs', 'cjs', 'jsx', 'mjsx']
+const allTsExtensions = allTsExtensionsArray.join(',')
+const allJsExtensions = allJsExtensionsArray.join(',')
+// @ts-expect-error - ignore this local variable
+const allExtensions = [...allTsExtensionsArray, ...allJsExtensionsArray].join(',')
 
 const importRules = {
   'import/no-unresolved': 'error',
@@ -76,7 +76,20 @@ const baseRules = {
   // '@stylistic/multiline-ternary': ['warn', 'always'],
 }
 
-const typescriptRules = {}
+const typescriptRules = {
+  ...prettierConfig.rules,
+  ...pluginImportConfig.rules,
+  ...typescriptEslintPlugin.configs.recommended.rules,
+  ...typescriptEslintPlugin.configs['recommended-type-checked'].rules,
+  //
+  // ...typescriptEslintPlugin.configs.strict.rules,
+  // ...typescriptEslintPlugin.configs['strict-type-checked'].rules,
+  //
+  ...typescriptEslintPlugin.configs['stylistic-type-checked'].rules,
+  ...typescriptStylisticPlugin.configs['disable-legacy'].rules,
+  ...importRules,
+  ...baseRules,
+}
 
 const javascriptRules = {}
 
@@ -114,12 +127,12 @@ const config = [
     /* setup parser for all files */
     files: [`**/*.{${allTsExtensions}}`],
     languageOptions: {
-      sourceType: 'module',
       parser: typescriptEslintParser,
       parserOptions: {
         ecmaVersion: 'latest', // 2024 sets the ecmaVersion parser option to 15
         tsconfigRootDir: resolve(projectDirname),
         project: env === 'production' ? './tsconfig.prod.json' : './tsconfig.json',
+        sourceType: 'module',
       },
     },
   },
@@ -141,19 +154,20 @@ const config = [
       'prettier': prettierPlugin,
     },
     rules: {
-      ...prettierConfig.rules,
-      ...pluginImportConfig.rules,
-      ...typescriptEslintPlugin.configs.recommended.rules,
-      ...typescriptEslintPlugin.configs['recommended-type-checked'].rules,
-      //
-      // ...typescriptEslintPlugin.configs.strict.rules,
-      // ...typescriptEslintPlugin.configs['strict-type-checked'].rules,
-      //
-      ...typescriptEslintPlugin.configs['stylistic-type-checked'].rules,
-      ...typescriptStylisticPlugin.configs['disable-legacy'].rules,
-      ...importRules,
-      ...baseRules,
       ...typescriptRules,
+    },
+  },
+  {
+    /* +strict for typescript files NOT in ./src/ folder */
+    files: [`**/*.{${allTsExtensions}}`],
+    ignores: [`src/**/*.{${allTsExtensions}}`, `typing/**/*.d.ts`, `**/*.config.{${allTsExtensions}}`],
+    plugins: {
+      '@typescript-eslint': typescriptEslintPlugin,
+      '@stylistic': defaultStylisticPlugin,
+    },
+    rules: {
+      ...typescriptEslintPlugin.configs.strict.rules,
+      ...typescriptEslintPlugin.configs['strict-type-checked'].rules,
     },
   },
   {
@@ -172,19 +186,6 @@ const config = [
     },
     rules: {
       ...typescriptRulesDev,
-    },
-  },
-  {
-    /* +strict for typescript files NOT in ./src/ folder */
-    files: [`**/*.{${allTsExtensions}}`],
-    ignores: [`src/**/*.{${allTsExtensions}}`, `typing/**/*.d.ts`, `**/*.config.{${allTsExtensions}}`],
-    plugins: {
-      '@typescript-eslint': typescriptEslintPlugin,
-      '@stylistic': defaultStylisticPlugin,
-    },
-    rules: {
-      ...typescriptEslintPlugin.configs.strict.rules,
-      ...typescriptEslintPlugin.configs['strict-type-checked'].rules,
     },
   },
   {

@@ -4,7 +4,9 @@ import { getString } from '../utils/locale'
 import { getPref, setPref } from '../utils/prefs'
 
 import { Elements } from './create-element'
+import { paramTypes, paramVals } from './mdbcConstants'
 import { Logger, trace } from './mdbcLogger'
+import { wrappers } from './mdbcStartupHelpers'
 import { patch as $patch$ } from './monkey-patch'
 
 // Components.utils.import('resource://gre/modules/FileUtils.jsm')
@@ -29,28 +31,6 @@ interface BetterBibTeX {
   }
   ready: boolean | Promise<boolean>
 }
-
-const _paramVals_filefilterstrategy = ['default', 'customfileregexp'] as const
-declare type _param_filefilterstrategy = (typeof _paramVals_filefilterstrategy)[number]
-
-const _paramVals_matchstrategy = ['bbtcitekeyyaml', 'bbtcitekeyregexp', 'zotitemkey'] as const
-declare type _param_matchstrategy = (typeof _paramVals_matchstrategy)[number]
-
-const _paramVals_mdeditor = ['system', 'obsidian', 'logseq'] as const
-declare type _param_mdeditor = (typeof _paramVals_mdeditor)[number]
-
-const _paramVals_obsidianresolvewithfile = [false, true] as const
-declare type _param_obsidianresolvewithfile = (typeof _paramVals_obsidianresolvewithfile)[number]
-const _paramVals_obsidianresolve = ['path', 'file'] as const
-declare type _param_obsidianresolve = (typeof _paramVals_obsidianresolvewithfile)[number]
-
-const _paramVals_grouplibraries = ['user', 'group'] as const
-declare type _param_grouplibraries = (typeof _paramVals_grouplibraries)[number]
-
-const _paramVals_removetags = ['keepsynced', 'addonly'] as const
-declare type _param_removetags = (typeof _paramVals_removetags)[number]
-
-const _paramVals_DebugMode = ['minimal' as DebugMode, 'maximal' as DebugMode] as const
 
 const favIcon = [
   `chrome://${config.addonRef}/content/icons/favicon.png`,
@@ -195,13 +175,13 @@ export class getParam {
   @trace
   static filefilterstrategy() {
     const name = 'filefilterstrategy'
-    const defaultValue = _paramVals_filefilterstrategy[0] as _param_filefilterstrategy
+    const defaultValue = paramVals.filefilterstrategy[0] as paramTypes['filefilterstrategy']
     const valid = true
     const param = { name: name, value: defaultValue, valid: valid }
 
-    const value = getPref(name) as _param_filefilterstrategy
-    if (_paramVals_filefilterstrategy.includes(value)) {
-      param.value = value as _param_filefilterstrategy
+    const value = getPref(name) as paramTypes['filefilterstrategy']
+    if (paramVals.filefilterstrategy.includes(value)) {
+      param.value = value
       param.valid = true
     } else {
       Logger.log('getParam', `ERROR: filefilterstrategy: invalid RegExp :: ${value}`, false, 'error')
@@ -238,10 +218,10 @@ export class getParam {
   @trace
   static matchstrategy() {
     const name = 'matchstrategy'
-    const defaultValue = _paramVals_matchstrategy[0] as _param_matchstrategy
+    const defaultValue = paramVals.matchstrategy[0] as paramTypes['matchstrategy']
     const param = { name: name, value: defaultValue, valid: true }
-    const value = getPref(name) as _param_matchstrategy
-    if (_paramVals_matchstrategy.includes(value)) {
+    const value = getPref(name) as paramTypes['matchstrategy']
+    if (paramVals.matchstrategy.includes(value)) {
       param.value = value
       param.valid = true
     } else {
@@ -323,11 +303,11 @@ export class getParam {
   @trace
   static mdeditor() {
     const name = 'mdeditor'
-    const defaultValue = _paramVals_mdeditor[0] as _param_mdeditor
+    const defaultValue = paramVals.mdeditor[0] as paramTypes['mdeditor']
     const param = { name: name, value: defaultValue, valid: true }
 
-    let value = getPref(name) as _param_mdeditor
-    if (_paramVals_mdeditor.includes(value)) {
+    let value = getPref(name) as paramTypes['mdeditor']
+    if (paramVals.mdeditor.includes(value)) {
       param.value = value
       param.valid = true
     } else {
@@ -342,17 +322,17 @@ export class getParam {
   @trace
   static obsidianresolve() {
     const name = 'obsidianresolvewithfile'
-    const defaultValue = _paramVals_obsidianresolvewithfile[0] as _param_obsidianresolvewithfile
+    const defaultValue = paramVals.obsidianresolvewithfile[0] as paramTypes['obsidianresolvewithfile']
     const valid = true
     const param = {
       name: name,
-      value: defaultValue ? _paramVals_obsidianresolve[1] : _paramVals_obsidianresolve[0], //// if true use 'file', if false use 'path' (the default)
+      value: defaultValue === false ? paramVals.obsidianresolvespec[0] : paramVals.obsidianresolvespec[1], //// if defaultValue === false use 'path' (the default), if defaultValue === true use 'file',
       valid: valid,
     }
 
-    const value = getPref('obsidianresolvewithfile') as _param_obsidianresolvewithfile
-    if (_paramVals_obsidianresolvewithfile.includes(value)) {
-      param.value = value ? _paramVals_obsidianresolve[1] : _paramVals_obsidianresolve[0]
+    const value = getPref('obsidianresolvewithfile') as paramTypes['obsidianresolvewithfile']
+    if (paramVals.obsidianresolvewithfile.includes(value)) {
+      param.value = value === false ? paramVals.obsidianresolvespec[0] : paramVals.obsidianresolvespec[1]
       param.valid = true
     } else {
       Logger.log('getParam', `ERROR: obsidianresolve: invalid param :: ${value}`, false, 'error')
@@ -429,11 +409,11 @@ export class getParam {
   @trace
   static grouplibraries() {
     const name = 'grouplibraries'
-    const defaultValue = _paramVals_grouplibraries[0] as _param_grouplibraries
+    const defaultValue = paramVals.grouplibraries[0] as paramTypes['grouplibraries']
     const param = { name: name, value: defaultValue, valid: true }
 
-    const value = getPref(name) as _param_grouplibraries
-    if (_paramVals_grouplibraries.includes(value)) {
+    const value = getPref(name) as paramTypes['grouplibraries']
+    if (paramVals.grouplibraries.includes(value)) {
       param.value = value
       param.valid = true
     } else {
@@ -448,11 +428,11 @@ export class getParam {
   @trace
   static removetags() {
     const name = 'removetags'
-    const defaultValue = _paramVals_removetags[0] as _param_removetags
+    const defaultValue = paramVals.removetags[0] as paramTypes['removetags']
     const param = { name: name, value: defaultValue, valid: true }
 
-    const value = getPref(name) as _param_removetags
-    if (_paramVals_removetags.includes(value)) {
+    const value = getPref(name) as paramTypes['removetags']
+    if (paramVals.removetags.includes(value)) {
       param.value = value
       param.valid = true
     } else {
@@ -490,7 +470,7 @@ export class getParam {
     const defaultValue = 'minimal' as DebugMode
     const param = { name: name, value: defaultValue, valid: true }
     const value = getPref(name) as DebugMode
-    if (_paramVals_DebugMode.includes(value)) {
+    if (paramVals.debugmode.includes(value)) {
       param.value = value
       param.valid = true
     } else {
@@ -1292,14 +1272,14 @@ export class ScanMarkdownFiles {
 
     /// find all item already tagged
     const items_withtags: Zotero.Item[] = await Utils.findTaggedItems(tagstr)
-    const items_withtags_zotids: number[] = items_withtags.map((x) => x.id)
+    const items_withtags_zotids: number[] = items_withtags.map((item) => item.id)
 
     /// find all items that should be tagged
     const items_withnotes: Zotero.Item[] = await Zotero.Items.getAsync(zotids)
-    const items_withnotes_zotids: number[] = items_withnotes.map((x) => x.id)
+    const items_withnotes_zotids: number[] = items_withnotes.map((item) => item.id)
 
     /// find items to be tagged
-    const items_totag = items_withnotes.filter((x) => !items_withtags_zotids.includes(x.id))
+    const items_totag = items_withnotes.filter((item) => !items_withtags_zotids.includes(item.id))
 
     /// find items that should not be tagged
     let items_removetag: Zotero.Item[] = []
@@ -1657,383 +1637,6 @@ export class ScanMarkdownFiles {
   }
 }
 
-export class wrappers {
-  @trace
-  static findPreviousVersion() {
-    const version_re =
-      /^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)(?<release>[-+]?[0-9A-Za-z]+\.?[0-9A-Za-z]*[-+]?[0-9A-Za-z]*)?$/
-
-    const configurationVersionThis = { major: 0, minor: 0, patch: 0, release: '', str: version }
-    const versionThis_rematch = version.match(version_re)
-    if (versionThis_rematch?.groups) {
-      configurationVersionThis.major = parseInt(versionThis_rematch.groups.major)
-      configurationVersionThis.minor = parseInt(versionThis_rematch.groups.minor)
-      configurationVersionThis.patch = parseInt(versionThis_rematch.groups.patch)
-      configurationVersionThis.release = versionThis_rematch.groups.release ? versionThis_rematch.groups.release : ''
-    }
-
-    let configurationVersionPreviousStr: any = ''
-    let configurationVersionPrevious = { major: 0, minor: 0, patch: 0, release: '', str: '' }
-    try {
-      configurationVersionPreviousStr = getPref('configuration')
-      if (typeof configurationVersionPreviousStr === 'string') {
-        configurationVersionPrevious.str = configurationVersionPreviousStr
-      }
-      if (typeof configurationVersionPreviousStr === 'string' && version_re.test(configurationVersionPreviousStr)) {
-        const version_rematch = configurationVersionPreviousStr.match(version_re)
-        if (version_rematch?.groups) {
-          configurationVersionPrevious.major = parseInt(version_rematch.groups.major)
-          configurationVersionPrevious.minor = parseInt(version_rematch.groups.minor)
-          configurationVersionPrevious.patch = parseInt(version_rematch.groups.patch)
-          configurationVersionPrevious.release = version_rematch.groups.release ? version_rematch.groups.release : ''
-        }
-      }
-    } catch (e) {}
-
-    return { app: configurationVersionThis, config: configurationVersionPrevious }
-  }
-
-  @trace
-  static async startupVersionCheck() {
-    const versonParse = this.findPreviousVersion()
-
-    // Logger.log('startupVersionCheck - versonParse.app', versonParse.app, false, 'debug')
-    // Logger.log('startupVersionCheck - configurationVersionPrevious', versonParse.config, false, 'debug')
-
-    if (versonParse.config.str !== versonParse.app.str) {
-      let prezot7 = versonParse.config.major === 0 && versonParse.config.minor < 1
-      let preprerename1 =
-        versonParse.config.major === 0 &&
-        versonParse.config.minor === 1 &&
-        versonParse.config.patch < 1 &&
-        !['-rc.1'].includes(versonParse.config.release)
-
-      if (!preprerename1) {
-        let test0 = getPref('sourcedir')
-        // Logger.log('startupVersionCheck - preprerename1 - test0', test0, false, 'debug')
-        if (typeof test0 !== 'string' || test0 === '') {
-          let test1 = getPref('source_dir')
-          // Logger.log('startupVersionCheck - preprerename1 - test1', test1, false, 'debug')
-          if (test1 && typeof test1 === 'string' && test1.length > 0) {
-            // Logger.log('startupVersionCheck - preprerename1 - AMHERE0', test1, false, 'debug')
-            preprerename1 = true
-          }
-        }
-      }
-      if (!preprerename1 && !prezot7) {
-        let test0 = getPref('sourcedir')
-        if (typeof test0 !== 'string' || test0 === '') {
-          let test1 = Zotero.Prefs.get('extensions.mdbconnect.source_dir', true)
-          if (test1 && typeof test1 === 'string' && test1.length > 0) {
-            prezot7 = true
-          }
-        }
-      }
-
-      // Logger.log('startupVersionCheck - preprerename1', preprerename1, false, 'debug')
-
-      // Logger.log('startupVersionCheck - prezot7', prezot7, false, 'debug')
-
-      /// sourcedir
-      try {
-        if (preprerename1) {
-          const val = getPref('source_dir') as string
-          // Logger.log('startupVersionCheck - sourcedir - val', val, false, 'debug')
-          if (val) {
-            // Logger.log('startupVersionCheck - sourcedir - AMHERE', val, false, 'debug')
-            setPref('sourcedir', val)
-            getParam.sourcedir()
-          }
-        } else if (prezot7) {
-          const val = Zotero.Prefs.get('extensions.mdbconnect.source_dir', true) as string
-          // Logger.log('startupVersionCheck - sourcedir - val2', val, false, 'debug')
-          if (val) {
-            // Logger.log('startupVersionCheck - sourcedir - AMHERE2', val, false, 'debug')
-            setPref('sourcedir', val)
-            getParam.sourcedir()
-          }
-        }
-      } catch (e) {
-        Logger.log('startupDependencyCheck', `sourcedir ERROR: ${e}`, false, 'error')
-      }
-
-      /// filefilterstrategy
-      try {
-        if (preprerename1) {
-          const val = getPref('filefilterstrategy') as string
-          if (val === 'customfileregex') {
-            setPref('filefilterstrategy', 'customfileregexp')
-          } else if (_paramVals_filefilterstrategy.includes(val as _param_filefilterstrategy)) {
-            setPref('filefilterstrategy', val)
-          } else {
-            setPref('filefilterstrategy', _paramVals_filefilterstrategy[0])
-          }
-          getParam.filefilterstrategy()
-        } else if (prezot7) {
-          const val = Zotero.Prefs.get('extensions.mdbconnect.filefilterstrategy', true) as string
-          if (val === 'customfileregex') {
-            setPref('filefilterstrategy', 'customfileregexp')
-          } else if (_paramVals_filefilterstrategy.includes(val as _param_filefilterstrategy)) {
-            setPref('filefilterstrategy', val)
-          } else {
-            setPref('filefilterstrategy', _paramVals_filefilterstrategy[0])
-          }
-          getParam.filefilterstrategy()
-        }
-      } catch (e) {
-        Logger.log('startupDependencyCheck', `filefilterstrategy ERROR: ${e}`, false, 'error')
-      }
-
-      /// filepattern
-      try {
-        if (preprerename1) {
-          const val = getPref('filepattern') as string
-          if (val) setPref('filepattern', val)
-          getParam.filepattern()
-        } else if (prezot7) {
-          const val = Zotero.Prefs.get('extensions.mdbconnect.filepattern', true) as string
-          if (val) setPref('filepattern', val)
-          getParam.filepattern()
-        }
-      } catch (e) {
-        Logger.log('startupDependencyCheck', `filepattern ERROR: ${e}`, false, 'error')
-      }
-
-      /// matchstrategy
-      try {
-        if (preprerename1) {
-          const val = getPref('matchstrategy') as string
-          if (val === 'bbtcitekey') {
-            setPref('matchstrategy', 'bbtcitekeyyaml')
-          } else if (_paramVals_matchstrategy.includes(val as _param_matchstrategy)) {
-            setPref('matchstrategy', val)
-          } else {
-            setPref('matchstrategy', _paramVals_matchstrategy[0])
-          }
-          getParam.matchstrategy()
-        } else if (prezot7) {
-          const val = Zotero.Prefs.get('extensions.mdbconnect.matchstrategy', true) as string
-          if (val === 'bbtcitekey') {
-            setPref('matchstrategy', 'bbtcitekeyyaml')
-          } else if (_paramVals_matchstrategy.includes(val as _param_matchstrategy)) {
-            setPref('matchstrategy', val)
-          } else {
-            setPref('matchstrategy', _paramVals_matchstrategy[0])
-          }
-          getParam.matchstrategy()
-        }
-      } catch (e) {
-        Logger.log('startupDependencyCheck', `matchstrategy ERROR: ${e}`, false, 'error')
-      }
-
-      /// bbtyamlkeyword
-      try {
-        if (preprerename1) {
-          const val = getPref('metadatakeyword') as string
-          if (val) {
-            setPref('bbtyamlkeyword', val)
-          }
-          getParam.bbtyamlkeyword()
-        } else if (prezot7) {
-          const val = Zotero.Prefs.get('extensions.mdbconnect.metadatakeyword', true) as string
-          if (val) {
-            setPref('bbtyamlkeyword', val)
-          }
-          getParam.bbtyamlkeyword()
-        }
-      } catch (e) {
-        Logger.log('startupDependencyCheck', `bbtyamlkeyword ERROR: ${e}`, false, 'error')
-      }
-
-      /// zotkeyregexp
-      try {
-        if (preprerename1) {
-          const val = getPref('zotkeyregex') as string
-          if (val) {
-            setPref('zotkeyregexp', val)
-          }
-          getParam.zotkeyregexp()
-        } else if (prezot7) {
-          const val = Zotero.Prefs.get('extensions.mdbconnect.zotkeyregex', true) as string
-          if (val) {
-            setPref('zotkeyregexp', val)
-          }
-          getParam.zotkeyregexp()
-        }
-      } catch (e) {
-        Logger.log('startupDependencyCheck', `zotkeyregexp ERROR: ${e}`, false, 'error')
-      }
-
-      /// mdeditor
-      try {
-        if (preprerename1) {
-          const val = getPref('vaultresolution') as string
-          if (val === 'path') {
-            setPref('mdeditor', 'obsidian')
-            setPref('obsidianresolvewithfile', false)
-          } else if (val === 'file') {
-            setPref('mdeditor', 'obsidian')
-            setPref('obsidianresolvewithfile', true)
-            getParam.obsidianresolve()
-          } else if (val === 'logseq') {
-            setPref('mdeditor', 'logseq')
-          } else if (val === 'default') {
-            setPref('mdeditor', 'system')
-          } else {
-            setPref('mdeditor', 'system')
-          }
-          getParam.mdeditor()
-        } else if (prezot7) {
-          const val = Zotero.Prefs.get('extensions.mdbconnect.vaultresolution', true) as string
-          if (val === 'path') {
-            setPref('mdeditor', 'obsidian')
-            setPref('obsidianresolvewithfile', false)
-          } else if (val === 'file') {
-            setPref('mdeditor', 'obsidian')
-            setPref('obsidianresolvewithfile', true)
-            getParam.obsidianresolve()
-          } else if (val === 'logseq') {
-            setPref('mdeditor', 'logseq')
-          } else if (val === 'default') {
-            setPref('mdeditor', 'system')
-          } else {
-            setPref('mdeditor', 'system')
-          }
-          getParam.mdeditor()
-        }
-      } catch (e) {
-        Logger.log('startupDependencyCheck', `mdeditor ERROR: ${e}`, false, 'error')
-      }
-
-      /// obsidianvaultname
-      try {
-        if (preprerename1) {
-          const val = getPref('vaultname') as string
-          if (val) {
-            setPref('obsidianvaultname', val)
-          }
-          getParam.obsidianvaultname()
-        } else if (prezot7) {
-          const val = Zotero.Prefs.get('extensions.mdbconnect.vaultname', true) as string
-          if (val) {
-            setPref('obsidianvaultname', val)
-          }
-          getParam.obsidianvaultname()
-        }
-      } catch (e) {
-        Logger.log('startupDependencyCheck', `obsidianvaultname ERROR: ${e}`, false, 'error')
-      }
-
-      /// logseqgraph
-      try {
-        if (preprerename1) {
-          const val = getPref('logseqgraph') as string
-          if (val) {
-            setPref('logseqgraph', val)
-          }
-          getParam.logseqgraph()
-        } else if (prezot7) {
-          const val = Zotero.Prefs.get('extensions.mdbconnect.logseqgraph', true) as string
-          if (val) {
-            setPref('logseqgraph', val)
-          }
-          getParam.logseqgraph()
-        }
-      } catch (e) {
-        Logger.log('startupDependencyCheck', `logseqgraph ERROR: ${e}`, false, 'error')
-      }
-
-      /// grouplibraries
-      try {
-        if (preprerename1) {
-          const val = getPref('grouplibraries') as string
-          if (_paramVals_grouplibraries.includes(val as _param_grouplibraries)) {
-            setPref('grouplibraries', val)
-          } else setPref('grouplibraries', _paramVals_grouplibraries[0])
-          getParam.grouplibraries()
-        } else if (prezot7) {
-          const val = Zotero.Prefs.get('extensions.mdbconnect.grouplibraries', true) as string
-          if (_paramVals_grouplibraries.includes(val as _param_grouplibraries)) {
-            setPref('grouplibraries', val)
-          } else setPref('grouplibraries', _paramVals_grouplibraries[0])
-          getParam.grouplibraries()
-        }
-      } catch (e) {
-        Logger.log('startupDependencyCheck', `grouplibraries ERROR: ${e}`, false, 'error')
-      }
-
-      /// removetags
-      try {
-        if (preprerename1) {
-          const val = getPref('removetags') as string
-          if (_paramVals_removetags.includes(val as _param_removetags)) {
-            setPref('removetags', val)
-          } else if (val) {
-            setPref('removetags', _paramVals_removetags[0])
-          }
-          getParam.removetags()
-        } else if (prezot7) {
-          const val = Zotero.Prefs.get('extensions.mdbconnect.removetags', true) as string
-          if (_paramVals_removetags.includes(val as _param_removetags)) {
-            setPref('removetags', val)
-          } else if (val) {
-            setPref('removetags', _paramVals_removetags[0])
-          }
-        }
-      } catch (e) {
-        Logger.log('startupDependencyCheck', `removetags ERROR: ${e}`, false, 'error')
-      }
-
-      /// tagstr
-      try {
-        if (preprerename1) {
-          const val = getPref('tagstr') as string
-          if (val) {
-            setPref('tagstr', val)
-          }
-          getParam.tagstr()
-        } else if (prezot7) {
-          const val = Zotero.Prefs.get('extensions.mdbconnect.tagstr', true) as string
-          if (val) {
-            setPref('tagstr', val)
-          }
-          getParam.tagstr()
-        }
-      } catch (e) {
-        Logger.log('startupDependencyCheck', `tagstr ERROR: ${e}`, false, 'error')
-      }
-
-      if (addon.data.env === 'production') {
-        setPref('configuration', version)
-        Logger.log(
-          'startupDependencyCheck',
-          `Configuration version set to ${versonParse.app.str}. Was previously ${versonParse.config.str}.`,
-          false,
-          'debug',
-        )
-      } else {
-        Logger.log(
-          'startupDependencyCheck',
-          `Configuration version set to ${versonParse.app.str}. Was previously ${versonParse.config.str}.`,
-          false,
-          'debug',
-        )
-      }
-    }
-  }
-
-  @trace
-  static async startupConfigCheck() {
-    let success = true
-
-    if (!getParam.sourcedir().valid) {
-      success = false
-    }
-
-    return success
-  }
-}
-
 export class systemInterface {
   static expandSelection(ids: 'selected' | number | number[]): number[] {
     if (Array.isArray(ids)) return ids
@@ -2374,6 +1977,28 @@ export class UIHelpers {
           }
         },
     )
+  }
+
+  @trace
+  static highlightTaggedRows() {
+    /* Render primary cell
+    _renderCell
+    _renderPrimaryCell
+    https://github.com/zotero/zotero/blob/32ba987c2892e2aee6046a82c08d69145e758afd/chrome/content/zotero/elements/colorPicker.js#L178
+    https://github.com/windingwind/ZoteroStyle/blob/6b7c7c95abb7e5d75d0e1fbcc2d824c0c4e2e81a/src/events.ts#L263
+    https://github.com/ZXLYX/ZoteroStyle/blob/57fa178a1a45e710a73706f0087892cf19c9caf1/src/events.ts#L286
+     */
+    const tagstrParam = getParam.tagstr()
+    if (!tagstrParam.valid) return
+    const tagstr = tagstrParam.value
+
+    // Select all span elements with aria-label containing "Tag ObsCite."
+    const spans: NodeListOf<HTMLSpanElement> = document.querySelectorAll(`span[aria-label*="Tag ${tagstr}."]`)
+
+    // Iterate over the NodeList and change the text color to red
+    spans.forEach((span) => {
+      span.style.color = 'red'
+    })
   }
 }
 
