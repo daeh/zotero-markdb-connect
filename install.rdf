@@ -5,12 +5,12 @@
   <Description about="urn:mozilla:install-manifest">
     <em:id>daeda@mit.edu</em:id>
     <em:name>MarkDB-Connect</em:name>
-    <em:version>0.0.26</em:version>
+    <em:version>0.0.27</em:version>
     <em:type>2</em:type>
     <em:creator>Dae Houlihan</em:creator>
     <em:description>Add a tag to Zotero items that have a external note.</em:description>
     <em:homepageURL>https://github.com/daeh/zotero-markdb-connect#readme</em:homepageURL>
-    <em:updateURL>https://raw.githubusercontent.com/daeh/zotero-markdb-connect/zot6/update.rdf</em:updateURL>
+    <em:updateURL>https://raw.githubusercontent.com/daeh/zotero-markdb-connect/main/update.json</em:updateURL>
 
     <em:targetApplication>
       <Description>

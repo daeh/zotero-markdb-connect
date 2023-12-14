@@ -14,7 +14,7 @@ This is a plugin for [Zotero](https://www.zotero.org), a research source managem
 
 This plugin was initially designed with the [Obsidian](https://obsidian.md) markdown editor in mind, and was inspired by the [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin) workflow. It offers preliminary support for [logseq](https://logseq.com) and [Zettlr](https://www.zettlr.com). It can be adapted to other databases that store markdown files outside of Zotero, and to other workflows that generate markdown reading notes linked to Zotero items (such as Zotero's `Export Note` feature).
 
-Please post any bugs, questions, or feature requests in the Github repository.
+Please post any bugs, questions, or feature requests in the Github repository's [issues](https://github.com/daeh/zotero-markdb-connect/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc).
 
 ## Plugin Functions
 
@@ -24,14 +24,17 @@ Supports multiple markdown files for a single Zotero item.
 
 Opens an existing markdown note in [Obsidian](https://obsidian.md), [logseq](https://logseq.com), or the system's default markdown note editor (e.g. [Zettlr](https://www.zettlr.com), [Typora](https://typora.io)) from the contextual menu of a Zotero item.
 
+> [!NOTE] 
+> Beginning with `v0.1.0`, _MarkDB-Connect_ will support Zotero 7 exclusively. The last release for Zotero 6 is [`v0.0.27`](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.0.27).
+
 ## Instalation
 
-- Download the plugin (the .xpi file) from the latest release: https://github.com/daeh/zotero-markdb-connect/releases
+- Download the plugin (the `.xpi` file) from the latest release: https://github.com/daeh/zotero-markdb-connect/releases (for Zotero 6 use [v0.0.27](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.0.27))
 - To download the .xpi file, right click it and select 'Save link as'
 - Open Zotero (version 6.x)
 - Go to `Tools -> Add-ons`
 - `Install Add-on From File`
-- Choose the file `MarkDBConnect-0.0.26.xpi`
+- Choose the file `MarkDBConnect-0.0.27.xpi`
 - Restart Zotero
 
 ## Setup
@@ -49,6 +52,7 @@ A markdown file can specify which Zotero item it's linked to using either a [Bet
 2. Using **Zotero Item Keys** to link markdown files to Zotero items.
 
    - This is recommended if you created the markdown notes with the `Export Note` feature of Zotero.
+
    - The markdown note contents should include the Zotero-Item-Key in a consistent format.
 
 NOTE: multiple markdown files can point to the same Zotero item. But a given markdown file should only be linked to a single Zotero item. A markdown reading note can reference multiple Zotero items throughout the file, but _MarkDB-Connect_ will only link the markdown note to one BetterBibTeX-citekey / Zotero-Item-Key.
@@ -177,4 +181,4 @@ Distributed under the MIT License.
 
 ## Author
 
-[![Personal Website](https://img.shields.io/badge/personal%20website-daeh.info-orange?style=for-the-badge)](https://daeh.info) [![Mastodon](https://img.shields.io/badge/mastodon-@dae@mastodon.online-purple?style=for-the-badge&logo=mastodon)](https://mastodon.online/@dae) [![Twitter](https://img.shields.io/badge/twitter-@DaeHoulihan-blue?style=for-the-badge&logo=twitter)](https://twitter.com/DaeHoulihan)
+[![Personal Website](https://img.shields.io/badge/personal%20website-daeh.info-orange?style=for-the-badge)](https://daeh.info) [![BlueSky](https://img.shields.io/badge/bsky-@dae.bsky.social-skyblue?style=for-the-badge&logo=mastodon)](https://bsky.app/profile/dae.bsky.social) [![Twitter](https://img.shields.io/badge/twitter-@DaeHoulihan-white?style=for-the-badge&logo=twitter)](https://twitter.com/DaeHoulihan)

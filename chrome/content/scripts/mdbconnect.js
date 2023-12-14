@@ -13,7 +13,7 @@ if (typeof Zotero === 'undefined') {
 }
 
 Zotero.MarkDBconnect = {
-  version: '0.0.26',
+  version: '0.0.27',
   folderSep: null,
   cleanrun: true,
   suppressNotifications: false,

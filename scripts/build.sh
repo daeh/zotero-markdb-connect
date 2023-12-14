@@ -1,6 +1,6 @@
 #!/bin/sh
 
-version='0.0.26'
+version='0.0.27'
 
 rm -f markdb-connect-${version}.xpi
 zip -r markdb-connect-${version}.xpi chrome/* defaults/* chrome.manifest install.rdf -x "*.DS_Store"
