@@ -1,11 +1,41 @@
-import { version } from '../../package.json'
+import { config, version } from '../../package.json'
 import { getPref, setPref } from '../utils/prefs'
 
 import { paramTypes, paramVals } from './mdbcConstants'
 import { Logger, trace } from './mdbcLogger'
-import { getParam } from './mdbcScan'
+import { getParam, Notifier } from './mdbcScan'
 
 export class wrappers {
+  @trace
+  static async fetchAndParseJsonFromGitHub(): Promise<any> {
+    const url = config.updateJSON
+    let status: 'match' | 'mismatch' | 'error' = 'error'
+    try {
+      // Fetch data from the GitHub repository
+      const response = await Zotero.HTTP.request('GET', url)
+
+      // Check if the response status is 200 (OK)
+      if (response.status !== 200) {
+        throw new Error(`Failed to fetch data: Status code ${response.status}`)
+      }
+
+      // Parse JSON data
+      try {
+        const jsonData = JSON.parse(response.responseText)
+        const addonIds = Object.keys(jsonData.addons)
+        status = addonIds.includes(config.addonID) ? 'match' : 'mismatch'
+        Logger.log('fetchAndParseJsonFromGitHub', `JSON data: ${JSON.stringify(Object.keys(jsonData))}`, false, 'debug')
+      } catch (jsonError) {
+        throw new Error('Failed to parse JSON data')
+      }
+    } catch (error) {
+      // Handle network errors or other issues
+      Logger.log('fetchAndParseJsonFromGitHub', `Error fetching JSON data: ${error.message}`, false, 'error')
+      throw error // Re-throw the error if you want to handle it outside this function
+    }
+    return status
+  }
+
   @trace
   static findPreviousVersion() {
     const version_re =
@@ -43,18 +73,18 @@ export class wrappers {
 
   @trace
   static async startupVersionCheck() {
-    const versonParse = this.findPreviousVersion()
+    const versionParse = this.findPreviousVersion()
 
-    // Logger.log('startupVersionCheck - versonParse.app', versonParse.app, false, 'debug')
-    // Logger.log('startupVersionCheck - configurationVersionPrevious', versonParse.config, false, 'debug')
+    // Logger.log('startupVersionCheck - versionParse.app', versionParse.app, false, 'debug')
+    // Logger.log('startupVersionCheck - configurationVersionPrevious', versionParse.config, false, 'debug')
 
-    if (versonParse.config.str !== versonParse.app.str) {
-      let prezot7 = versonParse.config.major === 0 && versonParse.config.minor < 1
+    if (versionParse.config.str !== versionParse.app.str) {
+      let prezot7 = versionParse.config.major === 0 && versionParse.config.minor < 1
       let preprerename1 =
-        versonParse.config.major === 0 &&
-        versonParse.config.minor === 1 &&
-        versonParse.config.patch < 1 &&
-        !['-rc.1'].includes(versonParse.config.release)
+        versionParse.config.major === 0 &&
+        versionParse.config.minor === 1 &&
+        versionParse.config.patch < 1 &&
+        !['-rc.1'].includes(versionParse.config.release)
 
       if (!preprerename1) {
         let test0 = getPref('sourcedir')
@@ -355,18 +385,35 @@ export class wrappers {
         setPref('configuration', version)
         Logger.log(
           'startupDependencyCheck',
-          `Configuration version set to ${versonParse.app.str}. Was previously ${versonParse.config.str}.`,
+          `Configuration version set to ${versionParse.app.str}. Was previously ${versionParse.config.str}.`,
           false,
           'debug',
         )
       } else {
         Logger.log(
           'startupDependencyCheck',
-          `Configuration version set to ${versonParse.app.str}. Was previously ${versonParse.config.str}.`,
+          `Configuration version set to ${versionParse.app.str}. Was previously ${versionParse.config.str}.`,
           false,
           'debug',
         )
       }
+    }
+
+    if (config.addonID !== 'daeda@mit.edu') {
+      this.fetchAndParseJsonFromGitHub()
+        .then((status) => {
+          if (status === 'mismatch') {
+            Notifier.notify({
+              title: 'UPDATE AVAILABLE',
+              body: `Please visit the ${config.addonName} GitHub repository to download.`,
+              type: 'warn',
+            })
+            Logger.log('fetchAndParseJsonFromGitHub', 'update suggested', false, 'info')
+          }
+        })
+        .catch((err) => {
+          Logger.log('fetchAndParseJsonFromGitHub', `ERROR :: ${err}`, true, 'error')
+        })
     }
   }
 

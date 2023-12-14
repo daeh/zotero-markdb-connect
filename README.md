@@ -2,7 +2,6 @@
 
 <!-- [![GitHub release (latest by date)](https://img.shields.io/github/v/release/daeh/zotero-markdb-connect?style=for-the-badge)](https://github.com/daeh/zotero-markdb-connect/releases/latest) [![GitHub all releases](https://img.shields.io/github/downloads/daeh/zotero-markdb-connect/total?style=for-the-badge&color=forestgreen)](https://github.com/daeh/zotero-markdb-connect/releases/latest) -->
 
-
 # MarkDB-Connect (Zotero Markdown DataBase Connect)
 
 [![zotero target version](https://img.shields.io/badge/Zotero-7-green?style=flat-square&logo=zotero&logoColor=CC2936)](https://www.zotero.org) [![Using Zotero Plugin Template](https://img.shields.io/badge/Using-Zotero%20Plugin%20Template-blue?style=flat-square&logo=github)](https://github.com/windingwind/zotero-plugin-template)
@@ -28,12 +27,13 @@ Supports multiple markdown files for a single Zotero item.
 
 Opens an existing markdown note in [Obsidian](https://obsidian.md), [logseq](https://logseq.com), or the system's default markdown note editor (e.g. [Zettlr](https://www.zettlr.com), [Typora](https://typora.io)) from the contextual menu of a Zotero item.
 
-N.B. Beginning with `v0.1.0`, _MarkDB-Connect_ will support Zotero 7 exclusively. The last release for Zotero 6 is [`v0.0.26`](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.0.26).
+> [!NOTE]
+> Beginning with `v0.1.0`, _MarkDB-Connect_ will support Zotero 7 exclusively. The last release for Zotero 6 is [`v0.0.27`](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.0.27).
 
 ## Instalation
 
 - Download the plugin (the `.xpi` file) from the latest release: https://github.com/daeh/zotero-markdb-connect/releases/latest
-- Open Zotero (version 7.x; for Zotero 6 use [v0.0.26](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.0.26))
+- Open Zotero (version 7.x)
 - From `Tools -> Add-ons`
 - Select `Install Add-on From File...` from the gear icon
 - Choose the `.xpi` file (e.g. `markdb-connect-0.1.0.xpi`)

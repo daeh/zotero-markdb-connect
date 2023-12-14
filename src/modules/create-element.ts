@@ -1,10 +1,11 @@
 //// Adapted from https://github.com/retorquere/zotero-better-bibtex/blob/master/content/create-element.ts ////
 
-// import { is7 } from './client'
+import { config } from '../../package.json'
 
-export const NAMESPACE = {
-  XUL: 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul',
+// createElementNS() necessary in Zotero 6; createElement() defaults to HTML in Zotero 7
+const NAMESPACE = {
   HTML: 'http://www.w3.org/1999/xhtml',
+  XUL: 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul',
 }
 
 type Handler = (event?: any) => void | Promise<void>
@@ -25,7 +26,7 @@ export class Elements {
 
   private className: string
   constructor(private document: Document) {
-    this.className = `mdbc-${Zotero.Utilities.generateObjectKey()}`
+    this.className = `${config.addonRef}-auto-${Zotero.Utilities.generateObjectKey()}`
   }
 
   public serialize(node: HTMLElement): string {
@@ -38,16 +39,22 @@ export class Elements {
     delete attrs.$
 
     const namespace = name.startsWith('html:') ? NAMESPACE.HTML : NAMESPACE.XUL
-    name = name.replace('html:', '')
+    // name = name.replace('html:', '')
+    const tagName = name.startsWith('html:') ? name.replace('html:', '') : name
 
-    const elt: HTMLElement = this.document[namespace === NAMESPACE.XUL ? 'createXULElement' : 'createElement'](
-      name,
-    ) as HTMLElement
+    // const elt: HTMLElement = this.document[namespace === NAMESPACE.XUL ? 'createXULElement' : 'createElement'](
+    //   name,
+    // ) as HTMLElement
+
+    // prettier-ignore
+    // @ts-ignore - assume that createXULElement exists on document
+    // eslint-disable-next-line @stylistic/max-len
+    const elt: HTMLElement = namespace === NAMESPACE.HTML ? this.document.createElement(tagName) : this.document.createXULElement(tagName)
     let attrsclass: string = ''
     try {
       attrsclass = attrs.class as string
     } catch (err) {}
-    attrs.class = `${this.className} ${attrsclass}`.trim()
+    attrs.class = `${this.className} ${attrsclass || ''}`.trim()
     for (const [a, v] of Object.entries(attrs)) {
       if (typeof v === 'string') {
         elt.setAttribute(a, v)
@@ -67,7 +74,7 @@ export class Elements {
       elt.appendChild(child)
     }
 
-    // Elements.all.add(new WeakRef(elt))
+    Elements.all.add(new WeakRef(elt))
 
     return elt
   }

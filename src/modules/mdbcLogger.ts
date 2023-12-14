@@ -201,6 +201,7 @@ export function trace(target: any, propertyKey: string | symbol, descriptor: Pro
       }
       return original.apply(this, args)
     } catch (error) {
+      ztoolkit.log(`{${config.addonInstance}}[call][ERROR] : SOME ERROR`)
       Zotero.debug(`{${config.addonInstance}}[call][ERROR] : ${target.name}.${String(propertyKey)} :: ${error}`)
       ztoolkit.log(`{${config.addonInstance}}[call][ERROR] : ${target.name}.${String(propertyKey)}`, error)
       Logger.log('trace', `ERROR : ${identifier} :: ${error}`, false, 'error')

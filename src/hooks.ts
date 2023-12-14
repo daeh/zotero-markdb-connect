@@ -65,7 +65,16 @@ async function onMainWindowLoad(win: Window): Promise<void> {
   UIHelpers.registerWindowMenuItem_Sync()
   if (!DataManager.isClean() || DataManager.numberRecords() === 0 || addon.data.env === 'development') {
     UIHelpers.registerWindowMenuItem_Debug()
+  } else {
+    ///WIP
+    // try {
+    //   ztoolkit.Menu.unregister(`${config.addonRef}-tools-menu-troubleshoot`)
+    // } catch (err) {
+    //   Logger.log('toolsmenu', `ERROR: unregister :: ${err}`)
+    // }
   }
+  // register(menuPopup: XUL.MenuPopup | keyof typeof MenuSelector, options: MenuitemOptions, insertPosition?: "before" | "after", anchorElement?: XUL.Element): false | undefined;
+  // unregister(menuId: string): void;
 
   UIHelpers.registerRightClickMenuItem()
 
@@ -163,7 +172,7 @@ function Logs() {
 }
 
 async function onMainWindowUnload(win: Window): Promise<void> {
-  Elements.removeAll() // maybe?
+  Elements.removeAll()
   $unpatch$()
   ztoolkit.unregisterAll()
   addon.data.dialog?.window?.close()

@@ -1284,7 +1284,7 @@ export class ScanMarkdownFiles {
     /// find items that should not be tagged
     let items_removetag: Zotero.Item[] = []
     if (getParam.removetags().value === 'keepsynced') {
-      items_removetag = items_withtags.filter((x) => !items_withnotes_zotids.includes(x.id))
+      items_removetag = items_withtags.filter((item) => !items_withnotes_zotids.includes(item.id))
     }
 
     /// find items that cannot be located in library
@@ -1842,6 +1842,7 @@ export class UIHelpers {
     // menu->Tools menuitem
     ztoolkit.Menu.register('menuTools', {
       tag: 'menuitem',
+      id: `${config.addonRef}-tools-menu-sync`,
       label: getString('menuitem-sync'),
       oncommand: `Zotero.${config.addonInstance}.hooks.syncMarkDB();`,
     })
@@ -1852,9 +1853,17 @@ export class UIHelpers {
     // menu->Tools menuitem
     ztoolkit.Menu.register('menuTools', {
       tag: 'menuitem',
+      id: `${config.addonRef}-tools-menu-troubleshoot`,
       label: getString('menuitem-debug'),
       oncommand: `Zotero.${config.addonInstance}.hooks.syncMarkDBReport();`,
     })
+    //   tag: "menuitem",
+    //   id: "zotero-itemmenu-addontemplate-test",
+    //   label: "Addon Template: Menuitem",
+    //   oncommand: "alert('Hello World! Default Menuitem.')",
+    //   icon: menuIcon,
+    // register(menuPopup: XUL.MenuPopup | keyof typeof MenuSelector, options: MenuitemOptions, insertPosition?: "before" | "after", anchorElement?: XUL.Element): false | undefined;
+    // unregister(menuId: string): void;
   }
 
   @trace
@@ -1999,6 +2008,8 @@ export class UIHelpers {
     spans.forEach((span) => {
       span.style.color = 'red'
     })
+
+    // await ztoolkit.ItemTree.register()
   }
 }
 
