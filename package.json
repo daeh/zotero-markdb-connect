@@ -4,7 +4,7 @@
   "description": "Zotero plugin that links your Markdown database to Zotero.",
   "config": {
     "addonName": "MarkDB-Connect",
-    "addonID": "dev@daeh.info",
+    "addonID": "daeda@mit.edu",
     "addonRef": "mdbc",
     "addonInstance": "MDBC",
     "prefsPrefix": "extensions.zotero.mdbc",

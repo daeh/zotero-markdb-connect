@@ -1,4 +1,4 @@
-[![GitHub release (with filter)](https://img.shields.io/github/v/release/daeh/zotero-markdb-connect?style=for-the-badge&filter=*v0.1.0*)](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.1.0-rc.4)
+[![GitHub release (with filter)](https://img.shields.io/github/v/release/daeh/zotero-markdb-connect?style=for-the-badge&filter=*v0.1.0*)](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.1.0-rc.6)
 
 <!-- [![GitHub release (latest by date)](https://img.shields.io/github/v/release/daeh/zotero-markdb-connect?style=for-the-badge)](https://github.com/daeh/zotero-markdb-connect/releases/latest) [![GitHub all releases](https://img.shields.io/github/downloads/daeh/zotero-markdb-connect/total?style=for-the-badge&color=forestgreen)](https://github.com/daeh/zotero-markdb-connect/releases/latest) -->
 
