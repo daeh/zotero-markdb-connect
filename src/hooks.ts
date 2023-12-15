@@ -55,7 +55,7 @@ async function onMainWindowLoad(win: Window): Promise<void> {
   })
 
   // TODO Only run Sync if config check passes.
-  await ScanMarkdownFiles.runSync(false, false)
+  await ScanMarkdownFiles.syncWrapper(false, false)
 
   popupWin.changeLine({
     progress: 80,
@@ -99,7 +99,7 @@ function syncMarkDB() {
   const displayReport = false
   const saveLogs = false
 
-  ScanMarkdownFiles.runSync(displayReport, saveLogs)
+  ScanMarkdownFiles.syncWrapper(displayReport, saveLogs)
     .then(() => {
       Logger.log('syncMarkDB', 'finished', true, 'info')
     })
@@ -113,7 +113,7 @@ function syncMarkDBReport() {
   const displayReport = true
   const saveLogs = false
 
-  ScanMarkdownFiles.runSync(displayReport, saveLogs)
+  ScanMarkdownFiles.syncWrapper(displayReport, saveLogs)
     .then(() => {
       Logger.log('syncMarkDBReport', 'finished', true, 'info')
     })
@@ -127,12 +127,17 @@ function syncMarkDBSaveDebug() {
   const displayReport = false
   const saveLogs = true
 
-  ScanMarkdownFiles.runSync(displayReport, saveLogs)
+  ScanMarkdownFiles.syncWrapper(displayReport, saveLogs)
     .then(() => {
       Logger.log('syncMarkDBSaveDebug', 'finished', true, 'info')
     })
     .catch((err) => {
       Logger.log('syncMarkDBSaveDebug', `ERROR :: ${err}`, true, 'error')
+      // const loggedMessages = Logger.getMessages()
+      // await
+      // ScanMarkdownFiles.displayReportDialog([], loggedMessages)
+      // await
+      // systemInterface.dumpDebuggingLog()
     })
 }
 

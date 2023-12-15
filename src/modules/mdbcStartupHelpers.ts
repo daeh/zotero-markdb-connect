@@ -23,7 +23,8 @@ export class wrappers {
       try {
         const jsonData = JSON.parse(response.responseText)
         const addonIds = Object.keys(jsonData.addons)
-        status = addonIds.includes(config.addonID) ? 'match' : 'mismatch'
+        status = config.addonID === 'dev@daeh.info' && addonIds.includes('daeda@mit.edu') ? 'mismatch' : 'match'
+        // status = addonIds.includes(config.addonID) ? 'match' : 'mismatch'
         Logger.log('fetchAndParseJsonFromGitHub', `JSON data: ${JSON.stringify(Object.keys(jsonData))}`, false, 'debug')
       } catch (jsonError) {
         throw new Error('Failed to parse JSON data')

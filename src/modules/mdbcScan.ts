@@ -64,8 +64,8 @@ export class Notifier {
       } else {
         messageArray = data.messageArray
       }
-    } catch (e) {
-      Logger.log('Notifier', `ERROR: ${e}`, false, 'error')
+    } catch (err) {
+      Logger.log('Notifier', `ERROR: ${err}`, false, 'error')
       return
     }
 
@@ -141,11 +141,18 @@ export class getParam {
     const name = 'sourcedir'
     const defaultValue = ''
     const valid = false
-    const param: prefParam = { name: name, value: defaultValue, valid: valid }
+    const param: prefParam = { name: name, value: defaultValue, valid: valid, msg: '' }
     try {
       const value = getPref(name) as string
-      if (typeof value !== 'string') throw new Error('Vault Path Not Found')
-      if (value.length === 0) throw new Error('Vault Path Not Found')
+      param.msg += `pref value: ${value}. `
+      if (typeof value !== 'string') {
+        param.msg += `type: ${typeof value}. `
+        throw new Error('Vault Path Not Found')
+      }
+      if (value.length === 0) {
+        param.msg += 'length: 0. '
+        throw new Error('Vault Path Not Found')
+      }
 
       const sourcedirpathObj = Zotero.File.pathToFile(value)
       sourcedirpathObj.normalize()
@@ -158,15 +165,20 @@ export class getParam {
       ) {
         param.value = sourcedirpath
         param.valid = true
+      } else {
+        param.msg += `sourcedirpath: ${sourcedirpath}. `
+        param.msg += `sourcedirpathObj.exists(): ${sourcedirpathObj.exists()}. `
+        param.msg += `sourcedirpathObj.isDirectory(): ${sourcedirpathObj.isDirectory()}. `
       }
-    } catch (e) {
+    } catch (err) {
       // TODO only show notification if user sync run manually (not run on startup)
-      Logger.log('getParam', `ERROR: sourcedirpath :: ${e}`, false, 'error')
+      Logger.log('getParam', `ERROR: sourcedirpath :: ${err}`, false, 'error')
       Notifier.notify({
         title: 'Warning',
         body: `Vault Path Not Found. Set the path to your notes in the ${config.addonName} preferences.`,
         type: 'error',
       })
+      param.msg += `Error:: ${err}. `
     }
     Logger.log(name, param, false, 'config')
     return param
@@ -199,8 +211,9 @@ export class getParam {
     const defaultRegExp_ = /^@(\S+).*\.md$/i
     const defaultRegExp = new RegExp(defaultValue, 'i')
     const valid = true
-    const param = { name: name, value: defaultRegExp, valid: valid }
+    const param = { name: name, value: defaultRegExp, valid: valid, msg: '' }
     const value = getPref(name) as string
+    param.msg += `pref value: ${value}. `
     if (typeof value === 'string' && value.length > 0 && prefHelpers.isValidRegExp(value)) {
       param.value = new RegExp(value, 'i')
       param.valid = true
@@ -238,8 +251,9 @@ export class getParam {
     const name = 'bbtyamlkeyword'
     const defaultValue = ''
     const valid = false
-    const param = { name: name, value: defaultValue, valid: valid }
+    const param = { name: name, value: defaultValue, valid: valid, msg: '' }
     const value = getPref(name) as string
+    param.msg += `pref value: ${value}. `
     if (typeof value === 'string' && value.length > 0 && prefHelpers.checkMetadataFormat(value)) {
       /// checkMetadataFormat() will show a notification
       param.value = value
@@ -261,8 +275,9 @@ export class getParam {
     const defaultValue = ''
     const defaultRegExp = new RegExp(defaultValue, 'm')
     const valid = false
-    const param = { name: name, value: defaultRegExp, valid: valid }
+    const param = { name: name, value: defaultRegExp, valid: valid, msg: '' }
     const value = getPref(name) as string
+    param.msg += `pref value: ${value}. `
     if (typeof value === 'string' && value.length > 0 && prefHelpers.isValidRegExp(value)) {
       param.value = new RegExp(value, 'm')
       param.valid = true
@@ -280,8 +295,9 @@ export class getParam {
   @trace
   static zotkeyregexp() {
     const name = 'zotkeyregexp'
-    const param = { name: name, value: new RegExp(''), valid: false }
+    const param = { name: name, value: new RegExp(''), valid: false, msg: '' }
     const value = getPref(name) as string
+    param.msg += `pref value: ${value}. `
 
     if (typeof value === 'string' && value.length > 0 && prefHelpers.isValidRegExp(value)) {
       param.value = new RegExp(value)
@@ -348,8 +364,9 @@ export class getParam {
     const name = 'obsidianvaultname'
     const defaultValue = ''
     const valid = false
-    const param = { name: name, value: defaultValue, valid: valid }
+    const param = { name: name, value: defaultValue, valid: valid, msg: '' }
     const value = getPref(name) as string
+    param.msg += `pref value: ${value}. `
     if (typeof value === 'string' && value.length > 0) {
       param.value = value
       param.valid = true
@@ -369,8 +386,9 @@ export class getParam {
     const name = 'logseqgraph'
     const defaultValue = ''
     const valid = false
-    const param = { name: name, value: defaultValue, valid: valid }
+    const param = { name: name, value: defaultValue, valid: valid, msg: '' }
     const value = getPref(name) as string
+    param.msg += `pref value: ${value}. `
     if (typeof value === 'string' && value.length > 0) {
       param.value = value
       param.valid = true
@@ -390,8 +408,9 @@ export class getParam {
     const name = 'logseqprefix'
     const defaultValue = ''
     const valid = false
-    const param = { name: name, value: defaultValue, valid: valid }
+    const param = { name: name, value: defaultValue, valid: valid, msg: '' }
     const value = getPref(name) as string
+    param.msg += `pref value: ${value}. `
     if (typeof value === 'string' && value.length > 0) {
       param.value = value
       param.valid = true
@@ -448,8 +467,9 @@ export class getParam {
   static tagstr() {
     const name = 'tagstr'
     const defaultValue = 'ObsCite'
-    const param = { name: name, value: defaultValue, valid: true }
+    const param = { name: name, value: defaultValue, valid: true, msg: '' }
     const value = getPref(name) as string
+    param.msg += `pref value: ${value}. `
     if (typeof value === 'string' && value.length > 0 && prefHelpers.checkTagStr(value)) {
       param.value = value
       param.valid = true
@@ -524,8 +544,8 @@ class Utils {
       for await (const filepath of listFilesRecursively(basedirObj.path)) {
         files.push(filepath)
       }
-    } catch (e) {
-      Logger.log('getFilesRecursively', `ERROR: ${e}`, false, 'warn')
+    } catch (err) {
+      Logger.log('getFilesRecursively', `ERROR: ${err}`, false, 'warn')
     }
 
     return files
@@ -636,8 +656,8 @@ export class ScanMarkdownFiles {
           if (reTitle_match_res && reTitle_match_res.length > 1) {
             entry_res.citekey_title = reTitle_match_res[1].trim()
           }
-        } catch (e) {
-          Logger.log('scanVault', `ERROR: get citekey from filename :: ${e}`, false, 'warn')
+        } catch (err) {
+          Logger.log('scanVault', `ERROR: get citekey from filename :: ${err}`, false, 'warn')
         }
 
         /// get citekey from metadata
@@ -668,8 +688,8 @@ export class ScanMarkdownFiles {
               }
             }
           }
-        } catch (e) {
-          Logger.log('scanVault', `ERROR: get citekey from metadata :: ${e}`, false, 'warn')
+        } catch (err) {
+          Logger.log('scanVault', `ERROR: get citekey from metadata :: ${err}`, false, 'warn')
         }
 
         entry_res.citekey = entry_res.citekey_metadata || entry_res.citekey_title
@@ -800,8 +820,8 @@ export class ScanMarkdownFiles {
           if (reContents_match_res && reContents_match_res.length > 1 && reContents_match_res[1].trim() !== '') {
             entry_res.zotkeys.push(reContents_match_res[1].trim())
           }
-        } catch (e) {
-          Logger.log('scanVaultCustomRegex', `ERROR: get zotid from contents :: ${e}`, false, 'warn')
+        } catch (err) {
+          Logger.log('scanVaultCustomRegex', `ERROR: get zotid from contents :: ${err}`, false, 'warn')
         }
 
         if (entry_res.zotkeys.length === 0) {
@@ -1333,35 +1353,8 @@ export class ScanMarkdownFiles {
   }
 
   @trace
-  static async runSync(displayReport = false, saveLogs = false) {
-    /// TODO validate settings on preference window close.
-
+  static async syncRun() {
     let dryrun = false
-    const debug = displayReport || saveLogs
-
-    const configPass = await wrappers.startupConfigCheck()
-    if (!configPass) {
-      Notifier.notify({
-        title: 'Configuration Invalid',
-        body: `Aborting. Check the ${config.addonName} preferences.`,
-        type: 'error',
-      })
-      return
-    }
-
-    if (debug) {
-      Logger.setDebugMode('maximal')
-    }
-
-    if (Logger.mode() === 'minimal') {
-      //// clear logs, data, and messages ////
-      Logger.clear()
-    } else {
-      //// only clear messages ////
-      Logger.clearMessages()
-    }
-
-    // let notifData: NotificationData = [`${config.addonName} Syncing Error`, 'Some Error Occurred', false]
 
     DataManager.initialize()
 
@@ -1402,7 +1395,55 @@ export class ScanMarkdownFiles {
         messageArray = [{ body: `Found ${DataManager.numberRecords()} notes.`, type: 'info' }]
       }
     }
-    const header = 'Synced'
+
+    return messageArray
+  }
+
+  @trace
+  static async syncWrapper(displayReport = false, saveLogs = false) {
+    /// TODO validate settings on preference window close.
+
+    const debug = displayReport || saveLogs
+
+    if (debug) {
+      Logger.setDebugMode('maximal')
+    }
+
+    if (Logger.mode() === 'minimal') {
+      //// clear logs, data, and messages ////
+      Logger.clear()
+    } else {
+      //// only clear messages ////
+      Logger.clearMessages()
+    }
+
+    let header = 'Error'
+
+    let messageArray: notificationData['messageArray']
+
+    const configPass = await wrappers.startupConfigCheck()
+    if (!configPass) {
+      header = 'Error - Configuration Invalid'
+      messageArray = [
+        {
+          body: `Aborting. Check the ${config.addonName} preferences.`,
+          type: 'error',
+        },
+      ]
+      // Notifier.notify({
+      //   title: 'Configuration Invalid',
+      //   body: `Aborting. Check the ${config.addonName} preferences.`,
+      //   type: 'error',
+      // })
+      // return
+    } else {
+      try {
+        messageArray = await this.syncRun()
+        header = 'Synced'
+      } catch (err) {
+        messageArray = [{ body: `An error occured :: ${err}`, type: 'error' }]
+      }
+    }
 
     const summaryMessages = messageArray.map((msg) => `${msg.body}`)
 
@@ -1424,7 +1465,10 @@ export class ScanMarkdownFiles {
         }
       }
       if (!DataManager.isClean() || DataManager.numberRecords() === 0) {
-        messageArray.push({ body: `For details, run "${getString('menuitem-debug')}" in Tools menu.`, type: 'warn' })
+        messageArray.push({
+          body: `For details, run "${getString('menuitem-troubleshoot')}" in Tools menu.`,
+          type: 'warn',
+        })
       }
       const notification: notificationData = {
         title: header,
@@ -1645,9 +1689,9 @@ export class systemInterface {
       try {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return Zotero.getActiveZoteroPane().getSelectedItems(true)
-      } catch (e) {
+      } catch (err) {
         // zoteroPane.getSelectedItems() doesn't test whether there's a selection and errors out if not
-        Logger.log('expandSelection', `Could not get selected items: ${e}`, false, 'warn')
+        Logger.log('expandSelection', `Could not get selected items: ${err}`, false, 'warn')
         return []
       }
     }
@@ -1733,7 +1777,7 @@ export class systemInterface {
         try {
           fileObj.reveal()
           Logger.log('showSelectedItemMarkdownInFilesystem', `Revealing ${fileObj.path}`, false, 'info')
-        } catch (e) {
+        } catch (err) {
           // On platforms that don't support nsIFileObj.reveal() (e.g. Linux), launch the parent directory
           Zotero.launchFile(fileObj.parent.path)
           Logger.log(
@@ -1744,8 +1788,8 @@ export class systemInterface {
           )
         }
       }
-    } catch (e) {
-      Logger.log('showSelectedItemMarkdownInFilesystem', `ERROR :: ${entry_res?.path} :: ${e}`, false, 'warn')
+    } catch (err) {
+      Logger.log('showSelectedItemMarkdownInFilesystem', `ERROR :: ${entry_res?.path} :: ${err}`, false, 'warn')
     }
   }
 
@@ -1758,8 +1802,8 @@ export class systemInterface {
         Zotero.launchFile(fileObj.path)
         Logger.log('openFileSystemPath', `Revealing ${fileObj.path}`, false, 'info')
       }
-    } catch (e) {
-      Logger.log('openFileSystemPath', `ERROR :: ${entry_res?.path} :: ${e}`, false, 'warn')
+    } catch (err) {
+      Logger.log('openFileSystemPath', `ERROR :: ${entry_res?.path} :: ${err}`, false, 'warn')
     }
   }
 
@@ -1783,8 +1827,8 @@ export class systemInterface {
         false,
         'info',
       )
-    } catch (e) {
-      Logger.log('openObsidianURI', `ERROR :: ${entry_res?.path} :: ${e}`, false, 'warn')
+    } catch (err) {
+      Logger.log('openObsidianURI', `ERROR :: ${entry_res?.path} :: ${err}`, false, 'warn')
     }
   }
 
@@ -1807,10 +1851,10 @@ export class systemInterface {
           const fileObj = Zotero.File.pathToFile(entry_res.path)
           fileObj.normalize()
           graphName = fileObj.parent.parent.leafName as string
-        } catch (e) {
-          Logger.log('openLogseqURI', `ERROR :: ${entry_res?.path} :: ${e}`, false, 'warn')
+        } catch (err) {
+          Logger.log('openLogseqURI', `ERROR :: ${entry_res?.path} :: ${err}`, false, 'warn')
           //// if candidate graph name not found, abort ////
-          throw e
+          throw err
         }
       }
 
@@ -1827,8 +1871,8 @@ export class systemInterface {
         false,
         'info',
       )
-    } catch (e) {
-      Logger.log('openLogseqURI', `ERROR :: ${entry_res?.path} :: ${e}`, false, 'warn')
+    } catch (err) {
+      Logger.log('openLogseqURI', `ERROR :: ${entry_res?.path} :: ${err}`, false, 'warn')
     }
   }
 }
@@ -1854,7 +1898,7 @@ export class UIHelpers {
     ztoolkit.Menu.register('menuTools', {
       tag: 'menuitem',
       id: `${config.addonRef}-tools-menu-troubleshoot`,
-      label: getString('menuitem-debug'),
+      label: getString('menuitem-troubleshoot'),
       oncommand: `Zotero.${config.addonInstance}.hooks.syncMarkDBReport();`,
     })
     //   tag: "menuitem",
@@ -2033,8 +2077,8 @@ export class prefHelpers {
       ) {
         setPref('sourcedir', vaultpath)
       }
-    } catch (e) {
-      Logger.log('chooseVaultFolder', `ERROR chooseVaultFolder :: ${e}`, false, 'warn')
+    } catch (err) {
+      Logger.log('chooseVaultFolder', `ERROR chooseVaultFolder :: ${err}`, false, 'warn')
     }
   }
 
@@ -2042,7 +2086,7 @@ export class prefHelpers {
     try {
       new RegExp(str)
       return true // No error means it's a valid RegExp
-    } catch (e) {
+    } catch (err) {
       Logger.log('isValidRegExp', `ERROR: RegExp is not valid:: >> ${str} <<.`, false, 'warn')
       return false // An error indicates an invalid RegExp
     }

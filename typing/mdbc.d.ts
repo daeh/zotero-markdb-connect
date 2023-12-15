@@ -30,6 +30,7 @@ interface prefParam {
   name: string
   value: string
   valid: boolean
+  msg?: string
 }
 
 interface OSFile {
