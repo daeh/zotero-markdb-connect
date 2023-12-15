@@ -1,6 +1,6 @@
 {
   "name": "markdb-connect",
-  "version": "0.1.0-rc.5",
+  "version": "0.1.0-rc.6",
   "description": "Zotero plugin that links your Markdown database to Zotero.",
   "config": {
     "addonName": "MarkDB-Connect",
