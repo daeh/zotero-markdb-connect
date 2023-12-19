@@ -1,23 +1,17 @@
-### Editor directories and files ###
-.vscode/*
-!.vscode/extensions.json
-# .idea
-!.idea
-.idea/workspace.xml
-
-### Building ###
-node_modules
+### Runtime ###
+node_modules/
 dist/
 build/
 logs/
 
 ### Editor directories and files ###
 # .vscode/*
-# !.vscode/extensions.json
+!.vscode/extensions.json
 # .idea/
+!.idea/
 .idea/workspace.xml
 
-### Project ###
+### Generated files ###
 eslint.config.js
 zotero-cmd.json
 

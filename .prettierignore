@@ -1,8 +1,8 @@
-**/.git
-**/.github
-# **/.vscode
-**/.idea
-**/build
-**/dist
+**/.git/
+**/.github/
+# **/.vscode/
+**/.idea/
+**/build/
+**/dist/
 **/package-lock.json
 **/*.lock

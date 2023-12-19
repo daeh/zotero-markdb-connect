@@ -15,7 +15,7 @@ import globals from 'globals'
 const projectDirname = dirname(fileURLToPath(import.meta.url))
 
 const env = (() => {
-  if (typeof process.env.NODE_ENV === 'undefined') return 'base'
+  if (typeof process.env.NODE_ENV === 'undefined') return 'default'
   if (process.env.NODE_ENV === 'development') return 'development'
   if (process.env.NODE_ENV === 'production') return 'production'
   return 'error'
@@ -51,6 +51,7 @@ const importRules = {
         'sibling', // Relative imports
         // ['sibling', 'parent'], // Relative imports, the sibling and parent types they can be mingled together
         'index', // index imports
+        'type', // type imports
         'unknown', // unknown
       ],
       'newlines-between': 'always',
