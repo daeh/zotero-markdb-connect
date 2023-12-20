@@ -1,3 +1,5 @@
+import type { DebugMode } from '../mdbcTypes'
+
 const _paramVals_filefilterstrategy = ['default', 'customfileregexp'] as const
 type _param_filefilterstrategy = (typeof _paramVals_filefilterstrategy)[number]
 
@@ -31,7 +33,7 @@ export const paramVals = {
   debugmode: _paramVals_debugmode,
 }
 
-export declare interface paramTypes {
+export interface paramTypes {
   filefilterstrategy: _param_filefilterstrategy
   matchstrategy: _paramTypes_matchstrategy
   mdeditor: _param_mdeditor

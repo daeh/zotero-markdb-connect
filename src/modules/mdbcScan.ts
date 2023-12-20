@@ -9,6 +9,18 @@ import { Logger, trace } from './mdbcLogger'
 import { wrappers } from './mdbcStartupHelpers'
 import { patch as $patch$ } from './monkey-patch'
 
+import type {
+  DebugMode,
+  Entry,
+  messageData,
+  notificationData,
+  NotificationType,
+  NotifyCreateLineOptions,
+  OSFile,
+  prefParam,
+  ZoteroIconURI,
+} from '../mdbcTypes'
+
 // Components.utils.import('resource://gre/modules/FileUtils.jsm')
 // declare const FileUtils: any
 
@@ -32,16 +44,14 @@ interface BetterBibTeX {
   ready: boolean | Promise<boolean>
 }
 
-const favIcon = [
-  `chrome://${config.addonRef}/content/icons/favicon.png`,
-  'chrome://zotero/skin/toolbar-item-add@2x.png',
-] as const
-declare type AddonIconURI = (typeof favIcon)[number]
-declare type IconURI = AddonIconURI | ZoteroIconURI
+const favIcon = `chrome://${config.addonRef}/content/icons/favicon.png` as const
+const additionalIcons = [favIcon, 'chrome://zotero/skin/toolbar-item-add@2x.png'] as const
+type AddonIconURI = (typeof additionalIcons)[number]
+type IconURI = AddonIconURI | ZoteroIconURI
 
 export class Notifier {
   static readonly notificationTypes: Record<NotificationType, IconURI> = {
-    addon: `chrome://${config.addonRef}/content/icons/favicon.png`,
+    addon: favIcon,
     success: 'chrome://zotero/skin/tick@2x.png',
     error: 'chrome://zotero/skin/error@2x.png', //'cross@2x.png',
     warn: 'chrome://zotero/skin/warning@2x.png',
@@ -1975,6 +1985,8 @@ export class UIHelpers {
           }
 
           itemmenu?.appendChild(elements.create('menuseparator', { id: itemMenuSeparatorId }))
+          ////WIP
+          // itemmenu?.appendChild(ztoolkit.UI.createElement(document, 'menuseparator', { id: itemMenuSeparatorId }))
 
           if (numEntries == 1) {
             itemmenu.appendChild(
@@ -1987,6 +1999,27 @@ export class UIHelpers {
                 oncommand: () => openfn(entry_res_list[0]),
               }),
             )
+            ////WIP
+            // itemmenu.appendChild(
+            //   ztoolkit.UI.createElement(document, 'menuitem', {
+            //     id: itemMenuOpenId,
+            //     attributes: {
+            //       label: menuitemopenlabel,
+            //     },
+            //     // properties: {}
+            //     // classList: ['icon'],
+            //     listeners: [
+            //       {
+            //         type: 'command',
+            //         listener: (event) => {
+            //           openfn(entry_res_list[0])
+            //           // event.preventDefault()
+            //         },
+            //       },
+            //     ],
+            //   }),
+            // )
+
             itemmenu.appendChild(
               elements.create('menuitem', {
                 id: itemMenuRevealId,
@@ -1994,6 +2027,26 @@ export class UIHelpers {
                 oncommand: () => systemInterface.showSelectedItemMarkdownInFilesystem(entry_res_list[0]),
               }),
             )
+            ////WIP
+            // itemmenu.appendChild(
+            //   ztoolkit.UI.createElement(document, 'menuitem', {
+            //     id: itemMenuRevealId,
+            //     attributes: {
+            //       label: getString('contextmenuitem-reveal'),
+            //     },
+            //     // properties: {}
+            //     // classList: ['icon'],
+            //     listeners: [
+            //       {
+            //         type: 'command',
+            //         listener: (event) => {
+            //           systemInterface.showSelectedItemMarkdownInFilesystem(entry_res_list[0])
+            //           // event.preventDefault()
+            //         },
+            //       },
+            //     ],
+            //   }),
+            // )
           } else if (numEntries > 1) {
             const menupopupOpen = itemmenu
               .appendChild(
@@ -2027,6 +2080,102 @@ export class UIHelpers {
                 }),
               )
             })
+
+            ////WIP
+            // const menupopupOpen =
+            // itemmenu.appendChild(
+            //   ztoolkit.UI.createElement(document, 'menu', {
+            //     id: itemMenuOpenId,
+            //     attributes: {
+            //       label: menuitemopenlabel,
+            //     },
+            //   }),
+            // )
+            // .appendChild(
+            //   ztoolkit.UI.createElement(document, 'menupopup', {
+            //     // children: [
+            //     //   {
+            //     //     tag: 'menuitem',
+            //     //     attributes: {
+            //     //       id: 'zotero-tb-tara-create-backup',
+            //     //       label: getString('toolbar-create'),
+            //     //       class: 'menuitem-iconic',
+            //     //       style: "list-style-image: url('chrome://tara/content/icons/create_icon.png');",
+            //     //       oncommand: "alert('create');",
+            //     //     },
+            //     //   },
+            //     // ],
+            //     children: entry_res_list.map((entry_res) => {
+            //       return {
+            //         tag: 'menuitem',
+            //         attributes: {
+            //           label: entry_res.name,
+            //         },
+            //         listeners: [
+            //           {
+            //             type: 'command',
+            //             listener: (event) => {
+            //               openfn(entry_res)
+            //               // event.preventDefault()
+            //             },
+            //           },
+            //         ],
+            //       }
+            //     }),
+            //   }),
+            // )
+
+            /////REVERT ME
+
+            // entry_res_list.forEach((entry_res) => {
+            //   menupopupOpen.appendChild(
+            //     ztoolkit.UI.createElement(document, 'menuitem', {
+            //       attributes: {
+            //         label: entry_res.name,
+            //       },
+            //       listeners: [
+            //         {
+            //           type: 'command',
+            //           listener: (event) => {
+            //             openfn(entry_res)
+            //             // event.preventDefault()
+            //           },
+            //         },
+            //       ],
+            //     }),
+            //   )
+            //   // menupopupReveal.appendChild(
+            //   //   elements.create('menuitem', {
+            //   //     label: entry_res.name,
+            //   //     oncommand: () => systemInterface.showSelectedItemMarkdownInFilesystem(entry_res),
+            //   //   }),
+            //   // )
+            // })
+
+            //     const menupopupReveal = itemmenu
+            //       .appendChild(
+            //         elements.create('menu', {
+            //           id: itemMenuRevealId,
+            //           label: getString('contextmenuitem-reveal'),
+            //         }),
+            //       )
+            //       .appendChild(elements.create('menupopup'))
+            //
+            //     entry_res_list.forEach((entry_res) => {
+            //       menupopupOpen.appendChild(
+            //         elements.create('menuitem', {
+            //           label: entry_res.name,
+            //           oncommand: () => openfn(entry_res),
+            //         }),
+            //       )
+            //       menupopupReveal.appendChild(
+            //         elements.create('menuitem', {
+            //           label: entry_res.name,
+            //           oncommand: () => systemInterface.showSelectedItemMarkdownInFilesystem(entry_res),
+            //         }),
+            //       )
+            //     })
+            //   }
           }
         },
     )
@@ -2208,7 +2357,7 @@ export class BasicExampleFactory {
       pluginID: config.addonID,
       src: rootURI + 'chrome/content/preferences.xhtml',
       label: getString('prefs-title'),
-      image: `chrome://${config.addonRef}/content/icons/favicon.png`,
+      image: favIcon,
       defaultXUL: true,
     }
     ztoolkit.PreferencePane.register(prefOptions)

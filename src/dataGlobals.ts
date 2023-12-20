@@ -1,3 +1,5 @@
+import type { Entry } from './mdbcTypes'
+
 const DataStore: {
   cleanrun: boolean
   data: Record<string, Entry[]>

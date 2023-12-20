@@ -1,6 +1,8 @@
 import { config } from '../../package.json'
 import { getPref } from '../utils/prefs'
 
+import type { DebugMode, LogType, messageData } from '../mdbcTypes'
+
 class LogsStore {
   static debug: DebugMode = getPref('debugmode') as DebugMode
   static time = {
