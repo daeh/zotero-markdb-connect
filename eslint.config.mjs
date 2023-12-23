@@ -52,6 +52,7 @@ const importRules = {
         // ['sibling', 'parent'], // Relative imports, the sibling and parent types they can be mingled together
         'index', // index imports
         'type', // type imports
+        'object', // object imports
         'unknown', // unknown
       ],
       'newlines-between': 'always',

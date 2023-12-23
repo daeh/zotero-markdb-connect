@@ -5,7 +5,7 @@ build/
 logs/
 
 ### Editor directories and files ###
-# .vscode/*
+# .vscode/
 !.vscode/extensions.json
 # .idea/
 !.idea/

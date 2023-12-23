@@ -2,6 +2,8 @@
   "name": "markdb-connect",
   "version": "0.1.0-rc.6",
   "description": "Zotero plugin that links your Markdown database to Zotero.",
+  "author": "Dae Houlihan <dev@daeh.info> (https://daeh.info)",
+  "license": "MIT",
   "config": {
     "addonName": "MarkDB-Connect",
     "addonID": "daeda@mit.edu",
@@ -11,7 +13,6 @@
     "releasePage": "https://github.com/daeh/zotero-markdb-connect/releases",
     "updateJSON": "https://raw.githubusercontent.com/daeh/zotero-markdb-connect/main/update.json"
   },
-  "main": "src/index.ts",
   "scripts": {
     "start": "node scripts/server.mjs",
     "build": "tsc --noEmit && node scripts/build.mjs production",
@@ -23,12 +24,11 @@
     "update-deps": "npm update --save && npm update --save-dev && npm outdated --depth=0",
     "postinstall": "node ./scripts/linkconfig.mjs"
   },
+  "main": "src/index.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/daeh/zotero-markdb-connect.git"
   },
-  "author": "daeh",
-  "license": "AGPL-3.0-or-later",
   "bugs": {
     "url": "https://github.com/daeh/zotero-markdb-connect/issues"
   },
