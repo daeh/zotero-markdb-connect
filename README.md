@@ -27,17 +27,19 @@ Supports multiple markdown files for a single Zotero item.
 
 Opens an existing markdown note in [Obsidian](https://obsidian.md), [logseq](https://logseq.com), or the system's default markdown note editor (e.g. [Zettlr](https://www.zettlr.com), [Typora](https://typora.io)) from the contextual menu of a Zotero item.
 
-> [!NOTE]
-> Beginning with `v0.1.0`, _MarkDB-Connect_ will support Zotero 7 exclusively. The last release for Zotero 6 is [`v0.0.27`](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.0.27).
-
 ## Instalation
 
-- Download the plugin (the `.xpi` file) from the latest release: https://github.com/daeh/zotero-markdb-connect/releases/latest
+<!-- - Download the plugin (the `.xpi` file) from the latest release: https://github.com/daeh/zotero-markdb-connect/releases/latest -->
+
+- Download the plugin (the `.xpi` file) from the latest release, [`v0.1.0-rc.6`](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.1.0-rc.6)
 - Open Zotero (version 7.x)
 - From `Tools -> Add-ons`
-- Select `Install Add-on From File...` from the gear icon
-- Choose the `.xpi` file (e.g. `markdb-connect-0.1.0.xpi`)
+- Select `Install Add-on From File...` from the gear icon ⛭
+- Choose the `.xpi` file you downloaded (e.g. `markdb-connect-0.1.0-rc.6.xpi`)
 - Restart Zotero
+
+> [!NOTE]
+> Beginning with `v0.1.0`, _MarkDB-Connect_ will support Zotero 7 exclusively. The last release for Zotero 6 is [`v0.0.27`](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.0.27).
 
 ## Setup
 

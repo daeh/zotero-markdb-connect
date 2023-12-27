@@ -120,6 +120,8 @@ export class BBTHelper {
 
   @trace
   private static async _check() {
+    ////TODO don't call Zotero.BetterBibTeX.ready before checking if Zotero.BetterBibTeX exists
+    ////TODO make sure error is reported to summary notification (maybe just throw error)
     await Zotero.BetterBibTeX.ready
     return this.BBTReady()
   }
@@ -1451,7 +1453,7 @@ export class ScanMarkdownFiles {
         messageArray = await this.syncRun()
         header = 'Synced'
       } catch (err) {
-        messageArray = [{ body: `An error occured :: ${err}`, type: 'error' }]
+        messageArray = [{ body: `An error occurred :: ${err}`, type: 'error' }]
       }
     }
 
