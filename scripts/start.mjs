@@ -2,13 +2,16 @@ import details from '../package.json' assert { type: 'json' }
 import { Logger } from './utils.mjs'
 import cmd from './zotero-cmd.json' assert { type: 'json' }
 import { spawn } from 'child_process'
-import { existsSync, readFileSync, writeFileSync } from 'fs'
+import { existsSync, readFileSync, writeFileSync, rmSync } from 'fs'
 import { clearFolder } from './utils.mjs'
 import path from 'path'
 import { exit } from 'process'
 
 const { addonID } = details.config
 const { zoteroBinPath, profilePath, dataDir } = cmd.exec
+
+// Keep in sync with the addon's onStartup
+const loadDevToolWhen = `Plugin ${addonID} startup`
 
 const logPath = 'logs'
 const logFilePath = path.join(logPath, 'zotero.log')
@@ -42,6 +45,11 @@ function prepareDevEnv() {
     writeAddonProxyFile()
   }
 
+  const addonXpiFilePath = path.join(profilePath, `extensions/${addonID}.xpi`)
+  if (existsSync(addonXpiFilePath)) {
+    rmSync(addonXpiFilePath)
+  }
+
   const prefsPath = path.join(profilePath, 'prefs.js')
   if (existsSync(prefsPath)) {
     const PrefsLines = readFileSync(prefsPath, 'utf-8').split('\n')
@@ -65,7 +73,9 @@ function prepareLog() {
   writeFileSync(logFilePath, '')
 }
 
-export function main() {
+export function main(callback) {
+  let isZoteroReady = false
+
   prepareDevEnv()
 
   prepareLog()
@@ -73,6 +83,10 @@ export function main() {
   const zoteroProcess = spawn(zoteroBinPath, ['--debugger', '--purgecaches', '-profile', profilePath])
 
   zoteroProcess.stdout.on('data', (data) => {
+    if (!isZoteroReady && data.toString().includes(loadDevToolWhen)) {
+      isZoteroReady = true
+      callback()
+    }
     writeFileSync(logFilePath, data, {
       flag: 'a',
     })

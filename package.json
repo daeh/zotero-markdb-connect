@@ -20,7 +20,7 @@
     "lint": "export ESLINT_USE_FLAT_CONFIG=true && export NODE_ENV=production && prettier --config prettier.config.mjs --write . && eslint --config eslint.config.mjs --fix .",
     "lint-dry": "export ESLINT_USE_FLAT_CONFIG=true && export NODE_ENV=production && prettier --config prettier.config.mjs --check . ; eslint --config eslint.config.mjs .",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "release": "DEBUG=release-it:* release-it",
+    "release": "release-it --only-version --preReleaseId=beta",
     "update-deps": "npm update --save && npm update --save-dev && npm outdated --depth=0",
     "postinstall": "node ./scripts/linkconfig.mjs"
   },
@@ -69,7 +69,12 @@
       "release": true,
       "assets": [
         "build/*.xpi"
-      ]
+      ],
+      "comments": {
+        "submit": true,
+        "issue": ":rocket: _This issue has been resolved in v${version}. See [${releaseName}](${releaseUrl}) for release notes._",
+        "pr": ":rocket: _This pull request is included in v${version}. See [${releaseName}](${releaseUrl}) for release notes._"
+      }
     },
     "hooks": {
       "before:init": "npm run lint",
