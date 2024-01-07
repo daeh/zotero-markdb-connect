@@ -29,7 +29,7 @@ Supports multiple markdown files for a single Zotero item.
 
 Opens an existing markdown note in [Obsidian](https://obsidian.md), [logseq](https://logseq.com), or the system's default markdown note editor (e.g. [Zettlr](https://www.zettlr.com), [Typora](https://typora.io)) from the contextual menu of a Zotero item.
 
-## Instalation
+## Installation
 
 <!-- - Download the plugin (the `.xpi` file) from the latest release: https://github.com/daeh/zotero-markdb-connect/releases/latest -->
 
@@ -71,7 +71,7 @@ _MarkDB-Connect_ can extract the BetterBibTeX citekey that specifies which Zoter
 
 <details>
 
-<summary>configuraton details</summary>
+<summary>configuration details</summary>
 
 - In Zotero's Settings, click the `MarkDB-Connect` preference pane.
 
@@ -111,7 +111,7 @@ Zotero automatically generates Item Keys, they take the form of `ABCD1234`, as i
 
 <details>
 
-<summary>configuraton details</summary>
+<summary>configuration details</summary>
 
 - In Zotero's Settings, click the `MarkDB-Connect` preference pane.
 
