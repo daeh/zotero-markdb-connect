@@ -121,7 +121,7 @@ Zotero automatically generates Item Keys, they take the form of `ABCD1234`, as i
 
     - Alternatively, you can define a custom RegExp pattern to match your reading note files.
 
-  - Select the `Match Markdown Files to Zotero Items Using:` `Zotero-Item-Key - captured with cutom RegExp` option.
+  - Select the `Match Markdown Files to Zotero Items Using:` `Zotero-Item-Key - captured with custom RegExp` option.
 
   - Specify a RegExp pattern to extract the Zotero-Item-Key from the markdown contents.
 

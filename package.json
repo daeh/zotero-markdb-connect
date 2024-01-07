@@ -18,7 +18,7 @@
     "build": "tsc --noEmit && node scripts/build.mjs production",
     "stop": "node scripts/stop.mjs",
     "lint": "export ESLINT_USE_FLAT_CONFIG=true && export NODE_ENV=production && prettier --config prettier.config.mjs --write . && eslint --config eslint.config.mjs --fix .",
-    "lint-dry": "export ESLINT_USE_FLAT_CONFIG=true && export NODE_ENV=production && prettier --config prettier.config.mjs --check . ; eslint --config eslint.config.mjs .",
+    "lint:dry": "export ESLINT_USE_FLAT_CONFIG=true && export NODE_ENV=production && prettier --config prettier.config.mjs --check . ; eslint --config eslint.config.mjs .",
     "test": "echo \"Error: no test specified\" && exit 1",
     "release": "release-it --only-version --preReleaseId=beta",
     "update-deps": "npm update --save && npm update --save-dev && npm outdated --depth=0",
@@ -34,18 +34,18 @@
   },
   "homepage": "https://github.com/daeh/zotero-markdb-connect#readme",
   "dependencies": {
-    "zotero-plugin-toolkit": "^2.3.15"
+    "zotero-plugin-toolkit": "^2.3.16"
   },
   "devDependencies": {
-    "@stylistic/eslint-plugin": "^1.5.1",
+    "@stylistic/eslint-plugin": "^1.5.3",
     "@stylistic/eslint-plugin-js": "^1.4.1",
     "@stylistic/eslint-plugin-ts": "^1.4.1",
-    "@types/node": "^20.10.5",
-    "@typescript-eslint/eslint-plugin": "^6.16.0",
-    "@typescript-eslint/parser": "^6.16.0",
+    "@types/node": "^20.10.7",
+    "@typescript-eslint/eslint-plugin": "^6.18.0",
+    "@typescript-eslint/parser": "^6.18.0",
     "chokidar": "^3.5.3",
     "compressing": "^1.10.0",
-    "esbuild": "^0.19.10",
+    "esbuild": "^0.19.11",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-import-resolver-typescript": "^3.6.1",
@@ -54,9 +54,9 @@
     "globals": "^13.24.0",
     "prettier": "^3.1.1",
     "release-it": "^17.0.1",
-    "replace-in-file": "^7.0.2",
+    "replace-in-file": "^7.1.0",
     "typescript": "^5.3.3",
-    "zotero-types": "^1.3.11"
+    "zotero-types": "^1.3.13"
   },
   "release-it": {
     "git": {
