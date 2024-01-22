@@ -34,7 +34,7 @@
   },
   "homepage": "https://github.com/daeh/zotero-markdb-connect#readme",
   "dependencies": {
-    "zotero-plugin-toolkit": "^2.3.16"
+    "zotero-plugin-toolkit": "^2.3.19"
   },
   "devDependencies": {
     "@stylistic/eslint-plugin": "^1.5.3",
