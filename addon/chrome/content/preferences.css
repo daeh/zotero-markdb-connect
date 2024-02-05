@@ -26,12 +26,21 @@ radio.mdbc-pref-radio-main {
 
 div.mdbc-pref-options-div {
   background-color: #e5e5e5;
+  border: 2px solid rgba(0, 0, 0, 0.5);
   padding: 5px;
   margin-left: 5px;
   margin-right: 5px;
   border-radius: 10px;
   width: 100%;
   max-width: fit-content;
+}
+
+/* Dark theme font color */
+@media (prefers-color-scheme: dark) {
+  div.mdbc-pref-options-div {
+    background-color: #212121;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+  }
 }
 
 hbox.mdbc-pref-hbox-indent {

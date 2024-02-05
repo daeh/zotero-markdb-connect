@@ -34,29 +34,29 @@
   },
   "homepage": "https://github.com/daeh/zotero-markdb-connect#readme",
   "dependencies": {
-    "zotero-plugin-toolkit": "^2.3.16"
+    "zotero-plugin-toolkit": "^2.3.19"
   },
   "devDependencies": {
-    "@stylistic/eslint-plugin": "^1.5.3",
+    "@stylistic/eslint-plugin": "^1.6.0",
     "@stylistic/eslint-plugin-js": "^1.4.1",
     "@stylistic/eslint-plugin-ts": "^1.4.1",
-    "@types/node": "^20.10.7",
-    "@typescript-eslint/eslint-plugin": "^6.18.0",
-    "@typescript-eslint/parser": "^6.18.0",
+    "@types/node": "^20.11.16",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
     "chokidar": "^3.5.3",
     "compressing": "^1.10.0",
-    "esbuild": "^0.19.11",
+    "esbuild": "^0.20.0",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-prettier": "^5.1.2",
+    "eslint-plugin-prettier": "^5.1.3",
     "globals": "^13.24.0",
-    "prettier": "^3.1.1",
-    "release-it": "^17.0.1",
+    "prettier": "^3.2.5",
+    "release-it": "^17.0.3",
     "replace-in-file": "^7.1.0",
     "typescript": "^5.3.3",
-    "zotero-types": "^1.3.13"
+    "zotero-types": "^1.3.18"
   },
   "release-it": {
     "git": {
