@@ -12,7 +12,7 @@ export class wrappers {
     let status: 'match' | 'mismatch' | 'error' = 'error'
     try {
       // Fetch data from the GitHub repository
-      const response = await Zotero.HTTP.request('GET', url)
+      const response = await Zotero.HTTP.request('GET', url, {})
 
       // Check if the response status is 200 (OK)
       if (response.status !== 200) {
