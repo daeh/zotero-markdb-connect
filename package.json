@@ -37,7 +37,7 @@
     "zotero-plugin-toolkit": "^2.3.19"
   },
   "devDependencies": {
-    "@stylistic/eslint-plugin": "^1.6.0",
+    "@stylistic/eslint-plugin": "^1.6.3",
     "@stylistic/eslint-plugin-js": "^1.4.1",
     "@stylistic/eslint-plugin-ts": "^1.4.1",
     "@types/node": "^20.11.16",
