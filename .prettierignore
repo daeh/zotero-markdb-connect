@@ -1,8 +1,11 @@
 **/.git/
 **/.github/
-# **/.vscode/
+**/.vscode/
 **/.idea/
 **/build/
 **/dist/
 **/package-lock.json
 **/*.lock
+logs
+**/node_modules
+# zotero-cmd.json

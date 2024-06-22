@@ -1,6 +1,5 @@
 import ZoteroToolkit from 'zotero-plugin-toolkit'
 
-// eslint-disable-next-line import/order
 import { config } from '../../package.json'
 
 export { createZToolkit }

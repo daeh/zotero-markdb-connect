@@ -50,7 +50,11 @@ export class DataManager {
     return DataStore.zotIds
   }
   static dump() {
-    return { cleanrun: DataStore.cleanrun, data: DataStore.data, zotIds: DataStore.zotIds }
+    return {
+      cleanrun: DataStore.cleanrun,
+      data: DataStore.data,
+      zotIds: DataStore.zotIds,
+    }
   }
   static numberRecords(): number {
     return DataStore.zotIds.length

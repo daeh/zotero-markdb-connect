@@ -97,9 +97,9 @@ async function onMainWindowLoad(win: Window): Promise<void> {
 function syncMarkDB() {
   //// called from tools menu ////
   const displayReport = false
-  const saveLogs = false
+  const saveLogsToggle = false
 
-  ScanMarkdownFiles.syncWrapper(displayReport, saveLogs)
+  ScanMarkdownFiles.syncWrapper(displayReport, saveLogsToggle)
     .then(() => {
       Logger.log('syncMarkDB', 'finished', true, 'info')
     })
@@ -111,9 +111,9 @@ function syncMarkDB() {
 function syncMarkDBReport() {
   //// called from tools menu ////
   const displayReport = true
-  const saveLogs = false
+  const saveLogsToggle = false
 
-  ScanMarkdownFiles.syncWrapper(displayReport, saveLogs)
+  ScanMarkdownFiles.syncWrapper(displayReport, saveLogsToggle)
     .then(() => {
       Logger.log('syncMarkDBReport', 'finished', true, 'info')
     })
@@ -125,9 +125,9 @@ function syncMarkDBReport() {
 function syncMarkDBSaveDebug() {
   //// called from prefs ////
   const displayReport = false
-  const saveLogs = true
+  const saveLogsToggle = true
 
-  ScanMarkdownFiles.syncWrapper(displayReport, saveLogs)
+  ScanMarkdownFiles.syncWrapper(displayReport, saveLogsToggle)
     .then(() => {
       Logger.log('syncMarkDBSaveDebug', 'finished', true, 'info')
     })

@@ -5,7 +5,7 @@ import { getPref, setPref } from '../utils/prefs'
 
 import { Elements } from './create-element'
 import { paramTypes, paramVals } from './mdbcConstants'
-import { Logger, trace } from './mdbcLogger'
+import { getErrorMessage, Logger, trace } from './mdbcLogger'
 import { wrappers } from './mdbcStartupHelpers'
 import { patch as $patch$ } from './monkey-patch'
 
@@ -75,7 +75,7 @@ export class Notifier {
         messageArray = data.messageArray
       }
     } catch (err) {
-      Logger.log('Notifier', `ERROR: ${err}`, false, 'error')
+      Logger.log('Notifier', `ERROR: ${getErrorMessage(err)}`, false, 'error')
       return
     }
 
@@ -131,7 +131,7 @@ export class BBTHelper {
     try {
       return BetterBibTeX.KeyManager.all()
     } catch (err) {
-      Logger.log('bbt-bridge', `_fetchBBTdata: KeyManager failed: ${err}`, false, 'error')
+      Logger.log('bbt-bridge', `_fetchBBTdata: KeyManager failed: ${getErrorMessage(err)}`, false, 'error')
       DataManager.markFail()
     }
     return []
@@ -153,7 +153,12 @@ export class getParam {
     const name = 'sourcedir'
     const defaultValue = ''
     const valid = false
-    const param: prefParam = { name: name, value: defaultValue, valid: valid, msg: '' }
+    const param: prefParam = {
+      name: name,
+      value: defaultValue,
+      valid: valid,
+      msg: '',
+    }
     try {
       const value = getPref(name) as string
       param.msg += `pref value: ${value}. `
@@ -184,13 +189,13 @@ export class getParam {
       }
     } catch (err) {
       // TODO only show notification if user sync run manually (not run on startup)
-      Logger.log('getParam', `ERROR: sourcedirpath :: ${err}`, false, 'error')
+      Logger.log('getParam', `ERROR: sourcedirpath :: ${getErrorMessage(err)}`, false, 'error')
       Notifier.notify({
         title: 'Warning',
         body: `Vault Path Not Found. Set the path to your notes in the ${config.addonName} preferences.`,
         type: 'error',
       })
-      param.msg += `Error:: ${err}. `
+      param.msg += `Error:: ${getErrorMessage(err)}. `
     }
     Logger.log(name, param, false, 'config')
     return param
@@ -557,7 +562,7 @@ class Utils {
         files.push(filepath)
       }
     } catch (err) {
-      Logger.log('getFilesRecursively', `ERROR: ${err}`, false, 'warn')
+      Logger.log('getFilesRecursively', `ERROR: ${getErrorMessage(err)}`, false, 'warn')
     }
 
     return files
@@ -649,6 +654,7 @@ export class ScanMarkdownFiles {
               noteName = noteName.replace(new RegExp(`^${logseq_prefix_file}`), '')
             }
             // const noteNameWithoutPrefix = decodeURIComponent(filenamebase).replace(decodeURIComponent(logseq_prefix_file), '')
+            noteName = decodeURIComponent(noteName)
           }
         }
 
@@ -669,7 +675,7 @@ export class ScanMarkdownFiles {
             entry_res.citekey_title = reTitle_match_res[1].trim()
           }
         } catch (err) {
-          Logger.log('scanVault', `ERROR: get citekey from filename :: ${err}`, false, 'warn')
+          Logger.log('scanVault', `ERROR: get citekey from filename :: ${getErrorMessage(err)}`, false, 'warn')
         }
 
         /// get citekey from metadata
@@ -701,7 +707,7 @@ export class ScanMarkdownFiles {
             }
           }
         } catch (err) {
-          Logger.log('scanVault', `ERROR: get citekey from metadata :: ${err}`, false, 'warn')
+          Logger.log('scanVault', `ERROR: get citekey from metadata :: ${getErrorMessage(err)}`, false, 'warn')
         }
 
         entry_res.citekey = entry_res.citekey_metadata || entry_res.citekey_title
@@ -811,6 +817,7 @@ export class ScanMarkdownFiles {
               noteName = noteName.replace(new RegExp(`^${logseq_prefix_file}`), '')
             }
             // const noteNameWithoutPrefix = decodeURIComponent(filenamebase).replace(decodeURIComponent(logseq_prefix_file), '')
+            noteName = decodeURIComponent(noteName)
           }
         }
 
@@ -833,7 +840,7 @@ export class ScanMarkdownFiles {
             entry_res.zotkeys.push(reContents_match_res[1].trim())
           }
         } catch (err) {
-          Logger.log('scanVaultCustomRegex', `ERROR: get zotid from contents :: ${err}`, false, 'warn')
+          Logger.log('scanVaultCustomRegex', `ERROR: get zotid from contents :: ${getErrorMessage(err)}`, false, 'warn')
         }
 
         if (entry_res.zotkeys.length === 0) {
@@ -1337,7 +1344,10 @@ export class ScanMarkdownFiles {
     /// TODO set color :: https://github.com/zotero/zotero/blob/52932b6eb03f72b5fb5591ba52d8e0f4c2ef825f/chrome/content/zotero/tagColorChooser.js
 
     const messageArray: notificationData['messageArray'] = [
-      { body: `Found ${items_withnotes.length} notes.`, type: nitems_notlocatable === 0 ? 'success' : 'info' },
+      {
+        body: `Found ${items_withnotes.length} notes.`,
+        type: nitems_notlocatable === 0 ? 'success' : 'info',
+      },
     ]
 
     if (nitems_notlocatable !== 0) {
@@ -1402,7 +1412,12 @@ export class ScanMarkdownFiles {
       messageArray = await this.updateItems(DataManager.zotIds())
     } else {
       if (DataManager.numberRecords() === 0) {
-        messageArray = [{ body: `Found ${DataManager.numberRecords()} notes. Check your settings.`, type: 'error' }]
+        messageArray = [
+          {
+            body: `Found ${DataManager.numberRecords()} notes. Check your settings.`,
+            type: 'error',
+          },
+        ]
       } else {
         messageArray = [{ body: `Found ${DataManager.numberRecords()} notes.`, type: 'info' }]
       }
@@ -1453,7 +1468,7 @@ export class ScanMarkdownFiles {
         messageArray = await this.syncRun()
         header = 'Synced'
       } catch (err) {
-        messageArray = [{ body: `An error occurred :: ${err}`, type: 'error' }]
+        messageArray = [{ body: `An error occurred :: ${getErrorMessage(err)}`, type: 'error' }]
       }
     }
 
@@ -1699,11 +1714,10 @@ export class systemInterface {
 
     if (ids === 'selected') {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return Zotero.getActiveZoteroPane().getSelectedItems(true)
       } catch (err) {
         // zoteroPane.getSelectedItems() doesn't test whether there's a selection and errors out if not
-        Logger.log('expandSelection', `Could not get selected items: ${err}`, false, 'warn')
+        Logger.log('expandSelection', `Could not get selected items: ${getErrorMessage(err)}`, false, 'warn')
         return []
       }
     }
@@ -1801,7 +1815,12 @@ export class systemInterface {
         }
       }
     } catch (err) {
-      Logger.log('showSelectedItemMarkdownInFilesystem', `ERROR :: ${entry_res?.path} :: ${err}`, false, 'warn')
+      Logger.log(
+        'showSelectedItemMarkdownInFilesystem',
+        `ERROR :: ${entry_res?.path} :: ${getErrorMessage(err)}`,
+        false,
+        'warn',
+      )
     }
   }
 
@@ -1815,7 +1834,7 @@ export class systemInterface {
         Logger.log('openFileSystemPath', `Revealing ${fileObj.path}`, false, 'info')
       }
     } catch (err) {
-      Logger.log('openFileSystemPath', `ERROR :: ${entry_res?.path} :: ${err}`, false, 'warn')
+      Logger.log('openFileSystemPath', `ERROR :: ${entry_res?.path} :: ${getErrorMessage(err)}`, false, 'warn')
     }
   }
 
@@ -1840,7 +1859,7 @@ export class systemInterface {
         'info',
       )
     } catch (err) {
-      Logger.log('openObsidianURI', `ERROR :: ${entry_res?.path} :: ${err}`, false, 'warn')
+      Logger.log('openObsidianURI', `ERROR :: ${entry_res?.path} :: ${getErrorMessage(err)}`, false, 'warn')
     }
   }
 
@@ -1862,9 +1881,9 @@ export class systemInterface {
         try {
           const fileObj = Zotero.File.pathToFile(entry_res.path)
           fileObj.normalize()
-          graphName = fileObj.parent.parent.leafName as string
+          graphName = fileObj.parent.parent.leafName
         } catch (err) {
-          Logger.log('openLogseqURI', `ERROR :: ${entry_res?.path} :: ${err}`, false, 'warn')
+          Logger.log('openLogseqURI', `ERROR :: ${entry_res?.path} :: ${getErrorMessage(err)}`, false, 'warn')
           //// if candidate graph name not found, abort ////
           throw err
         }
@@ -1872,7 +1891,39 @@ export class systemInterface {
 
       if (graphName === '') throw new Error('graphName not resolved')
 
-      const fileKey = `page=${logseq_prefix_file}${encodeURIComponent(entry_res.name)}`
+      const encodedFileName = encodeURIComponent(entry_res.name)
+      /// define pairs of characters to replace
+      /*
+      const charmap = [
+        ['%3A', ':'],
+        // ["%2F", "/"],
+        // ["%3F", "?"],
+        // ["%3D", "="],
+        // ["%26", "&"],
+        // ["%25", "%"],
+        // ["%23", "#"],
+        // ["%2B", "+"],
+        // ["%2C", ","],
+        // ["%3B", ";"],
+        // ["%40", "@"],
+        // ["%24", "$"],
+        // ["%5B", "["],
+        // ["%5D", "]"],
+        // ["%7B", "{"],
+        // ["%7D", "}"],
+        // ["%7C", "|"],
+        // ["%5C", "\\"],
+        // ["%22", '"'],
+        // ["%27", "'"],
+        // ["%60", "`"],
+        // ["%20", " "]
+      ]
+      for (const [encoded, decoded] of charmap) {
+        encodedFileName = encodedFileName.replaceAll(encoded, decoded)
+      }
+      // encodedFileName.replace(/%20/g, '+')
+      */
+      const fileKey = `page=${logseq_prefix_file}${encodedFileName}`
 
       /* prefix not encoded, filename encoded */
       Zotero.launchURL(`logseq://graph/${graphName}?${fileKey}`)
@@ -1884,7 +1935,7 @@ export class systemInterface {
         'info',
       )
     } catch (err) {
-      Logger.log('openLogseqURI', `ERROR :: ${entry_res?.path} :: ${err}`, false, 'warn')
+      Logger.log('openLogseqURI', `ERROR :: ${entry_res?.path} :: ${getErrorMessage(err)}`, false, 'warn')
     }
   }
 }
@@ -1929,7 +1980,7 @@ export class UIHelpers {
       'buildItemContextMenu',
       (original) =>
         async function ZoteroPane_buildItemContextMenu() {
-          await original.apply(this, arguments) // eslint-disable-line prefer-rest-params
+          await original.apply(this, arguments)
 
           const itemMenuRevealId = '__addonRef__-itemmenu'
           document.getElementById(itemMenuRevealId)?.remove()
@@ -2229,7 +2280,7 @@ export class prefHelpers {
         setPref('sourcedir', vaultpath)
       }
     } catch (err) {
-      Logger.log('chooseVaultFolder', `ERROR chooseVaultFolder :: ${err}`, false, 'warn')
+      Logger.log('chooseVaultFolder', `ERROR chooseVaultFolder :: ${getErrorMessage(err)}`, false, 'warn')
     }
   }
 

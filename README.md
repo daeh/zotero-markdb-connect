@@ -1,4 +1,6 @@
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/daeh/zotero-markdb-connect?style=for-the-badge)](https://github.com/daeh/zotero-markdb-connect/releases/latest) [![GitHub Downloads all releases](https://img.shields.io/github/downloads/daeh/zotero-markdb-connect/total?style=for-the-badge&color=forestgreen)](https://github.com/daeh/zotero-markdb-connect/releases/latest) [![GitHub Downloads (latest release)](https://img.shields.io/github/downloads/daeh/zotero-markdb-connect/latest/total?style=for-the-badge)](https://github.com/daeh/zotero-markdb-connect/releases/latest) [![GitHub Downloads release (by tag)](https://img.shields.io/github/downloads/daeh/zotero-markdb-connect/v0.0.25/total?style=for-the-badge)](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.0.27)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/daeh/zotero-markdb-connect?style=for-the-badge)](https://github.com/daeh/zotero-markdb-connect/releases/latest) [![GitHub Downloads all releases](https://img.shields.io/github/downloads/daeh/zotero-markdb-connect/total?style=for-the-badge&color=forestgreen)](https://github.com/daeh/zotero-markdb-connect/releases/latest) [![GitHub Downloads (latest release)](https://img.shields.io/github/downloads/daeh/zotero-markdb-connect/latest/total?style=for-the-badge)](https://github.com/daeh/zotero-markdb-connect/releases/latest)
+
+<!-- [![GitHub Downloads release (by tag)](https://img.shields.io/github/downloads/daeh/zotero-markdb-connect/v0.0.25/total?style=for-the-badge)](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.0.27) -->
 
 <!-- [![GitHub release (with filter)](https://img.shields.io/github/v/release/daeh/zotero-markdb-connect?style=for-the-badge&filter=*v0.1.0*)](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.1.0) [![GitHub all releases](https://img.shields.io/github/downloads/daeh/zotero-markdb-connect/total?style=for-the-badge&color=forestgreen)](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.1.0) -->
 
@@ -21,7 +23,7 @@ This is a plugin for [Zotero](https://www.zotero.org), a research source managem
 
 This plugin was initially designed with the [Obsidian](https://obsidian.md) markdown editor in mind, and was inspired by the [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin) workflow. It offers preliminary support for [logseq](https://logseq.com) and [Zettlr](https://www.zettlr.com). It can be adapted to other databases that store markdown files outside of Zotero, and to other workflows that generate markdown reading notes linked to Zotero items (such as Zotero's `Export Note` feature).
 
-Please post any bugs, questions, or feature requests in the Github repository's [issues](https://github.com/daeh/zotero-markdb-connect/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc).
+Please post any bugs, questions, or feature requests in the GitHub repository's [issues](https://github.com/daeh/zotero-markdb-connect/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc).
 
 ## Plugin Functions
 

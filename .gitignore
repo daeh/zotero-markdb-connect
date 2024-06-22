@@ -1,8 +1,14 @@
+### Local config files ###
+zotero-cmd.json
+.env
+
 ### Runtime ###
 node_modules/
-dist/
 build/
+dist/
 logs/
+yarn.lock
+.DS_Store
 
 ### Editor directories and files ###
 # .vscode/
@@ -13,5 +19,3 @@ logs/
 
 ### Generated files ###
 eslint.config.js
-zotero-cmd.json
-

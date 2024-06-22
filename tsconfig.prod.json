@@ -1,8 +1,8 @@
 {
   "extends": "./tsconfig.base",
   "compilerOptions": {
-    // "strict": true,
-    "strict": false,
+    "strict": true,
+    // "strict": false,
     "sourceMap": false,
     "removeComments": true,
     // "noUnusedLocals": false,

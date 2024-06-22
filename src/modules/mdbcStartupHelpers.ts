@@ -2,7 +2,7 @@ import { config, version } from '../../package.json'
 import { getPref, setPref } from '../utils/prefs'
 
 import { paramTypes, paramVals } from './mdbcConstants'
-import { Logger, trace } from './mdbcLogger'
+import { getErrorMessage, Logger, trace } from './mdbcLogger'
 import { getParam, Notifier } from './mdbcScan'
 
 export class wrappers {
@@ -31,7 +31,15 @@ export class wrappers {
       }
     } catch (error) {
       // Handle network errors or other issues
-      Logger.log('fetchAndParseJsonFromGitHub', `Error fetching JSON data: ${error.message}`, false, 'error')
+      ///TEMP
+      let message: string
+      try {
+        // @ts-ignore
+        message = error.message
+      } catch (err) {
+        message = 'error'
+      }
+      Logger.log('fetchAndParseJsonFromGitHub', `Error fetching JSON data: ${message}`, false, 'error')
       throw error // Re-throw the error if you want to handle it outside this function
     }
     return status
@@ -42,7 +50,13 @@ export class wrappers {
     const version_re =
       /^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)(?<release>[-+]?[0-9A-Za-z]+\.?[0-9A-Za-z]*[-+]?[0-9A-Za-z]*)?$/
 
-    const configurationVersionThis = { major: 0, minor: 0, patch: 0, release: '', str: version }
+    const configurationVersionThis = {
+      major: 0,
+      minor: 0,
+      patch: 0,
+      release: '',
+      str: version,
+    }
     const versionThis_rematch = version.match(version_re)
     if (versionThis_rematch?.groups) {
       configurationVersionThis.major = parseInt(versionThis_rematch.groups.major)
@@ -52,7 +66,13 @@ export class wrappers {
     }
 
     let configurationVersionPreviousStr: any = ''
-    let configurationVersionPrevious = { major: 0, minor: 0, patch: 0, release: '', str: '' }
+    let configurationVersionPrevious = {
+      major: 0,
+      minor: 0,
+      patch: 0,
+      release: '',
+      str: '',
+    }
     try {
       configurationVersionPreviousStr = getPref('configuration')
       if (typeof configurationVersionPreviousStr === 'string') {
@@ -67,9 +87,12 @@ export class wrappers {
           configurationVersionPrevious.release = version_rematch.groups.release ? version_rematch.groups.release : ''
         }
       }
-    } catch (e) {}
+    } catch (err) {}
 
-    return { app: configurationVersionThis, config: configurationVersionPrevious }
+    return {
+      app: configurationVersionThis,
+      config: configurationVersionPrevious,
+    }
   }
 
   @trace
@@ -132,8 +155,8 @@ export class wrappers {
             getParam.sourcedir()
           }
         }
-      } catch (e) {
-        Logger.log('startupDependencyCheck', `sourcedir ERROR: ${e}`, false, 'error')
+      } catch (err) {
+        Logger.log('startupDependencyCheck', `sourcedir ERROR: ${getErrorMessage(err)}`, false, 'error')
       }
 
       /// filefilterstrategy
@@ -159,8 +182,8 @@ export class wrappers {
           }
           getParam.filefilterstrategy()
         }
-      } catch (e) {
-        Logger.log('startupDependencyCheck', `filefilterstrategy ERROR: ${e}`, false, 'error')
+      } catch (err) {
+        Logger.log('startupDependencyCheck', `filefilterstrategy ERROR: ${getErrorMessage(err)}`, false, 'error')
       }
 
       /// filepattern
@@ -174,8 +197,8 @@ export class wrappers {
           if (val) setPref('filepattern', val)
           getParam.filepattern()
         }
-      } catch (e) {
-        Logger.log('startupDependencyCheck', `filepattern ERROR: ${e}`, false, 'error')
+      } catch (err) {
+        Logger.log('startupDependencyCheck', `filepattern ERROR: ${getErrorMessage(err)}`, false, 'error')
       }
 
       /// matchstrategy
@@ -201,8 +224,8 @@ export class wrappers {
           }
           getParam.matchstrategy()
         }
-      } catch (e) {
-        Logger.log('startupDependencyCheck', `matchstrategy ERROR: ${e}`, false, 'error')
+      } catch (err) {
+        Logger.log('startupDependencyCheck', `matchstrategy ERROR: ${getErrorMessage(err)}`, false, 'error')
       }
 
       /// bbtyamlkeyword
@@ -220,8 +243,8 @@ export class wrappers {
           }
           getParam.bbtyamlkeyword()
         }
-      } catch (e) {
-        Logger.log('startupDependencyCheck', `bbtyamlkeyword ERROR: ${e}`, false, 'error')
+      } catch (err) {
+        Logger.log('startupDependencyCheck', `bbtyamlkeyword ERROR: ${getErrorMessage(err)}`, false, 'error')
       }
 
       /// zotkeyregexp
@@ -239,8 +262,8 @@ export class wrappers {
           }
           getParam.zotkeyregexp()
         }
-      } catch (e) {
-        Logger.log('startupDependencyCheck', `zotkeyregexp ERROR: ${e}`, false, 'error')
+      } catch (err) {
+        Logger.log('startupDependencyCheck', `zotkeyregexp ERROR: ${getErrorMessage(err)}`, false, 'error')
       }
 
       /// mdeditor
@@ -280,8 +303,8 @@ export class wrappers {
           }
           getParam.mdeditor()
         }
-      } catch (e) {
-        Logger.log('startupDependencyCheck', `mdeditor ERROR: ${e}`, false, 'error')
+      } catch (err) {
+        Logger.log('startupDependencyCheck', `mdeditor ERROR: ${getErrorMessage(err)}`, false, 'error')
       }
 
       /// obsidianvaultname
@@ -299,8 +322,8 @@ export class wrappers {
           }
           getParam.obsidianvaultname()
         }
-      } catch (e) {
-        Logger.log('startupDependencyCheck', `obsidianvaultname ERROR: ${e}`, false, 'error')
+      } catch (err) {
+        Logger.log('startupDependencyCheck', `obsidianvaultname ERROR: ${getErrorMessage(err)}`, false, 'error')
       }
 
       /// logseqgraph
@@ -318,8 +341,8 @@ export class wrappers {
           }
           getParam.logseqgraph()
         }
-      } catch (e) {
-        Logger.log('startupDependencyCheck', `logseqgraph ERROR: ${e}`, false, 'error')
+      } catch (err) {
+        Logger.log('startupDependencyCheck', `logseqgraph ERROR: ${getErrorMessage(err)}`, false, 'error')
       }
 
       /// grouplibraries
@@ -337,8 +360,8 @@ export class wrappers {
           } else setPref('grouplibraries', paramVals.grouplibraries[0])
           getParam.grouplibraries()
         }
-      } catch (e) {
-        Logger.log('startupDependencyCheck', `grouplibraries ERROR: ${e}`, false, 'error')
+      } catch (err) {
+        Logger.log('startupDependencyCheck', `grouplibraries ERROR: ${getErrorMessage(err)}`, false, 'error')
       }
 
       /// removetags
@@ -359,8 +382,8 @@ export class wrappers {
             setPref('removetags', paramVals.removetags[0])
           }
         }
-      } catch (e) {
-        Logger.log('startupDependencyCheck', `removetags ERROR: ${e}`, false, 'error')
+      } catch (err) {
+        Logger.log('startupDependencyCheck', `removetags ERROR: ${getErrorMessage(err)}`, false, 'error')
       }
 
       /// tagstr
@@ -378,8 +401,8 @@ export class wrappers {
           }
           getParam.tagstr()
         }
-      } catch (e) {
-        Logger.log('startupDependencyCheck', `tagstr ERROR: ${e}`, false, 'error')
+      } catch (err) {
+        Logger.log('startupDependencyCheck', `tagstr ERROR: ${getErrorMessage(err)}`, false, 'error')
       }
 
       if (addon.data.env === 'production') {

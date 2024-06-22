@@ -2,7 +2,7 @@
   "compilerOptions": {
     "module": "commonjs",
     "moduleResolution": "node",
-    "target": "ES2017",
+    "target": "ES2018",
     "lib": [
       "ES2017",
       "DOM",
@@ -26,9 +26,6 @@
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": [
-    "src",
-    "typing" //"node_modules/zotero-types"
-  ],
-  "exclude": ["build", "addon", "scripts"]
+  "include": ["src", "typing", "node_modules/zotero-types"],
+  "exclude": ["build", "addon"]
 }

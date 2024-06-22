@@ -177,16 +177,16 @@ export class Logger {
       if (toLogsStore) this.addLog(key, value, overwrite)
 
       success = true
-    } catch (error) {
-      Zotero.debug(`{${config.addonInstance}}[log][ERROR] addDebugLog Error: ${error}`)
-      ztoolkit.log(`{${config.addonInstance}}[log][ERROR] addDebugLog Error`, error)
+    } catch (err) {
+      Zotero.debug(`{${config.addonInstance}}[log][ERROR] addDebugLog Error: ${getErrorMessage(err)}`)
+      ztoolkit.log(`{${config.addonInstance}}[log][ERROR] addDebugLog Error`, err)
     }
     if (!success) {
       try {
         LogsStore.logs[key] = [LogsStore.logs[key], value]
-      } catch (error) {
-        Zotero.debug(`{${config.addonInstance}}[log][ERROR] addDebugLog-fallback Error: ${error}`)
-        ztoolkit.log(`{${config.addonInstance}}[log][ERROR] addDebugLog-fallback Error`, error)
+      } catch (err) {
+        Zotero.debug(`{${config.addonInstance}}[log][ERROR] addDebugLog-fallback Error: ${getErrorMessage(err)}`)
+        ztoolkit.log(`{${config.addonInstance}}[log][ERROR] addDebugLog-fallback Error`, err)
       }
     }
   }
@@ -202,13 +202,22 @@ export function trace(target: any, propertyKey: string | symbol, descriptor: Pro
         Logger.log('trace', identifier, false, 'trace')
       }
       return original.apply(this, args)
-    } catch (error) {
+    } catch (err) {
       ztoolkit.log(`{${config.addonInstance}}[call][ERROR] : SOME ERROR`)
-      Zotero.debug(`{${config.addonInstance}}[call][ERROR] : ${target.name}.${String(propertyKey)} :: ${error}`)
-      ztoolkit.log(`{${config.addonInstance}}[call][ERROR] : ${target.name}.${String(propertyKey)}`, error)
-      Logger.log('trace', `ERROR : ${identifier} :: ${error}`, false, 'error')
-      throw error
+      Zotero.debug(
+        `{${config.addonInstance}}[call][ERROR] : ${target.name}.${String(propertyKey)} :: ${getErrorMessage(err)}`,
+      )
+      ztoolkit.log(`{${config.addonInstance}}[call][ERROR] : ${target.name}.${String(propertyKey)}`, err)
+      Logger.log('trace', `ERROR : ${identifier} :: ${getErrorMessage(err)}`, false, 'error')
+      throw err
     }
   }
   return descriptor
+}
+
+export function getErrorMessage(err: unknown): string {
+  if (err instanceof Error) {
+    return err.message
+  }
+  return String(err)
 }
