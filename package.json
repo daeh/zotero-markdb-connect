@@ -55,7 +55,7 @@
     "prettier": "^3.2.5",
     "release-it": "^17.1.1",
     "replace-in-file": "^7.1.0",
-    "typescript": "^5.4.3",
+    "typescript": "^5.5.2",
     "zotero-types": "^1.3.20"
   },
   "release-it": {
