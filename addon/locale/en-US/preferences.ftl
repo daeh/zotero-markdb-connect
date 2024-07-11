@@ -14,7 +14,6 @@ pref-vault-source-folder-desc = MarkDB-Connect will search this directory recurs
 pref-filefilterstrategy-title = File Filter
 pref-filefilterstrategy-default-label = Default File Filter: recursively find markdown files beginning with {"@"}
 pref-filefilterstrategy-default-desc1 = Markdown files should begin with {"@"}{"{"}{"{"}citekey{"}"}{"}"}, where {"{"}{"{"}citekey{"}"}{"}"} is the BetterBibTeX citekey,
-pref-filefilterstrategy-default-desc2 = e.g. a filename could be '@shepard1987science Universal Law.md', where 'shepard1987science' is the BetterBibTeX citekey.
 
 pref-filefilterstrategy-custom-label = Custom File Filter: recursively find files matching this RegExp pattern
 pref-filefilterstrategy-custom-desc1 = RegExp (case insensitive):

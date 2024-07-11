@@ -1,9 +1,11 @@
 import { config, version } from '../../package.json'
 import { getPref, setPref } from '../utils/prefs'
 
-import { paramTypes, paramVals } from './mdbcConstants'
+import { paramVals } from './mdbcConstants'
 import { getErrorMessage, Logger, trace } from './mdbcLogger'
 import { getParam, Notifier } from './mdbcScan'
+
+import type { paramTypes } from './mdbcConstants'
 
 export class wrappers {
   @trace

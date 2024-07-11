@@ -1,4 +1,8 @@
 <!--https://www.oreilly.com/library/view/creating-applications-with/9780596000523/07_chapter-03.html-->
+<!-- Three tags available in XUL handle basic text display in the UI, and each has its own context for use. They include a <caption>, a <label>, and a <description> element. -->
+<!-- The caption is designed specifically for the text that appears inline in the border of a group box. You can control where the caption appears by putting the caption element above or below the other content in the group box: -->
+<!-- label is more flexible than caption because it isn't tied to a particular widget and can even be used as a standalone. -->
+<!-- For longer text, the <description> element is best. You can embed text in the description element and have it wrap to the maximum size of the containing element: -->
 
 <linkset>
   <html:link
@@ -13,13 +17,22 @@
   id="zotero-prefpane-__addonRef__"
   onload="Zotero.__addonInstance__.hooks.onPrefsEvent('load', {window})">
   <groupbox>
-    <label class="mdbc-pref-text-center"><html:h1 data-l10n-id="pref-title"> </html:h1></label>
+    <!--<label class="mdbc-pref-text-center"><html:h1 data-l10n-id="pref-title"> </html:h1></label>-->
+    <!--<caption-->
+    <!--  class="mdbc-pref-hone"-->
+    <!--  data-l10n-id="pref-title" />-->
+    <label
+      class="mdbc-pref-text-center mdbc-pref-label-hone"
+      data-l10n-id="pref-title" />
   </groupbox>
 
   <groupbox class="mdbc-pref-section-box">
-    <caption class="mdbc-pref-section-title">
-      <html:span data-l10n-id="pref-locate-mdfiles"> </html:span>
-    </caption>
+    <caption
+      class="mdbc-pref-section-title"
+      data-l10n-id="pref-locate-mdfiles" />
+    <!--<caption class="mdbc-pref-section-title">-->
+    <!--  <html:span data-l10n-id="pref-locate-mdfiles"> </html:span>-->
+    <!--</caption>-->
 
     <separator />
 
@@ -54,9 +67,14 @@
       <html:div
         class="mdbc-pref-options-div"
         id="zotero-prefpane-__addonRef__-filefilterstrategy-default-options">
-        <description>Recursively find markdown files beginning with @ .</description>
-        <description data-l10n-id="pref-filefilterstrategy-default-desc1"> </description>
-        <description data-l10n-id="pref-filefilterstrategy-default-desc2"> </description>
+        <description>Recursively find markdown files beginning with <html:code>@</html:code> .</description>
+        <description
+          class="mdbc-pref-description-indent"
+          data-l10n-id="pref-filefilterstrategy-default-desc1">
+        </description>
+        <description class="mdbc-pref-description-indent"
+          >E.g. a filename could be '<html:code>@shepard1987science Universal Law.md</html:code>', where '<html:code>shepard1987science</html:code>' is the BetterBibTeX citekey.</description
+        >
       </html:div>
 
       <!--<separator />-->
@@ -76,20 +94,22 @@
             data-l10n-id="pref-filefilterstrategy-custom-desc1"
             class="mdbc-pref-options-span-first">
           </html:span
-          ><html:span class="mdbc-pref-options-span-left mdbc-pref-options-code-span">/</html:span
+          ><html:span class="mdbc-pref-options-span-left mdbc-pref-options-code-span"><html:code>/</html:code></html:span
           ><html:input
             type="text"
             id="zotero-prefpane-__addonRef__-filepattern"
             preference="__prefsPrefix__.filepattern"
             class="mdbc-pref-textbox-partialwidth"
             onchange="return Zotero.__addonInstance__.hooks.onPrefsEvent('checkRegExpValid', {value: this.value})" /><html:span class="mdbc-pref-options-span-right mdbc-pref-options-code-span"
-            >/i</html:span
+            ><html:code>/i</html:code></html:span
           >
         </hbox>
-        <description class="mdbc-pref-explication-minor">The default file filter looks for Markdown files beginning with '@' : ^@.+\.md$ </description>
-        <description>N.B. If the BBT citekey is present in the filename pattern, you can include one capturing group to match it.</description>
-        <description>E.g. the default citekey-capturing RegExp uses the non-whitespace characters after the leading '@' as the BBT citekey:</description>
-        <label>^@(\S+).*\.md$</label>
+        <description class="mdbc-pref-explication-minor">The default file filter looks for Markdown files beginning with '<html:code>@</html:code>' : <html:code>/^@.+\.md$/i</html:code> </description>
+        <description class="mdbc-pref-description-indent">N.B. If the BBT citekey is present in the filename pattern, you can include one capturing group to match it.</description>
+        <description class="mdbc-pref-description-indent"
+          >E.g. the default citekey-capturing RegExp uses the non-whitespace characters after the leading '<html:code>@</html:code>' as the BBT citekey:</description
+        >
+        <description class="mdbc-pref-description-indent"><html:code class="mdbc-pref-code-indent">^@(\S+).*\.md$</html:code></description>
       </html:div>
     </radiogroup>
   </groupbox>
@@ -129,9 +149,11 @@
               class="mdbc-pref-textbox-partialwidth"
               onchange="Zotero.__addonInstance__.hooks.onPrefsEvent('checkMetadataFormat', {value: this.value})" /><html:span class="mdbc-pref-options-span-right"> </html:span>
           </hbox>
-          <description>If you want to extract the citekey from a markdown note's metadata, indicate the keyword here. A common value is: 'citekey'.</description>
-          <description>If the specified keyword is not found in the YAML header, MDBC will fallback to searching the filename for a BBT citekey.</description>
-          <description>If no YAML keyword is given, the citekey will be taken from the filename. </description>
+          <description class="mdbc-pref-description-indent"
+            >If you want to extract the citekey from a markdown note's metadata, indicate the keyword here. A common value is: '<html:code>citekey</html:code>'.</description
+          >
+          <description class="mdbc-pref-description-indent">If the specified keyword is not found in the YAML header, MDBC will fallback to searching the filename for a BBT citekey.</description>
+          <description class="mdbc-pref-description-indent">If no YAML keyword is given, the citekey will be taken from the filename. </description>
         </html:div>
       </groupbox>
 
@@ -154,21 +176,23 @@
 
           <description>RegExp to match BBT citekey in file content (optional if BBT citkey is in title, required otherwise)</description>
           <hbox class="mdbc-pref-hbox-indent">
-            <html:span class="mdbc-pref-options-span-first">RegExp:</html:span><html:span class="mdbc-pref-options-span-left mdbc-pref-options-code-span">/</html:span
+            <html:span class="mdbc-pref-options-span-first">RegExp:</html:span><html:span class="mdbc-pref-options-span-left mdbc-pref-options-code-span"><html:code>/</html:code></html:span
             ><html:input
               type="text"
               id="zotero-prefpane-__addonRef__-bbtregexp"
               preference="__prefsPrefix__.bbtregexp"
               class="mdbc-pref-textbox-partialwidth"
               onchange="return Zotero.__addonInstance__.hooks.onPrefsEvent('checkRegExpValid', {value: this.value})" /><html:span class="mdbc-pref-options-span-right mdbc-pref-options-code-span"
-              >/m</html:span
+              ><html:code>/m</html:code></html:span
             >
           </hbox>
-          <description>If you want to extract the citekey from a markdown file's contents, specify a RegExp with one capturing group here. It should return exactly one match per file.</description>
-          <description
+          <description class="mdbc-pref-description-indent"
+            >If you want to extract the citekey from a markdown file's contents, specify a RegExp with one capturing group here. It should return exactly one match per file.</description
+          >
+          <description class="mdbc-pref-description-indent"
             >If more than one match is returned only the first will be used. If the RegExp does not return any matches, MDBC will fallback to searching the filename for a BBT citekey.</description
           >
-          <description>If no pattern is given, the citekey will be taken from the filename. </description>
+          <description class="mdbc-pref-description-indent">If no pattern is given, the citekey will be taken from the filename. </description>
         </html:div>
       </groupbox>
 
@@ -190,19 +214,19 @@
           <!--<separator />-->
 
           <label>Required: Specify a RegExp to match the Zotero-Item-Key from the markdown contents</label>
-          <label>(e.g. match 'ABCD1234' in 'zotero://select/library/items/ABCD1234')</label>
+          <label>(e.g. match '<html:code>ABCD1234</html:code>' in <html:code>zotero://select/library/items/ABCD1234</html:code>)</label>
           <hbox class="mdbc-pref-hbox-indent">
-            <html:span class="mdbc-pref-options-span-first">RegExp:</html:span><html:span class="mdbc-pref-options-span-left mdbc-pref-options-code-span">/</html:span
+            <html:span class="mdbc-pref-options-span-first">RegExp:</html:span><html:span class="mdbc-pref-options-span-left mdbc-pref-options-code-span"><html:code>/</html:code></html:span
             ><html:input
               type="text"
               id="zotero-prefpane-__addonRef__-zotkeyregexp"
               preference="__prefsPrefix__.zotkeyregexp"
               class="mdbc-pref-textbox-partialwidth"
               onchange="return Zotero.__addonInstance__.hooks.onPrefsEvent('checkRegExpValid', {value: this.value})" /><html:span class="mdbc-pref-options-span-right mdbc-pref-options-code-span"
-              >/m</html:span
+              ><html:code>/m</html:code></html:span
             >
           </hbox>
-          <description>N.B. The Zotero-Item-Key is assigned automatically by Zotero. It is not the same as the BetterBibTeX citekey.</description>
+          <description class="mdbc-pref-description-indent">N.B. The Zotero-Item-Key is assigned automatically by Zotero. It is not the same as the BetterBibTeX citekey.</description>
         </html:div>
       </groupbox>
     </radiogroup>
@@ -241,21 +265,22 @@
                 preference="__prefsPrefix__.obsidianvaultname"
                 class="mdbc-pref-textbox-partialwidth" /><html:span class="mdbc-pref-options-span-right"> </html:span>
             </hbox>
-            <label
-              class="mdbc-pref-explication-minor"
-              value="The Vault name replaces {{vault}} in obsidian://open?vault={{vault}}&amp;path={{filepath}}" />
+            <label class="mdbc-pref-explication-minor"
+              >The Vault name replaces <html:code>{{vault}}</html:code> in <br /> <html:code class="mdbc-pref-code-indent">obsidian://open?vault={{vault}}&amp;path={{filepath}}</html:code></label
+            >
           </groupbox>
 
           <separator />
 
           <groupbox>
             <!-- filename or file path -->
-            <label>Use filename rather than full path to open note in Obsidian</label>
             <checkbox
-              label="Use filename instead of path in URI"
+              label="Use filename instead of filepath in URI"
               id="zotero-prefpane-__addonRef__-obsidianresolvewithfile"
               preference="__prefsPrefix__.obsidianresolvewithfile" />
-            <description class="mdbc-pref-explication-minor">Use only the filename in the URI rather than using the full file path. This is only advised if the default is not working.</description>
+            <description class="mdbc-pref-explication-minor mdbc-pref-description-indent"
+              >Use only the filename in the URI rather than using the full file path. This is only advised if the default is not working.</description
+            >
           </groupbox>
         </html:div>
       </groupbox>
@@ -287,6 +312,8 @@
               class="mdbc-pref-explication-minor"
               value="The graph name replaces {{graph}} in logseq://graph/{{graph}}?page={{prefix}}{{title}}" />
 
+            <separator />
+
             <hbox class="mdbc-pref-hbox-indent">
               <html:span class="mdbc-pref-options-span-first">logseq page prefix (optional):</html:span
               ><html:input
@@ -298,6 +325,12 @@
             <label
               class="mdbc-pref-explication-minor"
               value="The page prefix replaces {{prefix}} in logseq://graph/{{graph}}?page={{prefix}}{{title}}" />
+
+            <separator />
+
+            <description class="mdbc-pref-explication-minor"
+              >The prefix and graph should be entered as url encoded strings that can be directly inserted into the <html:code>logseq://</html:code> URI.</description
+            >
           </groupbox>
         </html:div>
       </groupbox>
@@ -417,8 +450,11 @@
     <!-- open github issues -->
     <label class="mdbc-pref-subsection-title">Git Help</label>
     <html:div class="mdbc-pref-options-div">
-      <groupbox class="mdbc-pref-width-full">
+      <groupbox>
         <description>Open Issue on GitHub</description>
+        <description
+          >Open Issue on GitHub Open Issue on GitHub Open Issue on GitHub Open Issue on GitHub Open Issue on GitHub Open Issue on GitHub Open Issue on GitHub Open Issue on GitHub</description
+        >
         <button
           id="zotero-prefpane-__addonRef__-gitissue-button"
           label="Open Issue on GitHub"

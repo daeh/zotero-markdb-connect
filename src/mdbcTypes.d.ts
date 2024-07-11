@@ -24,6 +24,9 @@ export interface Entry {
   zotids: number[]
   name: string
   path: string
+  // filename: string
+  // filenamebase: string
+  // displayname: string
 }
 
 export interface prefParam {

@@ -1,25 +1,34 @@
 import { dirname, resolve } from 'path'
 import { fileURLToPath } from 'url'
 
-import defaultStylisticPlugin from '@stylistic/eslint-plugin'
-import javascriptStylisticPlugin from '@stylistic/eslint-plugin-js'
-import typescriptStylisticPlugin from '@stylistic/eslint-plugin-ts'
+import stylisticPlugin from '@stylistic/eslint-plugin'
 import typescriptEslintPlugin from '@typescript-eslint/eslint-plugin'
 import typescriptEslintParser from '@typescript-eslint/parser'
 import prettierConfig from 'eslint-config-prettier'
-// import pluginImport from 'eslint-plugin-import'
-import pluginImport from 'eslint-plugin-import-x'
+import pluginImport from 'eslint-plugin-import'
 import pluginImportConfig from 'eslint-plugin-import/config/recommended.js'
-// import pluginImportConfig from 'eslint-plugin-import-x/config/recommended.js'
 import prettierPlugin from 'eslint-plugin-prettier'
 import globals from 'globals'
 
 const projectDirname = dirname(fileURLToPath(import.meta.url))
 
-const env = (() => {
+const context = (() => {
   if (typeof process.env.NODE_ENV === 'undefined') return 'default'
-  if (process.env.NODE_ENV === 'development') return 'development'
-  if (process.env.NODE_ENV === 'production') return 'production'
+  if (process.env.NODE_ENV === 'development') return 'dev'
+  if (process.env.NODE_ENV === 'production') return 'prod'
+  if (process.env.NODE_ENV === 'repo') return 'repo'
+  new Error('Invalid NODE_ENV')
+  return 'error'
+})()
+
+const projectFilesToIgnore = context === 'repo' ? [] : ['.release-it.ts', 'zotero-plugin.config.ts']
+
+const tsconfig = (() => {
+  if (context === 'default') return './tsconfig.json'
+  if (context === 'dev') return './tsconfig.dev.json'
+  if (context === 'prod') return './tsconfig.prod.json'
+  if (context === 'repo') return './tsconfig.repo.json'
+  new Error('Invalid context')
   return 'error'
 })()
 
@@ -27,11 +36,11 @@ const allTsExtensionsArray = ['ts', 'mts', 'cts', 'tsx', 'mtsx']
 const allJsExtensionsArray = ['js', 'mjs', 'cjs', 'jsx', 'mjsx']
 const allTsExtensions = allTsExtensionsArray.join(',')
 const allJsExtensions = allJsExtensionsArray.join(',')
-// @ts-expect-error - ignore this local variable
 const allExtensions = [...allTsExtensionsArray, ...allJsExtensionsArray].join(',')
 
 const importRules = {
   'import/no-unresolved': 'error',
+  'import/namespace': 'off',
   'sort-imports': [
     'error',
     {
@@ -90,7 +99,7 @@ const typescriptRules = {
   // ...typescriptEslintPlugin.configs['strict-type-checked'].rules,
   //
   ...typescriptEslintPlugin.configs['stylistic-type-checked'].rules,
-  ...typescriptStylisticPlugin.configs['disable-legacy'].rules,
+  ...stylisticPlugin.configs['disable-legacy'].rules,
   ...importRules,
   ...baseRules,
 }
@@ -120,6 +129,7 @@ const typescriptRulesDev = {
       'ts-check': 'allow-with-description',
     },
   ],
+  '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
 }
 
 const javascriptRulesDev = {
@@ -135,8 +145,8 @@ const config = [
       parserOptions: {
         ecmaVersion: 'latest', // 2024 sets the ecmaVersion parser option to 15
         tsconfigRootDir: resolve(projectDirname),
-        project: env === 'production' ? './tsconfig.prod.json' : './tsconfig.json',
         sourceType: 'module',
+        project: tsconfig,
       },
     },
   },
@@ -153,7 +163,7 @@ const config = [
     },
     plugins: {
       '@typescript-eslint': typescriptEslintPlugin,
-      '@stylistic': defaultStylisticPlugin,
+      '@stylistic': stylisticPlugin,
       'import': pluginImport,
       'prettier': prettierPlugin,
     },
@@ -167,7 +177,7 @@ const config = [
     ignores: [`src/**/*.{${allTsExtensions}}`, `typing/**/*.d.ts`, `**/*.config.{${allTsExtensions}}`],
     plugins: {
       '@typescript-eslint': typescriptEslintPlugin,
-      '@stylistic': defaultStylisticPlugin,
+      '@stylistic': stylisticPlugin,
     },
     rules: {
       ...typescriptEslintPlugin.configs.strict.rules,
@@ -193,7 +203,7 @@ const config = [
     },
   },
   {
-    ignores: ['build', 'scripts', '**/*.js', '**/*.bak'],
+    ignores: ['build', 'scripts', '**/*.js', '**/*.bak', ...projectFilesToIgnore],
   },
 ]
 

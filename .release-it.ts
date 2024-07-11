@@ -24,6 +24,13 @@ export default {
     'before:init': 'npm run lint',
     'after:bump': 'npm run build',
     'after:release': 'echo Successfully released ${name} v${version} to ${repo.repository}.',
+    // 'after:release': async (context) => {
+    //   const { github, version } = context;
+    //   if (github && github.releaseUrl) {
+    //     console.log(`Opening draft release for v${version}...`);
+    //     await open(github.releaseUrl);
+    //   }
+    // }
   },
   npm: {
     publish: false,

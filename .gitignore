@@ -1,5 +1,4 @@
 ### Local config files ###
-zotero-cmd.json
 .env
 
 ### Runtime ###
@@ -11,11 +10,7 @@ yarn.lock
 .DS_Store
 
 ### Editor directories and files ###
-# .vscode/
-!.vscode/extensions.json
-# .idea/
-!.idea/
-.idea/workspace.xml
+.idea/
 
 ### Generated files ###
 eslint.config.js

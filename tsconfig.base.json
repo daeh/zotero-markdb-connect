@@ -10,17 +10,20 @@
       "ES2021.WeakRef"
       // "webworker",
     ],
-    // "isolatedModules": true,
-    // "esModuleInterop": true,
-    ////
-    "noEmit": true,
-    "skipLibCheck": true,
+
+    /*  */
     "experimentalDecorators": true,
     "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    // "strict": true,
+
+    /*  */
+    // "isolatedModules": true, // for bundlers like vite. Setting the isolatedModules flag tells TypeScript to warn you if you write certain code that can’t be correctly interpreted by a single-file transpilation process.
+    // "esModuleInterop": true,
+
     // "allowImportingTsExtensions": true,
     // "allowSyntheticDefaultImports": false,
-    // "esModuleInterop": false,
-    // "isolatedModules": true, // for bundlers like vite. Setting the isolatedModules flag tells TypeScript to warn you if you write certain code that can’t be correctly interpreted by a single-file transpilation process.
 
     /* Linting */
     "noFallthroughCasesInSwitch": true,

@@ -4,11 +4,12 @@ import { getString } from '../utils/locale'
 import { getPref, setPref } from '../utils/prefs'
 
 import { Elements } from './create-element'
-import { paramTypes, paramVals } from './mdbcConstants'
+import { paramVals } from './mdbcConstants'
 import { getErrorMessage, Logger, trace } from './mdbcLogger'
 import { wrappers } from './mdbcStartupHelpers'
 import { patch as $patch$ } from './monkey-patch'
 
+import type { paramTypes } from './mdbcConstants'
 import type {
   DebugMode,
   Entry,
@@ -420,6 +421,9 @@ export class getParam {
     return param
   }
 
+  /**
+   * Prefix for logseq filenames (NB: presumes that prefix has already been URL encoded)
+   */
   @trace
   static logseqprefix() {
     const name = 'logseqprefix'
@@ -619,23 +623,17 @@ export class ScanMarkdownFiles {
     if (filefilterstrategy === 'customfileregexp') {
       re_file = re_title = getParam.filepattern().value
     }
-    // if (filefilterstrategy === 'default && protocol === 'logseq') {
-    //   const logseq_prefix_file = getParam.logseqprefix().value
-    //   // const logseq_prefix_file_encoded = encodeURIComponent(logseq_prefix_file)
-    //   re_title = new RegExp(`^@${logseq_prefix_file}(\\S+).*\\.md$`, 'i')
-    // }
 
     /// pattern to trim extension from filename
     const re_suffix = /\.md$/i
 
     let logseq_prefix_valid = false
     let logseq_prefix_file = ''
-    // let logseq_prefix_title = ''
     if (protocol === 'logseq') {
+      /* logseq filename prefix, should be URL encoded */
       const logseqprefixParam = getParam.logseqprefix()
       logseq_prefix_valid = logseqprefixParam.valid
       logseq_prefix_file = logseqprefixParam.value
-      // logseq_prefix_title = logseqprefixParam.value
     }
 
     const allFiles = await Utils.getFilesRecursively(sourcedir)
@@ -647,15 +645,20 @@ export class ScanMarkdownFiles {
         const filenamebase = filename.replace(re_suffix, '')
         const filepath = entry.path
 
+        ///TODO make separate fields for name (filename, filenamebase, displayname)
+        /* use display name in context menu
+        for obsidian, display name is the filenamebase
+        for logseq, display name is the filenamebase with prefix removed and URL decoded
+        for URI, always use filenamebase
+         */
         let noteName = filenamebase
-        if (protocol === 'logseq') {
+        if (protocol === 'logseq' && logseq_prefix_valid) {
           if (logseq_prefix_valid) {
             if (noteName.startsWith(logseq_prefix_file)) {
               noteName = noteName.replace(new RegExp(`^${logseq_prefix_file}`), '')
             }
-            // const noteNameWithoutPrefix = decodeURIComponent(filenamebase).replace(decodeURIComponent(logseq_prefix_file), '')
-            noteName = decodeURIComponent(noteName)
           }
+          noteName = decodeURIComponent(noteName)
         }
 
         const entry_res: Entry = {
@@ -762,6 +765,7 @@ export class ScanMarkdownFiles {
     return res
   }
 
+  @trace
   static async scanVaultCustomRegex(): Promise<Entry[]> {
     const res: Entry[] = []
     const reserr: Entry[] = []
@@ -793,12 +797,11 @@ export class ScanMarkdownFiles {
 
     let logseq_prefix_valid = false
     let logseq_prefix_file = ''
-    // let logseq_prefix_title = ''
     if (protocol === 'logseq') {
+      /* logseq filename prefix, should be URL encoded */
       const logseqprefixParam = getParam.logseqprefix()
       logseq_prefix_valid = logseqprefixParam.valid
       logseq_prefix_file = logseqprefixParam.value
-      // logseq_prefix_title = logseqprefixParam.value
     }
 
     const allFiles = await Utils.getFilesRecursively(sourcedir)
@@ -811,14 +814,13 @@ export class ScanMarkdownFiles {
         const filepath = entry.path
 
         let noteName = filenamebase
-        if (protocol === 'logseq') {
+        if (protocol === 'logseq' && logseq_prefix_valid) {
           if (logseq_prefix_valid) {
             if (noteName.startsWith(logseq_prefix_file)) {
               noteName = noteName.replace(new RegExp(`^${logseq_prefix_file}`), '')
             }
-            // const noteNameWithoutPrefix = decodeURIComponent(filenamebase).replace(decodeURIComponent(logseq_prefix_file), '')
-            noteName = decodeURIComponent(noteName)
           }
+          noteName = decodeURIComponent(noteName)
         }
 
         const entry_res: Entry = {
@@ -1537,6 +1539,9 @@ export class ScanMarkdownFiles {
 
     const dialogHelper = new ztoolkit.Dialog(nrows, 1)
 
+    const minWidth = '300px'
+    const maxWidth = '1000px'
+
     dialogHelper
       .addCell(irow++, 0, {
         tag: 'h1',
@@ -1544,6 +1549,8 @@ export class ScanMarkdownFiles {
         namespace: 'html',
         styles: {
           textAlign: 'center',
+          minWidth: minWidth,
+          maxWidth: maxWidth,
         },
       })
       .addCell(irow++, 0, {
@@ -1552,6 +1559,8 @@ export class ScanMarkdownFiles {
         namespace: 'html',
         styles: {
           textAlign: 'center',
+          minWidth: minWidth,
+          maxWidth: maxWidth,
         },
       })
 
@@ -1564,7 +1573,8 @@ export class ScanMarkdownFiles {
         namespace: 'html',
         styles: {
           textAlign: 'center',
-          width: '200px',
+          minWidth: minWidth,
+          maxWidth: maxWidth,
         },
       })
     }
@@ -1577,6 +1587,8 @@ export class ScanMarkdownFiles {
           namespace: 'html',
           styles: {
             textAlign: 'center',
+            minWidth: minWidth,
+            maxWidth: maxWidth,
           },
         })
         .addCell(irow++, 0, {
@@ -1589,7 +1601,8 @@ export class ScanMarkdownFiles {
           namespace: 'html',
           styles: {
             textAlign: 'center',
-            width: '200px',
+            minWidth: minWidth,
+            maxWidth: maxWidth,
           },
         })
     }
@@ -1604,7 +1617,8 @@ export class ScanMarkdownFiles {
           namespace: 'html',
           styles: {
             textAlign: 'center',
-            width: '200px',
+            minWidth: minWidth,
+            maxWidth: maxWidth,
             paddingBottom: '3px',
             marginBottom: '0px',
             lineHeight: '1em',
@@ -1618,7 +1632,8 @@ export class ScanMarkdownFiles {
           namespace: 'html',
           styles: {
             textAlign: 'center',
-            width: '200px',
+            minWidth: minWidth,
+            maxWidth: maxWidth,
           },
         })
 
@@ -1635,7 +1650,8 @@ export class ScanMarkdownFiles {
             styles: {
               // border: '3px solid blue',
               // marginLeft: 'auto',
-              // width: '100%',
+              minWidth: minWidth,
+              maxWidth: maxWidth,
             },
             listeners: [
               {
@@ -1692,7 +1708,15 @@ export class ScanMarkdownFiles {
 
     dialogHelper.addButton('Close', 'cancel')
     dialogHelper.setDialogData(dialogData)
-    dialogHelper.open(`${config.addonName} Report`) // { resizable: true, centerscreen: true }
+
+    dialogHelper.open(`${config.addonName} Report`, {
+      // width: 400, // ignored if fitContent is true
+      centerscreen: true,
+      resizable: true,
+      fitContent: true,
+      // noDialogMode: false,
+      // alwaysRaised?: boolean;
+    }) // { resizable: true, centerscreen: true }
 
     addon.data.dialog = dialogHelper
     await dialogData.unloadLock?.promise
@@ -1850,14 +1874,10 @@ export class systemInterface {
           ? `file=${encodeURIComponent(entry_res.name)}`
           : `path=${encodeURIComponent(entry_res.path)}`
 
-      Zotero.launchURL(`obsidian://open?${vaultKey}${fileKey}`)
+      const uri = `obsidian://open?${vaultKey}${fileKey}`
+      Zotero.launchURL(uri)
 
-      Logger.log(
-        'openObsidianURI',
-        `Launching ${entry_res.path} :: obsidian://open?${vaultKey}${fileKey}`,
-        false,
-        'info',
-      )
+      Logger.log('openObsidianURI', `Launching ${entry_res.path} :: ${uri}`, false, 'info')
     } catch (err) {
       Logger.log('openObsidianURI', `ERROR :: ${entry_res?.path} :: ${getErrorMessage(err)}`, false, 'warn')
     }
@@ -1866,74 +1886,49 @@ export class systemInterface {
   @trace
   static openLogseqURI(entry_res: Entry): void {
     try {
+      /// get filename without extension
+      const fileObj = Zotero.File.pathToFile(entry_res.path)
+      fileObj.normalize()
+      // const filename = fileObj.getRelativePath(fileObj.parent)
+      // const filename = fileObj.displayName
+      const filename = fileObj.leafName
+      const filenamebase = filename.replace(/\.md$/i, '')
+
+      /// get graph name
+      let graphName: string = ''
       const graphNameParam = getParam.logseqgraph()
-      let graphName = ''
-
-      const logseqprefixParam = getParam.logseqprefix()
-      // const logseq_prefix_valid = logseqprefixParam.valid
-      const logseq_prefix_file = logseqprefixParam.value
-      // const logseq_prefix_title = logseqprefixParam.value
-
       if (graphNameParam.valid) {
         graphName = graphNameParam.value
       } else {
-        //// if graph name not specified, try to get it from the path ////
+        /* if graph name not specified, try to get it from the path */
         try {
-          const fileObj = Zotero.File.pathToFile(entry_res.path)
-          fileObj.normalize()
           graphName = fileObj.parent.parent.leafName
         } catch (err) {
           Logger.log('openLogseqURI', `ERROR :: ${entry_res?.path} :: ${getErrorMessage(err)}`, false, 'warn')
-          //// if candidate graph name not found, abort ////
-          throw err
+          /* if candidate graph name not found, abort */
+          graphName = '' /// will case error below
         }
       }
 
-      if (graphName === '') throw new Error('graphName not resolved')
-
-      const encodedFileName = encodeURIComponent(entry_res.name)
-      /// define pairs of characters to replace
-      /*
-      const charmap = [
-        ['%3A', ':'],
-        // ["%2F", "/"],
-        // ["%3F", "?"],
-        // ["%3D", "="],
-        // ["%26", "&"],
-        // ["%25", "%"],
-        // ["%23", "#"],
-        // ["%2B", "+"],
-        // ["%2C", ","],
-        // ["%3B", ";"],
-        // ["%40", "@"],
-        // ["%24", "$"],
-        // ["%5B", "["],
-        // ["%5D", "]"],
-        // ["%7B", "{"],
-        // ["%7D", "}"],
-        // ["%7C", "|"],
-        // ["%5C", "\\"],
-        // ["%22", '"'],
-        // ["%27", "'"],
-        // ["%60", "`"],
-        // ["%20", " "]
-      ]
-      for (const [encoded, decoded] of charmap) {
-        encodedFileName = encodedFileName.replaceAll(encoded, decoded)
+      if (graphName === '') {
+        Notifier.notify({
+          title: 'Error',
+          body: `logseq graph name not found. Set the graph name in the ${config.addonName} preferences.`,
+          type: 'error',
+        })
+        throw new Error('graphName not resolved')
       }
-      // encodedFileName.replace(/%20/g, '+')
-      */
-      const fileKey = `page=${logseq_prefix_file}${encodedFileName}`
+
+      /// if using re-encoded note name
+      // const fileKey = `page=${logseq_prefix_file}${filenamebase}`
+      /// if using filename
+      const fileKey = `page=${filenamebase}`
+      const uri = `logseq://graph/${graphName}?${fileKey}`
 
       /* prefix not encoded, filename encoded */
-      Zotero.launchURL(`logseq://graph/${graphName}?${fileKey}`)
+      Zotero.launchURL(uri)
 
-      Logger.log(
-        'openLogseqURI',
-        `Launching ${entry_res.path} :: logseq://graph/${graphName}?${fileKey}`,
-        false,
-        'info',
-      )
+      Logger.log('openLogseqURI', `Launching ${entry_res.path} :: ${uri}`, false, 'info')
     } catch (err) {
       Logger.log('openLogseqURI', `ERROR :: ${entry_res?.path} :: ${getErrorMessage(err)}`, false, 'warn')
     }
@@ -1980,6 +1975,7 @@ export class UIHelpers {
       'buildItemContextMenu',
       (original) =>
         async function ZoteroPane_buildItemContextMenu() {
+          // @ts-ignore
           await original.apply(this, arguments)
 
           const itemMenuRevealId = '__addonRef__-itemmenu'
@@ -1992,6 +1988,7 @@ export class UIHelpers {
           document.getElementById(itemMenuSeparatorId)?.remove()
 
           //// this ~= Zotero.getActiveZoteroPane() ////
+          // @ts-ignore
           const selectedItemIds: number[] = this.getSelectedItems(true)
 
           if (!selectedItemIds) return

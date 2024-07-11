@@ -8,4 +8,5 @@
 **/*.lock
 logs
 **/node_modules
-# zotero-cmd.json
+**/*_lintignore*
+**/*-lintignore*
