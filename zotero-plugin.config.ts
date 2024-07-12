@@ -42,15 +42,15 @@ export default defineConfig({
       },
     ],
     // If you want to checkout update.json into the repository, uncomment the following lines:
-    // makeUpdateJson: {
-    //   hash: false,
-    // },
-    // hooks: {
-    //   "build:makeUpdateJSON": (ctx) => {
-    //     copyFileSync("build/update.json", "update.json");
-    //     copyFileSync("build/update-beta.json", "update-beta.json");
-    //   },
-    // },
+    makeUpdateJson: {
+      hash: false,
+    },
+    hooks: {
+      "build:makeUpdateJSON": (ctx) => {
+        copyFileSync("build/update.json", "update_gitignore.json");
+        copyFileSync("build/update-beta.json", "update-beta_gitignore.json");
+      },
+    },
   },
   // release: {
   //   bumpp: {

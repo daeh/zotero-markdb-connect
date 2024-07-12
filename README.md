@@ -2,9 +2,9 @@
 
 <!-- [![GitHub Downloads release (by tag)](https://img.shields.io/github/downloads/daeh/zotero-markdb-connect/v0.0.25/total?style=for-the-badge)](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.0.27) -->
 
-<!-- [![GitHub release (with filter)](https://img.shields.io/github/v/release/daeh/zotero-markdb-connect?style=for-the-badge&filter=*v0.1.0*)](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.1.0) [![GitHub all releases](https://img.shields.io/github/downloads/daeh/zotero-markdb-connect/total?style=for-the-badge&color=forestgreen)](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.1.0) -->
+<!-- [![GitHub release (with filter)](https://img.shields.io/github/v/release/daeh/zotero-markdb-connect?style=for-the-badge&filter=*v0.1.1*)](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.1.1) [![GitHub all releases](https://img.shields.io/github/downloads/daeh/zotero-markdb-connect/total?style=for-the-badge&color=forestgreen)](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.1.1) -->
 
-<!-- [![GitHub release (latest by SemVer including pre-releases)](https://img.shields.io/github/downloads-pre/daeh/zotero-markdb-connect/latest/total?style=for-the-badge&label=downloads@prerelease)](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.1.0) [![GitHub release (by tag)](https://img.shields.io/github/downloads/daeh/zotero-markdb-connect/v0.0.25/total?style=for-the-badge)](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.0.27) -->
+<!-- [![GitHub release (latest by SemVer including pre-releases)](https://img.shields.io/github/downloads-pre/daeh/zotero-markdb-connect/latest/total?style=for-the-badge&label=downloads@prerelease)](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.1.1) [![GitHub release (by tag)](https://img.shields.io/github/downloads/daeh/zotero-markdb-connect/v0.0.25/total?style=for-the-badge)](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.0.27) -->
 
 <!-- [![GitHub release (latest by date)](https://img.shields.io/github/v/release/daeh/zotero-markdb-connect?style=for-the-badge)](https://github.com/daeh/zotero-markdb-connect/releases/latest) [![GitHub all releases](https://img.shields.io/github/downloads/daeh/zotero-markdb-connect/total?style=for-the-badge&color=forestgreen)](https://github.com/daeh/zotero-markdb-connect/releases/latest) -->
 
@@ -37,11 +37,11 @@ Opens an existing markdown note in [Obsidian](https://obsidian.md), [logseq](htt
 
 <!-- - Download the plugin (the `.xpi` file) from the latest release: https://github.com/daeh/zotero-markdb-connect/releases/latest -->
 
-- Download the plugin (the `.xpi` file) from the latest release, [`v0.1.0`](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.1.0)
+- Download the plugin (the `.xpi` file) from the [latest release](https://github.com/daeh/zotero-markdb-connect/releases/latest)
 - Open Zotero (version 7.x)
-- From `Tools -> Add-ons`
+- From `Tools -> Plugins`
 - Select `Install Add-on From File...` from the gear icon ⛭
-- Choose the `.xpi` file you downloaded (e.g. `markdb-connect-0.1.0.xpi`)
+- Choose the `.xpi` file you downloaded (e.g. `mark-db-connect.xpi`)
 - Restart Zotero
 
 > [!NOTE]
