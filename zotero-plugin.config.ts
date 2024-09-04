@@ -46,9 +46,9 @@ export default defineConfig({
       hash: false,
     },
     hooks: {
-      "build:makeUpdateJSON": (ctx) => {
-        copyFileSync("build/update.json", "update_gitignore.json");
-        copyFileSync("build/update-beta.json", "update-beta_gitignore.json");
+      'build:makeUpdateJSON': (ctx) => {
+        copyFileSync('build/update.json', 'update_gitignore.json')
+        copyFileSync('build/update-beta.json', 'update-beta_gitignore.json')
       },
     },
   },

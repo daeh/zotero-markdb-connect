@@ -17,7 +17,7 @@
 - **_Supports various Markdown databases, including [Obsidian](https://obsidian.md), [logseq](https://logseq.com), and [Zettlr](https://www.zettlr.com)_**
 - **_[Zotero 7](https://www.zotero.org/support/beta_builds) compatible_**
 
-![MarkDBConnectScreenshot](MarkDBConnectScreenshot.png)
+![MarkDBConnectScreenshot](./docs/assets/readme/MarkDBConnectScreenshot.png)
 
 This is a plugin for [Zotero](https://www.zotero.org), a research source management tool. The _MarkDB-Connect_ plugin searches a user-defined folder for markdown files that include a [Better BibTeX](https://retorque.re/zotero-better-bibtex/) citekey or Zotero-Item-Key, and adds a colored tag to the corresponding Zotero items.
 
@@ -34,8 +34,6 @@ Supports multiple markdown files for a single Zotero item.
 Opens an existing markdown note in [Obsidian](https://obsidian.md), [logseq](https://logseq.com), or the system's default markdown note editor (e.g. [Zettlr](https://www.zettlr.com), [Typora](https://typora.io)) from the contextual menu of a Zotero item.
 
 ## Installation
-
-<!-- - Download the plugin (the `.xpi` file) from the latest release: https://github.com/daeh/zotero-markdb-connect/releases/latest -->
 
 - Download the plugin (the `.xpi` file) from the [latest release](https://github.com/daeh/zotero-markdb-connect/releases/latest)
 - Open Zotero (version 7.x)
@@ -161,17 +159,83 @@ doi: 10.1016/j.copsyc.2017.04.019
 
 # Formalizing emotion concepts within a Bayesian model of theory of mind
 
-The body of notes can include references to other Zotero items. The _MarkDB-Connect_ plugin
-will only link this file to one Zotero item.
+The body of notes can include references to other Zotero items. The _MarkDB-Connect_ plugin will only link this file to one Zotero item (in this case, it will use the value of the `citekey` property).
 
-Here are links to other papers.
+Here are links to other papers:
 
-This one uses [a Zotero URI](zotero://select/library/items/4RJ97IFL)
+- This one uses [a Zotero URI](zotero://select/library/items/4RJ97IFL)
 
-This one uses [a BetterBibTeX URI](zotero://select/items/@anzellotti2021opaque)
+- This one uses [a BetterBibTeX URI](zotero://select/items/@anzellotti2021opaque)
 
-This one uses an Obsidian wiki link: [[@cusimano2018cogsci]]
+- This one uses an Obsidian wiki link: [[@cusimano2018cogsci]]
 ```
+
+<details>
+
+<summary>Example Templates</summary>
+
+Below are example templates for common Obsidian plugins
+
+### Template for [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin)
+
+```md
+---
+citekey: "{{citekey}}"
+zoterouri: {{zoteroSelectURI}}
+title: "{{title}}"
+year: {{year}}
+authors: [{{authorString}}]
+{{#if containerTitle~}} publication: "{{containerTitle}}" {{~else~}} {{~/if}}
+{{#if DOI~}} doi: "{{DOI}}" {{~else~}} {{~/if}}
+aliases: ["@{{citekey}}", "@{{citekey}} {{title}}"]
+tags: 
+ - readingNote
+---
+
+# @{{citekey}}
+
+**{{title}}**
+{{authorString}}
+{{#if year~}} ({{year}}) {{~else~}} {{~/if}} {{~#if containerTitle}} {{containerTitle~}} {{~else~}} {{~/if}}
+[@{{citekey}}]({{zoteroSelectURI}})
+```
+
+### Template for ZotLit
+
+Make a file (e.g. `zotlit-properties.eta.md`) with the following contents, and point to that file in ZotLit settings: `Template` > `Note Properties`.
+
+```eta
+citekey: "<%= it.citekey %>"
+title: "<%= it.title %>"
+<% if (it.date) { %>year: <%= it.date %><% } %>
+authors: [<%= it.authors.map(v => v.firstName v.lastName) %>]
+<% if (it.publicationTitle) { %>publication: "<%= it.publicationTitle %>"<% } %>
+<% if (it.DOI) { %>doi: "<%= it.DOI %>"<% } %>
+aliases: ["@<%= it.citekey %>", "@<%= it.citekey %> <%= it.title %>"]
+tags:
+ - readingNote
+```
+
+</details>
+
+### Suppressing the Zotero security notification
+
+Recent builds of Zotero have introduced a security notification for external links. At present, Zotero does not remember the user's link preferences, so this alert is shown every time an application-specific URI is launched. You can suppress this warning by setting `security.external_protocol_requires_permission` to `false` in Zotero's advanced configuration.
+
+![Zotero Security Notification](./docs/assets/readme/ExternalLinkNotificationScreenshot.png)
+
+<details>
+
+<summary>Instructions for modifying Zotero's advanced config</summary>
+
+1. Open Zotero Settings
+2. Click the "Advanced" tab
+3. Click the "Config Editor" button
+4. Click the "Accept Risk and Continue" button
+5. Search for `security.external_protocol_requires_permission`
+6. Double click the `security.external_protocol_requires_permission` item to toggle its value to `false`
+
+</details>
 
 ## Related Projects
 
@@ -204,4 +268,4 @@ Distributed under the MIT License.
 
 ## Author
 
-[![Personal Website](https://img.shields.io/badge/personal%20website-daeh.info-orange?style=for-the-badge)](https://daeh.info) [![BlueSky](https://img.shields.io/badge/bsky-@dae.bsky.social-skyblue?style=for-the-badge&logo=mastodon)](https://bsky.app/profile/dae.bsky.social) [![Twitter](https://img.shields.io/badge/twitter-@DaeHoulihan-white?style=for-the-badge&logo=twitter)](https://twitter.com/DaeHoulihan)
+[![Personal Website](https://img.shields.io/badge/personal%20website-daeh.info-orange?style=for-the-badge)](https://daeh.info) [![BlueSky](https://img.shields.io/badge/bsky-@dae.bsky.social-skyblue?style=for-the-badge&logo=bluesky)](https://bsky.app/profile/dae.bsky.social) [![Twitter](https://img.shields.io/badge/twitter-@DaeHoulihan-white?style=for-the-badge&logo=x)](https://x.com/DaeHoulihan)
