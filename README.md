@@ -176,7 +176,7 @@ Here are links to other papers:
 
 Below are example templates for common Obsidian plugins
 
-### Template for [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin)
+#### Template for [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin)
 
 ```md
 ---
@@ -200,7 +200,7 @@ tags:
 [@{{citekey}}]({{zoteroSelectURI}})
 ```
 
-### Template for ZotLit
+#### Template for ZotLit
 
 Make a file (e.g. `zotlit-properties.eta.md`) with the following contents, and point to that file in ZotLit settings: `Template` > `Note Properties`.
 
@@ -218,7 +218,7 @@ tags:
 
 </details>
 
-### Suppressing the Zotero security notification
+## Suppressing the Zotero security notification
 
 Recent builds of Zotero have introduced a security notification for external links. At present, Zotero does not remember the user's link preferences, so this alert is shown every time an application-specific URI is launched. You can suppress this warning by setting `security.external_protocol_requires_permission` to `false` in Zotero's advanced configuration.
 
