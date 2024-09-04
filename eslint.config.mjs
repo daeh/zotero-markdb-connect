@@ -5,8 +5,7 @@ import stylisticPlugin from '@stylistic/eslint-plugin'
 import typescriptEslintPlugin from '@typescript-eslint/eslint-plugin'
 import typescriptEslintParser from '@typescript-eslint/parser'
 import prettierConfig from 'eslint-config-prettier'
-import pluginImport from 'eslint-plugin-import'
-import pluginImportConfig from 'eslint-plugin-import/config/recommended.js'
+import importPlugin from 'eslint-plugin-import'
 import prettierPlugin from 'eslint-plugin-prettier'
 import globals from 'globals'
 
@@ -14,23 +13,26 @@ const projectDirname = dirname(fileURLToPath(import.meta.url))
 
 const context = (() => {
   if (typeof process.env.NODE_ENV === 'undefined') return 'default'
-  if (process.env.NODE_ENV === 'development') return 'dev'
-  if (process.env.NODE_ENV === 'production') return 'prod'
-  if (process.env.NODE_ENV === 'repo') return 'repo'
+  if (process.env.NODE_ENV === 'development') return 'development'
+  if (process.env.NODE_ENV === 'production') return 'production'
+  if (process.env.NODE_ENV === 'repo') return 'repository'
   new Error('Invalid NODE_ENV')
   return 'error'
 })()
 
-const projectFilesToIgnore = context === 'repo' ? [] : ['.release-it.ts', 'zotero-plugin.config.ts']
+const projectFilesToIgnore =
+  context === 'repository' ? [] : ['.release-it.ts', 'zotero-plugin.config.ts', '*.config.mjs']
 
 const tsconfig = (() => {
   if (context === 'default') return './tsconfig.json'
-  if (context === 'dev') return './tsconfig.dev.json'
-  if (context === 'prod') return './tsconfig.prod.json'
-  if (context === 'repo') return './tsconfig.repo.json'
+  if (context === 'development') return './tsconfig.dev.json'
+  if (context === 'production') return './tsconfig.prod.json'
+  if (context === 'repository') return './tsconfig.repo.json'
   new Error('Invalid context')
   return 'error'
 })()
+
+console.log(`env: ${process.env.NODE_ENV}, context: ${context}, tsconfig: ${tsconfig}`)
 
 const allTsExtensionsArray = ['ts', 'mts', 'cts', 'tsx', 'mtsx']
 const allJsExtensionsArray = ['js', 'mjs', 'cjs', 'jsx', 'mjsx']
@@ -39,6 +41,7 @@ const allJsExtensions = allJsExtensionsArray.join(',')
 const allExtensions = [...allTsExtensionsArray, ...allJsExtensionsArray].join(',')
 
 const importRules = {
+  ...importPlugin.flatConfigs.recommended.rules,
   'import/no-unresolved': 'error',
   'import/namespace': 'off',
   'sort-imports': [
@@ -91,7 +94,6 @@ const baseRules = {
 
 const typescriptRules = {
   ...prettierConfig.rules,
-  ...pluginImportConfig.rules,
   ...typescriptEslintPlugin.configs.recommended.rules,
   ...typescriptEslintPlugin.configs['recommended-type-checked'].rules,
   //
@@ -104,7 +106,15 @@ const typescriptRules = {
   ...baseRules,
 }
 
-const javascriptRules = {}
+const javascriptRules = {
+  ...prettierConfig.rules,
+  ...typescriptEslintPlugin.configs.recommended.rules,
+  ...typescriptEslintPlugin.configs.strict.rules,
+  ...typescriptEslintPlugin.configs.stylistic.rules,
+  ...stylisticPlugin.configs['disable-legacy'].rules,
+  ...importRules,
+  ...baseRules,
+}
 
 const typescriptRulesDev = {
   '@typescript-eslint/no-explicit-any': ['off', { ignoreRestArgs: true }],
@@ -132,20 +142,18 @@ const typescriptRulesDev = {
   '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
 }
 
-const javascriptRulesDev = {
-  '@typescript-eslint/no-unused-vars': ['warn'],
-}
+const javascriptRulesDev = {}
 
 const config = [
   {
     /* setup parser for all files */
-    files: [`**/*.{${allTsExtensions}}`],
+    files: [`**/*.{${allExtensions}}`],
     languageOptions: {
       parser: typescriptEslintParser,
       parserOptions: {
         ecmaVersion: 'latest', // 2024 sets the ecmaVersion parser option to 15
-        tsconfigRootDir: resolve(projectDirname),
         sourceType: 'module',
+        tsconfigRootDir: resolve(projectDirname),
         project: tsconfig,
       },
     },
@@ -164,7 +172,7 @@ const config = [
     plugins: {
       '@typescript-eslint': typescriptEslintPlugin,
       '@stylistic': stylisticPlugin,
-      'import': pluginImport,
+      'import': importPlugin,
       'prettier': prettierPlugin,
     },
     rules: {
@@ -174,7 +182,7 @@ const config = [
   {
     /* +strict for typescript files NOT in ./src/ folder */
     files: [`**/*.{${allTsExtensions}}`],
-    ignores: [`src/**/*.{${allTsExtensions}}`, `typing/**/*.d.ts`, `**/*.config.{${allTsExtensions}}`],
+    ignores: [`src/**/*.{${allTsExtensions}}`, 'typing/**/*.d.ts', `**/*.config.{${allTsExtensions}}`],
     plugins: {
       '@typescript-eslint': typescriptEslintPlugin,
       '@stylistic': stylisticPlugin,
@@ -186,7 +194,7 @@ const config = [
   },
   {
     /* +lenient for typescript files in ./src/ folder */
-    files: [`src/**/*.{${allTsExtensions}}`, `typing/**/*.d.ts`],
+    files: [`src/**/*.{${allTsExtensions}}`, 'typing/**/*.d.ts'],
     ignores: [`**/*.config.{${allTsExtensions}}`],
     settings: {
       'import/resolver': {
@@ -200,6 +208,44 @@ const config = [
     },
     rules: {
       ...typescriptRulesDev,
+    },
+  },
+  {
+    /* config files: javascript */
+    files: [`**/*.config.{${allJsExtensions}}`],
+    settings: {
+      'import/resolver': {
+        node: {},
+        typescript: {
+          extensions: ['.ts', '.d.ts'],
+        },
+      },
+      // 'import/ignore': ['node_modules/firebase'],
+    },
+    // languageOptions: {
+    //   globals: {
+    //     ...globals.browser,
+    //     ...globals.node,
+    //     ...globals.es2021,
+    //   },
+    // },
+    // 'import/resolver': {
+    //   // node: {},
+    //   typescript: {
+    //     extensions: ['.ts', '.d.ts'],
+    //   },
+    // },
+    plugins: {
+      '@typescript-eslint': typescriptEslintPlugin,
+      '@stylistic': stylisticPlugin,
+      'import': importPlugin,
+      'prettier': prettierPlugin,
+    },
+    rules: {
+      ...javascriptRules,
+      '@typescript-eslint/no-unsafe-assignment': ['off'],
+      '@typescript-eslint/no-unused-vars': ['off'],
+      '@typescript-eslint/no-unsafe-member-access': ['off'],
     },
   },
   {

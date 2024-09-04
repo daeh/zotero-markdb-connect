@@ -1,6 +1,7 @@
 {
   "extends": "./tsconfig.base",
   "compilerOptions": {
+    "strictNullChecks": true,
     /* Enable JavaScript Compilation */
     "allowJs": true,
     "checkJs": true

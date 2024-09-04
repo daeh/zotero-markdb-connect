@@ -156,14 +156,15 @@ zoterouri: zotero://select/library/items/IACZMXU4
 bbturi: zotero://select/items/@saxe2017emobtom
 doi: 10.1016/j.copsyc.2017.04.019
 ---
+
 # @saxe2017emobtom
 
 **Formalizing emotion concepts within a Bayesian model of theory of mind**
-(2017) *Current Opinion in Psychology*
+(2017) _Current Opinion in Psychology_
 [Open in Zotero](zotero://select/library/items/IACZMXU4)
 
-The body of notes can include references to other Zotero items. 
-The _MarkDB-Connect_ plugin will only link this file to one Zotero item 
+The body of notes can include references to other Zotero items.
+The _MarkDB-Connect_ plugin will only link this file to one Zotero item
 (in this case, it will use the value of the `citekey` property).
 
 Here are links to other papers:
@@ -195,11 +196,12 @@ aliases: ["@{{citekey}}", "@{{citekey}} {{title}}"]
 tags: 
  - readingNote
 ---
+
 # @{{citekey}}
 
 **{{title}}**
 {{authorString}}
-{{#if year~}} ({{year}}) {{~else~}} {{~/if}} {{~#if containerTitle}} *{{containerTitle~}}* {{~else~}} {{~/if}}
+{{#if year~}} ({{year}}) {{~else~}} {{~/if}} {{~#if containerTitle}} _{{containerTitle~}}_ {{~else~}} {{~/if}}
 [Open in Zotero]({{zoteroSelectURI}})
 ```
 

@@ -30,22 +30,22 @@
     "update-deps": "npm outdated --depth=0; npm update --save; npm update --save-dev; npm outdated --depth=0"
   },
   "dependencies": {
-    "zotero-plugin-toolkit": "^2.3.37"
+    "zotero-plugin-toolkit": "^3.0.0"
   },
   "devDependencies": {
-    "@stylistic/eslint-plugin": "^2.3.0",
-    "@types/node": "^20.14.11",
-    "@typescript-eslint/eslint-plugin": "^7.16.1",
-    "@typescript-eslint/parser": "^7.16.1",
+    "@stylistic/eslint-plugin": "^2.7.2",
+    "@types/node": "^22.5.3",
+    "@typescript-eslint/eslint-plugin": "^8.4.0",
+    "@typescript-eslint/parser": "^8.4.0",
     "eslint": "<9.0.0",
     "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-import": "^2.30.0",
     "eslint-plugin-prettier": "^5.2.1",
-    "globals": "^15.8.0",
+    "globals": "^15.9.0",
     "prettier": "^3.3.3",
-    "typescript": "^5.5.3",
-    "zotero-plugin-scaffold": "^0.0.32",
-    "zotero-types": "^2.1.0"
+    "typescript": "^5.5.4",
+    "zotero-plugin-scaffold": "^0.1.2",
+    "zotero-types": "^2.1.1"
   },
   "packageManager": "yarn@1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447"
 }
