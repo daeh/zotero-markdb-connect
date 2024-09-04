@@ -159,7 +159,9 @@ doi: 10.1016/j.copsyc.2017.04.019
 
 # Formalizing emotion concepts within a Bayesian model of theory of mind
 
-The body of notes can include references to other Zotero items. The _MarkDB-Connect_ plugin will only link this file to one Zotero item (in this case, it will use the value of the `citekey` property).
+The body of notes can include references to other Zotero items. 
+The _MarkDB-Connect_ plugin will only link this file to one Zotero item 
+(in this case, it will use the value of the `citekey` property).
 
 Here are links to other papers:
 
@@ -181,7 +183,6 @@ Below are example templates for common Obsidian plugins
 ```md
 ---
 citekey: "{{citekey}}"
-zoterouri: {{zoteroSelectURI}}
 title: "{{title}}"
 year: {{year}}
 authors: [{{authorString}}]
@@ -191,13 +192,12 @@ aliases: ["@{{citekey}}", "@{{citekey}} {{title}}"]
 tags: 
  - readingNote
 ---
-
 # @{{citekey}}
 
 **{{title}}**
 {{authorString}}
 {{#if year~}} ({{year}}) {{~else~}} {{~/if}} {{~#if containerTitle}} {{containerTitle~}} {{~else~}} {{~/if}}
-[@{{citekey}}]({{zoteroSelectURI}})
+[Open in Zotero]({{zoteroSelectURI}})
 ```
 
 #### Template for ZotLit
