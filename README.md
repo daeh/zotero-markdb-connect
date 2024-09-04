@@ -156,8 +156,11 @@ zoterouri: zotero://select/library/items/IACZMXU4
 bbturi: zotero://select/items/@saxe2017emobtom
 doi: 10.1016/j.copsyc.2017.04.019
 ---
+# @saxe2017emobtom
 
-# Formalizing emotion concepts within a Bayesian model of theory of mind
+**Formalizing emotion concepts within a Bayesian model of theory of mind**
+(2017) *Current Opinion in Psychology*
+[Open in Zotero](zotero://select/library/items/IACZMXU4)
 
 The body of notes can include references to other Zotero items. 
 The _MarkDB-Connect_ plugin will only link this file to one Zotero item 
@@ -176,7 +179,7 @@ Here are links to other papers:
 
 <summary>Example Templates</summary>
 
-Below are example templates for common Obsidian plugins
+Below are example templates for various Obsidian plugins
 
 #### Template for [obsidian-citation-plugin](https://github.com/hans/obsidian-citation-plugin)
 
@@ -196,7 +199,7 @@ tags:
 
 **{{title}}**
 {{authorString}}
-{{#if year~}} ({{year}}) {{~else~}} {{~/if}} {{~#if containerTitle}} {{containerTitle~}} {{~else~}} {{~/if}}
+{{#if year~}} ({{year}}) {{~else~}} {{~/if}} {{~#if containerTitle}} *{{containerTitle~}}* {{~else~}} {{~/if}}
 [Open in Zotero]({{zoteroSelectURI}})
 ```
 
