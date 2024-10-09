@@ -1,6 +1,6 @@
 {
   "name": "markdb-connect",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Zotero plugin that links your Markdown database to Zotero.",
   "author": "Dae Houlihan <dev@daeh.info> (https://daeh.info)",
   "license": "MIT",
@@ -30,22 +30,23 @@
     "update-deps": "npm outdated --depth=0; npm update --save; npm update --save-dev; npm outdated --depth=0"
   },
   "dependencies": {
-    "zotero-plugin-toolkit": "^3.0.0"
+    "zotero-plugin-toolkit": "^4.0.6"
   },
   "devDependencies": {
-    "@stylistic/eslint-plugin": "^2.7.2",
-    "@types/node": "^22.5.3",
-    "@typescript-eslint/eslint-plugin": "^8.4.0",
-    "@typescript-eslint/parser": "^8.4.0",
+    "@stylistic/eslint-plugin": "^2.9.0",
+    "@types/node": "^22.7.5",
+    "@typescript-eslint/eslint-plugin": "^8.8.1",
+    "@typescript-eslint/parser": "^8.8.1",
     "eslint": "<9.0.0",
     "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-import": "^2.30.0",
+    "eslint-import-resolver-typescript": "^3.6.3",
+    "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-prettier": "^5.2.1",
-    "globals": "^15.9.0",
+    "globals": "^15.10.0",
     "prettier": "^3.3.3",
-    "typescript": "^5.5.4",
-    "zotero-plugin-scaffold": "^0.1.2",
-    "zotero-types": "^2.1.1"
+    "typescript": "^5.6.3",
+    "zotero-plugin-scaffold": "^0.1.6",
+    "zotero-types": "^2.2.0"
   },
   "packageManager": "yarn@1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447"
 }
