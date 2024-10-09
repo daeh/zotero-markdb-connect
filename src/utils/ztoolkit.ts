@@ -1,4 +1,5 @@
-import ZoteroToolkit from 'zotero-plugin-toolkit'
+// @ts-ignore
+import { BasicTool, UITool, unregister, ZoteroToolkit } from 'zotero-plugin-toolkit'
 
 import { config } from '../../package.json'
 
@@ -24,24 +25,4 @@ function initZToolkit(_ztoolkit: ReturnType<typeof createZToolkit>) {
   _ztoolkit.basicOptions.debug.disableDebugBridgePassword = __env__ === 'development'
   _ztoolkit.basicOptions.api.pluginID = config.addonID
   _ztoolkit.ProgressWindow.setIconURI('default', `chrome://${config.addonRef}/content/icons/favicon.png`)
-}
-
-import { BasicTool, unregister } from 'zotero-plugin-toolkit/dist/basic'
-import { PreferencePaneManager } from 'zotero-plugin-toolkit/dist/managers/preferencePane'
-import { UITool } from 'zotero-plugin-toolkit/dist/tools/ui'
-
-// @ts-ignore
-class MyToolkit extends BasicTool {
-  UI: UITool
-  PreferencePane: PreferencePaneManager
-
-  constructor() {
-    super()
-    this.UI = new UITool(this)
-    this.PreferencePane = new PreferencePaneManager(this)
-  }
-
-  unregisterAll() {
-    unregister(this)
-  }
 }

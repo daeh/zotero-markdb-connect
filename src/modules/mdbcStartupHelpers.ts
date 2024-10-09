@@ -59,7 +59,7 @@ export class wrappers {
       release: '',
       str: version,
     }
-    const versionThis_rematch = version.match(version_re)
+    const versionThis_rematch = version_re.exec(version)
     if (versionThis_rematch?.groups) {
       configurationVersionThis.major = parseInt(versionThis_rematch.groups.major)
       configurationVersionThis.minor = parseInt(versionThis_rematch.groups.minor)
@@ -81,7 +81,7 @@ export class wrappers {
         configurationVersionPrevious.str = configurationVersionPreviousStr
       }
       if (typeof configurationVersionPreviousStr === 'string' && version_re.test(configurationVersionPreviousStr)) {
-        const version_rematch = configurationVersionPreviousStr.match(version_re)
+        const version_rematch = version_re.exec(configurationVersionPreviousStr)
         if (version_rematch?.groups) {
           configurationVersionPrevious.major = parseInt(version_rematch.groups.major)
           configurationVersionPrevious.minor = parseInt(version_rematch.groups.minor)

@@ -33,7 +33,7 @@ export function waitUtilAsync(condition: () => boolean, interval = 100, timeout 
         resolve()
       } else if (Date.now() - start > timeout) {
         ztoolkit.getGlobal('clearInterval')(intervalId)
-        reject()
+        reject(new Error('waitUtilAsync: something bad happened'))
       }
     }, interval)
   })

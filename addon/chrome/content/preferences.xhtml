@@ -104,12 +104,13 @@
             ><html:code>/i</html:code></html:span
           >
         </hbox>
-        <description class="mdbc-pref-explication-minor">The default file filter looks for Markdown files beginning with '<html:code>@</html:code>' : <html:code>/^@.+\.md$/i</html:code> </description>
-        <description class="mdbc-pref-description-indent">N.B. If the BBT citekey is present in the filename pattern, you can include one capturing group to match it.</description>
+        <!--<description class="mdbc-pref-explication-minor">The default file filter looks for Markdown files beginning with '<html:code>@</html:code>' : <html:code>/^@.+\.md$/i</html:code> </description>-->
+        <description class="mdbc-pref-description-indent">If the BBT citekey is present in the filename pattern, you can include one capturing group to match it.</description>
         <description class="mdbc-pref-description-indent"
-          >E.g. the default citekey-capturing RegExp uses the non-whitespace characters after the leading '<html:code>@</html:code>' as the BBT citekey:</description
+          >E.g. the default RegExp filters for MarkDown files that begin with <html:code>@</html:code> and attempts to use the subsequent non-whitespace characters as the BBT citekey:</description
         >
-        <description class="mdbc-pref-description-indent"><html:code class="mdbc-pref-code-indent">^@(\S+).*\.md$</html:code></description>
+        <description class="mdbc-pref-description-indent"><html:code class="mdbc-pref-code-indent">/^@(\S+).*\.md$/i</html:code></description>
+        <!--<description class="mdbc-pref-description-indent">E.g. to simply filter for MarkDown files beginning with <html:code>@</html:code>: <html:code>/^@.+\.md$/i</html:code></description>-->
       </html:div>
     </radiogroup>
   </groupbox>
@@ -139,7 +140,8 @@
 
           <!--<separator />-->
 
-          <description>Markdown YAML Metadata Keyword (optional if BBT citkey is in title, required otherwise)</description>
+          <!-- WIP TEMP DEBUG TODO not finished editing pref instructions -->
+          <description>Specify the markdown YAML metadata keyword (optional if BBT citkey is in title, required otherwise).</description>
           <hbox class="mdbc-pref-hbox-indent">
             <html:span class="mdbc-pref-options-span-first">YAML keyword: </html:span
             ><html:input
@@ -209,12 +211,11 @@
         <html:div
           class="mdbc-pref-options-div"
           id="zotero-prefpane-__addonRef__-matchstrategy-zotid-options">
-          <label>__addonName__ will search for a Zotero-Item-Key in the file's contents. </label>
+          <label>__addonName__ will search for a Zotero-Item-Key in the note's contents.</label>
 
           <!--<separator />-->
 
-          <label>Required: Specify a RegExp to match the Zotero-Item-Key from the markdown contents</label>
-          <label>(e.g. match '<html:code>ABCD1234</html:code>' in <html:code>zotero://select/library/items/ABCD1234</html:code>)</label>
+          <description>Required: Specify a RegExp to match the Zotero-Item-Key from the markdown contents.</description>
           <hbox class="mdbc-pref-hbox-indent">
             <html:span class="mdbc-pref-options-span-first">RegExp:</html:span><html:span class="mdbc-pref-options-span-left mdbc-pref-options-code-span"><html:code>/</html:code></html:span
             ><html:input
@@ -226,6 +227,10 @@
               ><html:code>/m</html:code></html:span
             >
           </hbox>
+          <description class="mdbc-pref-description-indent"
+            >E.g. for a Zotero item that can be opened with this URI <html:code>zotero://select/library/items/ABCD1234</html:code> the RegExp should return a single match:
+            '<html:code>ABCD1234</html:code>'.</description
+          >
           <description class="mdbc-pref-description-indent">N.B. The Zotero-Item-Key is assigned automatically by Zotero. It is not the same as the BetterBibTeX citekey.</description>
         </html:div>
       </groupbox>

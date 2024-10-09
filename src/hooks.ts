@@ -29,7 +29,9 @@ async function onStartup() {
 
   // registerPreferenceStyleSheet()
 
-  await onMainWindowLoad(window)
+  // await onMainWindowLoad(window)
+
+  await Promise.all(Zotero.getMainWindows().map((win) => onMainWindowLoad(win)))
 }
 
 async function onMainWindowLoad(win: Window): Promise<void> {

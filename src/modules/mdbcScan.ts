@@ -2408,8 +2408,8 @@ export class BasicExampleFactory {
       src: rootURI + 'chrome/content/preferences.xhtml',
       label: getString('prefs-title'),
       image: favIcon,
-      defaultXUL: true,
+      // defaultXUL: true,
     }
-    ztoolkit.PreferencePane.register(prefOptions)
+    Zotero.PreferencePanes.register(prefOptions)
   }
 }

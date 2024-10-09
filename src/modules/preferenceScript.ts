@@ -91,7 +91,7 @@ async function updatePrefsUI() {
     // Returning false to prevent default event.
     .setProp('onKeyDown', (event: KeyboardEvent) => {
       if (event.key == 'Delete' || (Zotero.isMac && event.key == 'Backspace')) {
-        addon.data.prefs.rows =
+        addon.data.prefs!.rows =
           addon.data.prefs?.rows.filter((v, i) => !tableHelper.treeInstance.selection.isSelected(i)) || []
         tableHelper.render()
         return false
@@ -109,18 +109,18 @@ async function updatePrefsUI() {
 }
 
 function bindPrefEvents() {
-  addon.data.prefs.window.document
+  addon.data.prefs!.window.document
     .querySelector(`#zotero-prefpane-${config.addonRef}-enable`)
     ?.addEventListener('command', (e) => {
       ztoolkit.log(e)
       addon.data.prefs.window.alert(`Successfully changed to ${(e.target as XUL.Checkbox).checked}!`)
     })
 
-  addon.data.prefs.window.document
+  addon.data.prefs!.window.document
     .querySelector(`#zotero-prefpane-${config.addonRef}-input`)
     ?.addEventListener('change', (e) => {
       ztoolkit.log(e)
-      addon.data.prefs.window.alert(`Successfully changed to ${(e.target as HTMLInputElement).value}!`)
+      addon.data.prefs!.window.alert(`Successfully changed to ${(e.target as HTMLInputElement).value}!`)
     })
 }
 */
