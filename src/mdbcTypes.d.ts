@@ -38,7 +38,6 @@ export interface prefParam {
 
 export interface OSFile {
   isDir: boolean
-  isSymLink: boolean
   name: string
   path: string
 }

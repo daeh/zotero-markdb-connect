@@ -539,12 +539,15 @@ const listDirContents = async (dirpath: string): Promise<OSFile[]> => {
 
 const listFilesRecursively = async function* (dirpath: string): AsyncGenerator<OSFile> {
   // Does not follow symbolic links //
-  const entries = await listDirContents(dirpath)
+  const entries: OSFile[] = await listDirContents(dirpath)
   for (const entry of entries) {
-    if (entry.isDir) {
-      yield* listFilesRecursively(entry.path)
-    } else if (!entry.isSymLink) {
-      yield entry
+    const zfile: nsIFile = Zotero.File.pathToFile(entry.path)
+    if (zfile.isReadable() && !zfile.isHidden() && !zfile.isSpecial() && !zfile.isSymlink()) {
+      if (zfile.isDirectory()) {
+        yield* listFilesRecursively(entry.path)
+      } else if (zfile.isFile()) {
+        yield entry
+      }
     }
   }
 }
@@ -554,7 +557,7 @@ class Utils {
     const files: OSFile[] = [] // OS.File.Entry[]
 
     try {
-      const basedirObj = Zotero.File.pathToFile(dirpath)
+      const basedirObj: nsIFile = Zotero.File.pathToFile(dirpath)
       basedirObj.normalize()
 
       if (!basedirObj.exists() || !basedirObj.isDirectory()) {
@@ -562,8 +565,8 @@ class Utils {
         throw new Error(`${basedirObj.path} does not exist or is file`)
       }
 
-      for await (const filepath of listFilesRecursively(basedirObj.path)) {
-        files.push(filepath)
+      for await (const file of listFilesRecursively(basedirObj.path)) {
+        files.push(file)
       }
     } catch (err) {
       Logger.log('getFilesRecursively', `ERROR: ${getErrorMessage(err)}`, false, 'warn')
@@ -1738,7 +1741,8 @@ export class systemInterface {
 
     if (ids === 'selected') {
       try {
-        return Zotero.getActiveZoteroPane().getSelectedItems(true)
+        // return Zotero.getActiveZoteroPane().getSelectedItems(true)
+        return ztoolkit.getGlobal('ZoteroPane').getSelectedItems(true)
       } catch (err) {
         // zoteroPane.getSelectedItems() doesn't test whether there's a selection and errors out if not
         Logger.log('expandSelection', `Could not get selected items: ${getErrorMessage(err)}`, false, 'warn')
@@ -1972,11 +1976,15 @@ export class UIHelpers {
   static registerRightClickMenuItem() {
     $patch$(
       ZoteroPane,
+      // ztoolkit.getGlobal('ZoteroPane'),
+      // ztoolkit.getGlobal('Zotero_Tabs').select('zotero-pane'),
       'buildItemContextMenu',
       (original) =>
         async function ZoteroPane_buildItemContextMenu() {
           // @ts-ignore
           await original.apply(this, arguments)
+
+          // const doc = Zotero.getMainWindow().document
 
           const itemMenuRevealId = '__addonRef__-itemmenu'
           document.getElementById(itemMenuRevealId)?.remove()
