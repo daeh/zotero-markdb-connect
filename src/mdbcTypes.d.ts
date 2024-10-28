@@ -29,19 +29,6 @@ export interface Entry {
   // displayname: string
 }
 
-export interface prefParam {
-  name: string
-  value: string
-  valid: boolean
-  msg?: string
-}
-
-export interface OSFile {
-  isDir: boolean
-  name: string
-  path: string
-}
-
 export interface NotifyCreateLineOptions {
   type?: string
   icon?: string

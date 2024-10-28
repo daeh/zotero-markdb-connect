@@ -3,9 +3,8 @@ import { getPref, setPref } from '../utils/prefs'
 
 import { paramVals } from './mdbcConstants'
 import { getErrorMessage, Logger, trace } from './mdbcLogger'
-import { getParam, Notifier } from './mdbcScan'
-
-import type { paramTypes } from './mdbcConstants'
+import { getParam } from './mdbcParam'
+import { Notifier } from './mdbcUX'
 
 export class wrappers {
   @trace
@@ -141,7 +140,7 @@ export class wrappers {
       /// sourcedir
       try {
         if (preprerename1) {
-          const val = getPref('source_dir') as string
+          const val = getPref('source_dir') // as string
           // Logger.log('startupVersionCheck - sourcedir - val', val, false, 'debug')
           if (val) {
             // Logger.log('startupVersionCheck - sourcedir - AMHERE', val, false, 'debug')
@@ -149,7 +148,7 @@ export class wrappers {
             getParam.sourcedir()
           }
         } else if (prezot7) {
-          const val = Zotero.Prefs.get('extensions.mdbconnect.source_dir', true) as string
+          const val = Zotero.Prefs.get('extensions.mdbconnect.source_dir', true) // as string
           // Logger.log('startupVersionCheck - sourcedir - val2', val, false, 'debug')
           if (val) {
             // Logger.log('startupVersionCheck - sourcedir - AMHERE2', val, false, 'debug')
@@ -164,20 +163,29 @@ export class wrappers {
       /// filefilterstrategy
       try {
         if (preprerename1) {
-          const val = getPref('filefilterstrategy') as string
+          const val = getPref('filefilterstrategy') // as string
           if (val === 'customfileregex') {
             setPref('filefilterstrategy', 'customfileregexp')
-          } else if (paramVals.filefilterstrategy.includes(val as paramTypes['filefilterstrategy'])) {
+            // } else if (paramVals.filefilterstrategy.includes(val as paramTypes['filefilterstrategy'])) {
+          } else if (
+            val &&
+            typeof val === 'string' &&
+            paramVals.filefilterstrategy.find((validName) => validName === val)
+          ) {
             setPref('filefilterstrategy', val)
           } else {
             setPref('filefilterstrategy', paramVals.filefilterstrategy[0])
           }
           getParam.filefilterstrategy()
         } else if (prezot7) {
-          const val = Zotero.Prefs.get('extensions.mdbconnect.filefilterstrategy', true) as string
+          const val = Zotero.Prefs.get('extensions.mdbconnect.filefilterstrategy', true) // as string
           if (val === 'customfileregex') {
             setPref('filefilterstrategy', 'customfileregexp')
-          } else if (paramVals.filefilterstrategy.includes(val as paramTypes['filefilterstrategy'])) {
+          } else if (
+            val &&
+            typeof val === 'string' &&
+            paramVals.filefilterstrategy.find((validName) => validName === val)
+          ) {
             setPref('filefilterstrategy', val)
           } else {
             setPref('filefilterstrategy', paramVals.filefilterstrategy[0])
@@ -191,12 +199,12 @@ export class wrappers {
       /// filepattern
       try {
         if (preprerename1) {
-          const val = getPref('filepattern') as string
-          if (val) setPref('filepattern', val)
+          const val = getPref('filepattern') //as string
+          if (val && typeof val === 'string') setPref('filepattern', val)
           getParam.filepattern()
         } else if (prezot7) {
-          const val = Zotero.Prefs.get('extensions.mdbconnect.filepattern', true) as string
-          if (val) setPref('filepattern', val)
+          const val = Zotero.Prefs.get('extensions.mdbconnect.filepattern', true) //as string
+          if (val && typeof val === 'string') setPref('filepattern', val)
           getParam.filepattern()
         }
       } catch (err) {
@@ -206,20 +214,20 @@ export class wrappers {
       /// matchstrategy
       try {
         if (preprerename1) {
-          const val = getPref('matchstrategy') as string
+          const val = getPref('matchstrategy') // as string
           if (val === 'bbtcitekey') {
             setPref('matchstrategy', 'bbtcitekeyyaml')
-          } else if (paramVals.matchstrategy.includes(val as paramTypes['matchstrategy'])) {
+          } else if (val && typeof val === 'string' && paramVals.matchstrategy.find((validName) => validName === val)) {
             setPref('matchstrategy', val)
           } else {
             setPref('matchstrategy', paramVals.matchstrategy[0])
           }
           getParam.matchstrategy()
         } else if (prezot7) {
-          const val = Zotero.Prefs.get('extensions.mdbconnect.matchstrategy', true) as string
+          const val = Zotero.Prefs.get('extensions.mdbconnect.matchstrategy', true) // as string
           if (val === 'bbtcitekey') {
             setPref('matchstrategy', 'bbtcitekeyyaml')
-          } else if (paramVals.matchstrategy.includes(val as paramTypes['matchstrategy'])) {
+          } else if (val && typeof val === 'string' && paramVals.matchstrategy.find((validName) => validName === val)) {
             setPref('matchstrategy', val)
           } else {
             setPref('matchstrategy', paramVals.matchstrategy[0])
@@ -233,14 +241,14 @@ export class wrappers {
       /// bbtyamlkeyword
       try {
         if (preprerename1) {
-          const val = getPref('metadatakeyword') as string
-          if (val) {
+          const val = getPref('metadatakeyword') // as string
+          if (val && typeof val === 'string') {
             setPref('bbtyamlkeyword', val)
           }
           getParam.bbtyamlkeyword()
         } else if (prezot7) {
-          const val = Zotero.Prefs.get('extensions.mdbconnect.metadatakeyword', true) as string
-          if (val) {
+          const val = Zotero.Prefs.get('extensions.mdbconnect.metadatakeyword', true) // as string
+          if (val && typeof val === 'string') {
             setPref('bbtyamlkeyword', val)
           }
           getParam.bbtyamlkeyword()
@@ -252,14 +260,14 @@ export class wrappers {
       /// zotkeyregexp
       try {
         if (preprerename1) {
-          const val = getPref('zotkeyregex') as string
-          if (val) {
+          const val = getPref('zotkeyregex') // as string
+          if (val && typeof val === 'string') {
             setPref('zotkeyregexp', val)
           }
           getParam.zotkeyregexp()
         } else if (prezot7) {
-          const val = Zotero.Prefs.get('extensions.mdbconnect.zotkeyregex', true) as string
-          if (val) {
+          const val = Zotero.Prefs.get('extensions.mdbconnect.zotkeyregex', true) // as string
+          if (val && typeof val === 'string') {
             setPref('zotkeyregexp', val)
           }
           getParam.zotkeyregexp()
@@ -271,7 +279,7 @@ export class wrappers {
       /// mdeditor
       try {
         if (preprerename1) {
-          const val = getPref('vaultresolution') as string
+          const val = getPref('vaultresolution') // as string
           if (val === 'path') {
             setPref('mdeditor', 'obsidian')
             setPref('obsidianresolvewithfile', false)
@@ -288,7 +296,7 @@ export class wrappers {
           }
           getParam.mdeditor()
         } else if (prezot7) {
-          const val = Zotero.Prefs.get('extensions.mdbconnect.vaultresolution', true) as string
+          const val = Zotero.Prefs.get('extensions.mdbconnect.vaultresolution', true) // as string
           if (val === 'path') {
             setPref('mdeditor', 'obsidian')
             setPref('obsidianresolvewithfile', false)
@@ -312,14 +320,14 @@ export class wrappers {
       /// obsidianvaultname
       try {
         if (preprerename1) {
-          const val = getPref('vaultname') as string
-          if (val) {
+          const val = getPref('vaultname') // && typeof val === 'string' as string
+          if (val && typeof val === 'string') {
             setPref('obsidianvaultname', val)
           }
           getParam.obsidianvaultname()
         } else if (prezot7) {
-          const val = Zotero.Prefs.get('extensions.mdbconnect.vaultname', true) as string
-          if (val) {
+          const val = Zotero.Prefs.get('extensions.mdbconnect.vaultname', true) // as string
+          if (val && typeof val === 'string') {
             setPref('obsidianvaultname', val)
           }
           getParam.obsidianvaultname()
@@ -331,14 +339,14 @@ export class wrappers {
       /// logseqgraph
       try {
         if (preprerename1) {
-          const val = getPref('logseqgraph') as string
-          if (val) {
+          const val = getPref('logseqgraph') // as string
+          if (val && typeof val === 'string') {
             setPref('logseqgraph', val)
           }
           getParam.logseqgraph()
         } else if (prezot7) {
-          const val = Zotero.Prefs.get('extensions.mdbconnect.logseqgraph', true) as string
-          if (val) {
+          const val = Zotero.Prefs.get('extensions.mdbconnect.logseqgraph', true) // as string
+          if (val && typeof val === 'string') {
             setPref('logseqgraph', val)
           }
           getParam.logseqgraph()
@@ -350,14 +358,14 @@ export class wrappers {
       /// grouplibraries
       try {
         if (preprerename1) {
-          const val = getPref('grouplibraries') as string
-          if (paramVals.grouplibraries.includes(val as paramTypes['grouplibraries'])) {
+          const val = getPref('grouplibraries') // as string
+          if (val && typeof val === 'string' && paramVals.grouplibraries.find((validName) => validName === val)) {
             setPref('grouplibraries', val)
           } else setPref('grouplibraries', paramVals.grouplibraries[0])
           getParam.grouplibraries()
         } else if (prezot7) {
-          const val = Zotero.Prefs.get('extensions.mdbconnect.grouplibraries', true) as string
-          if (paramVals.grouplibraries.includes(val as paramTypes['grouplibraries'])) {
+          const val = Zotero.Prefs.get('extensions.mdbconnect.grouplibraries', true) // as string
+          if (val && typeof val === 'string' && paramVals.grouplibraries.find((validName) => validName === val)) {
             setPref('grouplibraries', val)
           } else setPref('grouplibraries', paramVals.grouplibraries[0])
           getParam.grouplibraries()
@@ -369,16 +377,16 @@ export class wrappers {
       /// removetags
       try {
         if (preprerename1) {
-          const val = getPref('removetags') as string
-          if (paramVals.removetags.includes(val as paramTypes['removetags'])) {
+          const val = getPref('removetags') // as string
+          if (val && typeof val === 'string' && paramVals.removetags.find((validName) => validName === val)) {
             setPref('removetags', val)
           } else if (val) {
             setPref('removetags', paramVals.removetags[0])
           }
           getParam.removetags()
         } else if (prezot7) {
-          const val = Zotero.Prefs.get('extensions.mdbconnect.removetags', true) as string
-          if (paramVals.removetags.includes(val as paramTypes['removetags'])) {
+          const val = Zotero.Prefs.get('extensions.mdbconnect.removetags', true) // as string
+          if (val && typeof val === 'string' && paramVals.removetags.find((validName) => validName === val)) {
             setPref('removetags', val)
           } else if (val) {
             setPref('removetags', paramVals.removetags[0])
@@ -391,13 +399,13 @@ export class wrappers {
       /// tagstr
       try {
         if (preprerename1) {
-          const val = getPref('tagstr') as string
+          const val = getPref('tagstr') // as string
           if (val) {
             setPref('tagstr', val)
           }
           getParam.tagstr()
         } else if (prezot7) {
-          const val = Zotero.Prefs.get('extensions.mdbconnect.tagstr', true) as string
+          const val = Zotero.Prefs.get('extensions.mdbconnect.tagstr', true) // as string
           if (val) {
             setPref('tagstr', val)
           }

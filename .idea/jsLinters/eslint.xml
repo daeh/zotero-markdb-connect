@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="EslintConfiguration">
+    <extra-options value="ESLINT_USE_FLAT_CONFIG=true npx eslint --config eslint.config.mjs" />
+    <files-pattern value="{**/*,*}.{ts,tsx,mts,cts,js,jsx,mjs,cjs}" />
+    <option name="fix-on-save" value="true" />
+  </component>
+</project>

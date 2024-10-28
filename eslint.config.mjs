@@ -197,16 +197,30 @@ const config = [
     files: [`src/**/*.{${allTsExtensions}}`, 'typing/**/*.d.ts'],
     ignores: [`**/*.config.{${allTsExtensions}}`],
     settings: {
+      // 'import/resolver': {
+      //   node: {
+      //     extensions: ['.ts'],
+      //   },
+      //   typescript: {
+      //     extensions: ['.ts', '.d.ts'],
+      //   },
+      // },
       'import/resolver': {
-        node: {
-          extensions: ['.ts'],
-        },
         typescript: {
-          extensions: ['.ts', '.d.ts'],
+          project: tsconfig,
+          alwaysTryTypes: true,
         },
+        node: {
+          extensions: ['.ts', '.tsx'],
+          moduleDirectory: ['node_modules', 'src/'],
+        },
+      },
+      'import/parsers': {
+        '@typescript-eslint/parser': ['.ts', '.tsx'],
       },
     },
     rules: {
+      ...typescriptRules,
       ...typescriptRulesDev,
     },
   },
@@ -249,7 +263,15 @@ const config = [
     },
   },
   {
-    ignores: ['build', 'scripts', '**/*.js', '**/*.bak', ...projectFilesToIgnore],
+    ignores: [
+      'build',
+      'scripts',
+      '**/*.js',
+      '**/*.bak',
+      '**/*-lintignore*',
+      '**/*_lintignore*',
+      ...projectFilesToIgnore,
+    ],
   },
 ]
 

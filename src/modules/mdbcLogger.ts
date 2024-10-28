@@ -58,7 +58,7 @@ export class Logger {
     LogsStore.messages.push(messageData)
   }
 
-  static addData<T>(key: string, valueIn: T, overwrite: boolean = true) {
+  static addData<T>(key: string, valueIn: T, overwrite = true) {
     if (LogsStore.debug === 'minimal') {
       LogsStore.data[key] = 'not stored in minimal debugging mode'
     } else {
@@ -85,7 +85,7 @@ export class Logger {
     }
   }
 
-  static addLog(key: string, value: any, overwrite: boolean = false) {
+  static addLog(key: string, value: any, overwrite = false) {
     const timedelta = this.updateTime()
     const timedvalue = { msg: value, td: timedelta }
     if (!(key in LogsStore.logs) || LogsStore.logs[key] === undefined) {
@@ -103,8 +103,8 @@ export class Logger {
     }
   }
 
-  static log(key: string, value: any, overwrite: boolean = false, type: LogType = 'info'): void {
-    let success: boolean = false
+  static log(key: string, value: any, overwrite = false, type: LogType = 'info'): void {
+    let success = false
     try {
       let toZoteroDebugConsole = false
       let toZoteroErrorConsole = false

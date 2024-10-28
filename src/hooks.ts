@@ -3,15 +3,9 @@ import { config } from '../package.json'
 import { DataManager } from './dataGlobals'
 import { Elements } from './modules/create-element'
 import { Logger } from './modules/mdbcLogger'
-import {
-  BasicExampleFactory,
-  Notifier,
-  prefHelpers,
-  ScanMarkdownFiles,
-  systemInterface,
-  UIHelpers,
-} from './modules/mdbcScan'
+import { ScanMarkdownFiles } from './modules/mdbcScan'
 import { wrappers } from './modules/mdbcStartupHelpers'
+import { Notifier, prefHelpers, Registrar, systemInterface, UIHelpers } from './modules/mdbcUX'
 import { unpatch as $unpatch$ } from './modules/monkey-patch'
 import { registerPrefsScripts } from './modules/preferenceScript'
 import { getString, initLocale } from './utils/locale'
@@ -23,7 +17,7 @@ async function onStartup() {
 
   await wrappers.startupVersionCheck()
 
-  BasicExampleFactory.registerPrefs()
+  Registrar.registerPrefs()
 
   // BasicExampleFactory.registerNotifier()
 

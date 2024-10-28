@@ -3,24 +3,12 @@ import { DataManager } from '../dataGlobals'
 import { getString } from '../utils/locale'
 import { getPref, setPref } from '../utils/prefs'
 
-import { Elements } from './create-element'
-import { paramVals } from './mdbcConstants'
 import { getErrorMessage, Logger, trace } from './mdbcLogger'
+import { getParam } from './mdbcParam'
 import { wrappers } from './mdbcStartupHelpers'
-import { patch as $patch$ } from './monkey-patch'
+import { Notifier, systemInterface } from './mdbcUX'
 
-import type { paramTypes } from './mdbcConstants'
-import type {
-  DebugMode,
-  Entry,
-  messageData,
-  notificationData,
-  NotificationType,
-  NotifyCreateLineOptions,
-  OSFile,
-  prefParam,
-  ZoteroIconURI,
-} from '../mdbcTypes'
+import type { Entry, messageData, notificationData } from '../mdbcTypes'
 
 // Components.utils.import('resource://gre/modules/FileUtils.jsm')
 // declare const FileUtils: any
@@ -43,65 +31,6 @@ interface BetterBibTeX {
     all(): BBTCitekeyRecord[]
   }
   ready: boolean | Promise<boolean>
-}
-
-const favIcon = `chrome://${config.addonRef}/content/icons/favicon.png` as const
-const additionalIcons = [favIcon, 'chrome://zotero/skin/toolbar-item-add@2x.png'] as const
-type AddonIconURI = (typeof additionalIcons)[number]
-type IconURI = AddonIconURI | ZoteroIconURI
-
-export class Notifier {
-  static readonly notificationTypes: Record<NotificationType, IconURI> = {
-    addon: favIcon,
-    success: 'chrome://zotero/skin/tick@2x.png',
-    error: 'chrome://zotero/skin/error@2x.png', //'cross@2x.png',
-    warn: 'chrome://zotero/skin/warning@2x.png',
-    info: 'chrome://zotero/skin/prefs-advanced.png',
-    debug: 'chrome://zotero/skin/treeitem-patent@2x.png',
-    config: 'chrome://zotero/skin/prefs-general.png',
-    itemsadded: 'chrome://zotero/skin/toolbar-item-add@2x.png',
-    itemsremoved: 'chrome://zotero/skin/minus@2x.png',
-    // xmark@2x.png
-  }
-
-  static notify(data: notificationData): void {
-    const header = `${config.addonName} : ${data.title}`
-
-    let messageArray: notificationData['messageArray'] = []
-    try {
-      if (!('messageArray' in data) || !Array.isArray(data.messageArray) || data.messageArray.length === 0) {
-        if (!data.body || !data.type) return
-        messageArray = [{ body: data.body, type: data.type }]
-      } else {
-        messageArray = data.messageArray
-      }
-    } catch (err) {
-      Logger.log('Notifier', `ERROR: ${getErrorMessage(err)}`, false, 'error')
-      return
-    }
-
-    const timeout = 5 // seconds
-    const ms = 1000 // milliseconds
-    const popupWin = new ztoolkit.ProgressWindow(header, {
-      // window?: Window,
-      closeOnClick: true,
-      closeTime: timeout * ms,
-      closeOtherProgressWindows: false,
-    })
-
-    for (const message of messageArray) {
-      const type = message.type || 'addon'
-
-      const lineOptions: NotifyCreateLineOptions = {
-        text: message.body,
-        icon: this.notificationTypes[type],
-        progress: 100,
-      }
-      popupWin.createLine(lineOptions)
-    }
-
-    popupWin.show()
-  }
 }
 
 export class BBTHelper {
@@ -148,424 +77,76 @@ export class BBTHelper {
   }
 }
 
-export class getParam {
-  @trace
-  static sourcedir(): prefParam {
-    const name = 'sourcedir'
-    const defaultValue = ''
-    const valid = false
-    const param: prefParam = {
-      name: name,
-      value: defaultValue,
-      valid: valid,
-      msg: '',
-    }
-    try {
-      const value = getPref(name) as string
-      param.msg += `pref value: ${value}. `
-      if (typeof value !== 'string') {
-        param.msg += `type: ${typeof value}. `
-        throw new Error('Vault Path Not Found')
+const listDirContents = async (dirpath: string): Promise<OS.File.Entry[]> => {
+  const items: OS.File.Entry[] = []
+  try {
+    /* Zotero.File.iterateDirectory calls new OS.File.DirectoryIterator(dirpath) */
+    await Zotero.File.iterateDirectory(dirpath, (item: OS.File.Entry) => {
+      if (!item.name.startsWith('.')) {
+        items.push(item)
       }
-      if (value.length === 0) {
-        param.msg += 'length: 0. '
-        throw new Error('Vault Path Not Found')
-      }
-
-      const sourcedirpathObj = Zotero.File.pathToFile(value)
-      sourcedirpathObj.normalize()
-      const sourcedirpath = sourcedirpathObj.path
-      if (
-        typeof sourcedirpath === 'string' &&
-        sourcedirpath.length > 0 &&
-        sourcedirpathObj.exists() &&
-        sourcedirpathObj.isDirectory()
-      ) {
-        param.value = sourcedirpath
-        param.valid = true
-      } else {
-        param.msg += `sourcedirpath: ${sourcedirpath}. `
-        param.msg += `sourcedirpathObj.exists(): ${sourcedirpathObj.exists()}. `
-        param.msg += `sourcedirpathObj.isDirectory(): ${sourcedirpathObj.isDirectory()}. `
-      }
-    } catch (err) {
-      // TODO only show notification if user sync run manually (not run on startup)
-      Logger.log('getParam', `ERROR: sourcedirpath :: ${getErrorMessage(err)}`, false, 'error')
-      Notifier.notify({
-        title: 'Warning',
-        body: `Vault Path Not Found. Set the path to your notes in the ${config.addonName} preferences.`,
-        type: 'error',
-      })
-      param.msg += `Error:: ${getErrorMessage(err)}. `
-    }
-    Logger.log(name, param, false, 'config')
-    return param
+    })
+  } catch (err) {
+    Logger.log('listDirContents', `Failed to process: ${dirpath} (${getErrorMessage(err)})`, false, 'warn')
   }
-
-  @trace
-  static filefilterstrategy() {
-    const name = 'filefilterstrategy'
-    const defaultValue = paramVals.filefilterstrategy[0] as paramTypes['filefilterstrategy']
-    const valid = true
-    const param = { name: name, value: defaultValue, valid: valid }
-
-    const value = getPref(name) as paramTypes['filefilterstrategy']
-    if (paramVals.filefilterstrategy.includes(value)) {
-      param.value = value
-      param.valid = true
-    } else {
-      Logger.log('getParam', `ERROR: filefilterstrategy: invalid RegExp :: ${value}`, false, 'error')
-      Logger.log('getParam', `filefilterstrategy: set to default :: ${defaultValue.toString()}`, false, 'error')
-      setPref(name, defaultValue)
-    }
-    Logger.log(name, param, false, 'config')
-    return param
-  }
-
-  @trace
-  static filepattern() {
-    const name = 'filepattern'
-    const defaultValue = '^@(\\S+).*\\.md$'
-    const defaultRegExp_ = /^@(\S+).*\.md$/i
-    const defaultRegExp = new RegExp(defaultValue, 'i')
-    const valid = true
-    const param = { name: name, value: defaultRegExp, valid: valid, msg: '' }
-    const value = getPref(name) as string
-    param.msg += `pref value: ${value}. `
-    if (typeof value === 'string' && value.length > 0 && prefHelpers.isValidRegExp(value)) {
-      param.value = new RegExp(value, 'i')
-      param.valid = true
-    } else {
-      if (value !== '' && value !== defaultValue) {
-        Logger.log('getParam', `ERROR: filepattern: invalid RegExp :: ${value}. Using default instead.`, false, 'error')
-        Logger.log('getParam', `filepattern: set to default :: ${defaultRegExp_.toString()}`, false, 'error')
-        setPref(name, defaultValue)
-      }
-    }
-    Logger.log(name, { ...param, value: param.value.toString() }, false, 'config')
-    return param
-  }
-
-  @trace
-  static matchstrategy() {
-    const name = 'matchstrategy'
-    const defaultValue = paramVals.matchstrategy[0] as paramTypes['matchstrategy']
-    const param = { name: name, value: defaultValue, valid: true }
-    const value = getPref(name) as paramTypes['matchstrategy']
-    if (paramVals.matchstrategy.includes(value)) {
-      param.value = value
-      param.valid = true
-    } else {
-      Logger.log('getParam', `ERROR: matchstrategy: invalid :: ${value}`, false, 'error')
-      Logger.log('getParam', `matchstrategy: set to default :: ${defaultValue}`, false, 'error')
-      setPref(name, defaultValue)
-    }
-    Logger.log(name, param, false, 'config')
-    return param
-  }
-
-  @trace
-  static bbtyamlkeyword() {
-    const name = 'bbtyamlkeyword'
-    const defaultValue = ''
-    const valid = false
-    const param = { name: name, value: defaultValue, valid: valid, msg: '' }
-    const value = getPref(name) as string
-    param.msg += `pref value: ${value}. `
-    if (typeof value === 'string' && value.length > 0 && prefHelpers.checkMetadataFormat(value)) {
-      /// checkMetadataFormat() will show a notification
-      param.value = value
-      param.valid = true
-    } else {
-      if (value !== '' && value !== defaultValue) {
-        Logger.log('getParam', `ERROR: bbtyamlkeyword: invalid param :: ${value}`, false, 'error')
-        Logger.log('getParam', `bbtyamlkeyword: set to default :: ${defaultValue}`, false, 'error')
-        setPref(name, defaultValue)
-      }
-    }
-    Logger.log(name, param, false, 'config')
-    return param
-  }
-
-  @trace
-  static bbtregexp() {
-    const name = 'bbtregexp'
-    const defaultValue = ''
-    const defaultRegExp = new RegExp(defaultValue, 'm')
-    const valid = false
-    const param = { name: name, value: defaultRegExp, valid: valid, msg: '' }
-    const value = getPref(name) as string
-    param.msg += `pref value: ${value}. `
-    if (typeof value === 'string' && value.length > 0 && prefHelpers.isValidRegExp(value)) {
-      param.value = new RegExp(value, 'm')
-      param.valid = true
-    } else {
-      if (value !== '' && value !== defaultValue) {
-        Logger.log('getParam', `ERROR: bbtregexp: invalid RegExp :: ${value}`, false, 'error')
-        Logger.log('getParam', `bbtregexp: set to default :: ${defaultRegExp.toString()}`, false, 'error')
-        setPref(name, defaultValue)
-      }
-    }
-    Logger.log(name, { ...param, value: param.value.toString() }, false, 'config')
-    return param
-  }
-
-  @trace
-  static zotkeyregexp() {
-    const name = 'zotkeyregexp'
-    const param = { name: name, value: new RegExp(''), valid: false, msg: '' }
-    const value = getPref(name) as string
-    param.msg += `pref value: ${value}. `
-
-    if (typeof value === 'string' && value.length > 0 && prefHelpers.isValidRegExp(value)) {
-      param.value = new RegExp(value)
-      param.valid = true
-    } else {
-      Logger.log('getParam', `ERROR: filepattern: invalid RegExp :: ${value}`, false, 'error')
-      // TODO only show notification if user sync run manually (not run on startup)
-      //TODO DEBUG
-      // Notifier.showNotification(
-      //   'Warning',
-      //   `User Defined RegExp Invalid. The RegExp you specified in the preferences is invalid: ${value}`,
-      //   false,
-      // )
-    }
-    Logger.log(name, { ...param, value: param.value.toString() }, false, 'config')
-    return param
-  }
-
-  @trace
-  static mdeditor() {
-    const name = 'mdeditor'
-    const defaultValue = paramVals.mdeditor[0] as paramTypes['mdeditor']
-    const param = { name: name, value: defaultValue, valid: true }
-
-    let value = getPref(name) as paramTypes['mdeditor']
-    if (paramVals.mdeditor.includes(value)) {
-      param.value = value
-      param.valid = true
-    } else {
-      Logger.log('getParam', `ERROR: mdeditor: invalid param :: ${value}`, false, 'error')
-      Logger.log('getParam', `mdeditor: set to default :: ${defaultValue}`, false, 'error')
-      setPref(name, defaultValue)
-    }
-    Logger.log(name, param, false, 'config')
-    return param
-  }
-
-  @trace
-  static obsidianresolve() {
-    const name = 'obsidianresolvewithfile'
-    const defaultValue = paramVals.obsidianresolvewithfile[0] as paramTypes['obsidianresolvewithfile']
-    const valid = true
-    const param = {
-      name: name,
-      value: defaultValue === false ? paramVals.obsidianresolvespec[0] : paramVals.obsidianresolvespec[1], //// if defaultValue === false use 'path' (the default), if defaultValue === true use 'file',
-      valid: valid,
-    }
-
-    const value = getPref('obsidianresolvewithfile') as paramTypes['obsidianresolvewithfile']
-    if (paramVals.obsidianresolvewithfile.includes(value)) {
-      param.value = value === false ? paramVals.obsidianresolvespec[0] : paramVals.obsidianresolvespec[1]
-      param.valid = true
-    } else {
-      Logger.log('getParam', `ERROR: obsidianresolve: invalid param :: ${value}`, false, 'error')
-      Logger.log('getParam', `obsidianresolve: set to default :: ${defaultValue.toString()}`, false, 'error')
-      setPref(name, defaultValue)
-    }
-    Logger.log(name, param, false, 'config')
-    return param
-  }
-
-  @trace
-  static obsidianvaultname() {
-    const name = 'obsidianvaultname'
-    const defaultValue = ''
-    const valid = false
-    const param = { name: name, value: defaultValue, valid: valid, msg: '' }
-    const value = getPref(name) as string
-    param.msg += `pref value: ${value}. `
-    if (typeof value === 'string' && value.length > 0) {
-      param.value = value
-      param.valid = true
-    } else {
-      if (value !== '' && value !== defaultValue) {
-        Logger.log('getParam', `ERROR: obsidianvaultname: invalid param :: ${value}`, false, 'error')
-        Logger.log('getParam', `obsidianvaultname: set to default :: ${defaultValue}`, false, 'error')
-        setPref(name, defaultValue)
-      }
-    }
-    Logger.log(name, param, false, 'config')
-    return param
-  }
-
-  @trace
-  static logseqgraph() {
-    const name = 'logseqgraph'
-    const defaultValue = ''
-    const valid = false
-    const param = { name: name, value: defaultValue, valid: valid, msg: '' }
-    const value = getPref(name) as string
-    param.msg += `pref value: ${value}. `
-    if (typeof value === 'string' && value.length > 0) {
-      param.value = value
-      param.valid = true
-    } else {
-      if (value !== '' && value !== defaultValue) {
-        Logger.log('getParam', `ERROR: logseqgraph: invalid param :: ${value}`, false, 'error')
-        Logger.log('getParam', `logseqgraph: set to default :: ${defaultValue}`, false, 'error')
-        setPref(name, defaultValue)
-      }
-    }
-    Logger.log(name, param, false, 'config')
-    return param
-  }
-
-  /**
-   * Prefix for logseq filenames (NB: presumes that prefix has already been URL encoded)
-   */
-  @trace
-  static logseqprefix() {
-    const name = 'logseqprefix'
-    const defaultValue = ''
-    const valid = false
-    const param = { name: name, value: defaultValue, valid: valid, msg: '' }
-    const value = getPref(name) as string
-    param.msg += `pref value: ${value}. `
-    if (typeof value === 'string' && value.length > 0) {
-      param.value = value
-      param.valid = true
-    } else {
-      if (value !== '' && value !== defaultValue) {
-        Logger.log('getParam', `ERROR: logseqprefix: invalid param :: ${value}`, false, 'error')
-        Logger.log('getParam', `logseqprefix: set to default :: ${defaultValue}`, false, 'error')
-        setPref(name, defaultValue)
-      }
-    }
-    Logger.log(name, param, false, 'config')
-    return param
-  }
-
-  @trace
-  static grouplibraries() {
-    const name = 'grouplibraries'
-    const defaultValue = paramVals.grouplibraries[0] as paramTypes['grouplibraries']
-    const param = { name: name, value: defaultValue, valid: true }
-
-    const value = getPref(name) as paramTypes['grouplibraries']
-    if (paramVals.grouplibraries.includes(value)) {
-      param.value = value
-      param.valid = true
-    } else {
-      Logger.log('getParam', `ERROR: grouplibraries: invalid param :: ${value}`, false, 'error')
-      Logger.log('getParam', `grouplibraries: set to default :: ${defaultValue}`, false, 'error')
-      setPref(name, defaultValue)
-    }
-    Logger.log(name, param, false, 'config')
-    return param
-  }
-
-  @trace
-  static removetags() {
-    const name = 'removetags'
-    const defaultValue = paramVals.removetags[0] as paramTypes['removetags']
-    const param = { name: name, value: defaultValue, valid: true }
-
-    const value = getPref(name) as paramTypes['removetags']
-    if (paramVals.removetags.includes(value)) {
-      param.value = value
-      param.valid = true
-    } else {
-      Logger.log('getParam', `ERROR: removetags: invalid param :: ${value}`, false, 'error')
-      Logger.log('getParam', `removetags: set to default :: ${defaultValue}`, false, 'error')
-      setPref(name, defaultValue)
-    }
-    Logger.log(name, param, false, 'config')
-    return param
-  }
-
-  @trace
-  static tagstr() {
-    const name = 'tagstr'
-    const defaultValue = 'ObsCite'
-    const param = { name: name, value: defaultValue, valid: true, msg: '' }
-    const value = getPref(name) as string
-    param.msg += `pref value: ${value}. `
-    if (typeof value === 'string' && value.length > 0 && prefHelpers.checkTagStr(value)) {
-      param.value = value
-      param.valid = true
-    } else {
-      if (value !== '') {
-        Logger.log('getParam', `ERROR: tagstr: invalid param :: ${value}`, false, 'error')
-        Logger.log('getParam', `tagstr: set to default :: ${defaultValue}`, false, 'error')
-        setPref(name, defaultValue)
-      }
-    }
-    Logger.log(name, param, false, 'config')
-    return param
-  }
-
-  @trace
-  static debugmode() {
-    const name = 'debugmode'
-    const defaultValue = 'minimal' as DebugMode
-    const param = { name: name, value: defaultValue, valid: true }
-    const value = getPref(name) as DebugMode
-    if (paramVals.debugmode.includes(value)) {
-      param.value = value
-      param.valid = true
-    } else {
-      if (value !== defaultValue) {
-        Logger.log('getParam', `ERROR: debugmode: invalid param :: ${value}`, false, 'error')
-        Logger.log('getParam', `debugmode: set to default :: ${defaultValue}`, false, 'error')
-        setPref(name, defaultValue)
-      }
-    }
-    Logger.log(name, param, false, 'config')
-    return param
-  }
-}
-
-const listDirContents = async (dirpath: string): Promise<OSFile[]> => {
-  const items: OSFile[] = []
-  /* Zotero.File.iterateDirectory calls new OS.File.DirectoryIterator(dirpath) */
-  await Zotero.File.iterateDirectory(dirpath, (item: OSFile) => {
-    if (!item.name.startsWith('.')) {
-      items.push(item)
-    }
-  })
   return items
 }
 
-const listFilesRecursively = async function* (dirpath: string): AsyncGenerator<OSFile> {
+const listFilesRecursively = async function* (dirpath: string): AsyncGenerator<OS.File.Entry> {
   // Does not follow symbolic links //
-  const entries: OSFile[] = await listDirContents(dirpath)
+
+  const entries: OS.File.Entry[] = await listDirContents(dirpath)
   for (const entry of entries) {
-    const zfile: nsIFile = Zotero.File.pathToFile(entry.path)
-    if (zfile.isReadable() && !zfile.isHidden() && !zfile.isSpecial() && !zfile.isSymlink()) {
-      if (zfile.isDirectory()) {
-        yield* listFilesRecursively(entry.path)
-      } else if (zfile.isFile()) {
-        yield entry
+    try {
+      const zfile: nsIFile = Zotero.File.pathToFile(entry.path)
+
+      if (zfile.exists() && zfile.isReadable() && !zfile.isHidden() && !zfile.isSpecial() && !zfile.isSymlink()) {
+        if (zfile.isDirectory()) {
+          yield* listFilesRecursively(entry.path)
+        } else if (zfile.isFile()) {
+          yield entry
+        }
       }
+    } catch (err) {
+      Logger.log('listFilesRecursively', `Failed to process: ${entry.path} (${getErrorMessage(err)})`, false, 'warn')
     }
   }
 }
 
+// const collectFilesRecursive = async (dirPath: string, parents: string[] = [], files: OS.File.Entry[] = []) => {
+//   await Zotero.File.iterateDirectory(dirPath, async (entry: OS.File.Entry) => {
+//     const zfile = Zotero.File.pathToFile(entry.path)
+//     if (
+//       !entry.name.startsWith('.') &&
+//       zfile.exists() &&
+//       zfile.isReadable() &&
+//       !zfile.isHidden() &&
+//       !zfile.isSpecial() &&
+//       !zfile.isSymlink()
+//     ) {
+//       if (zfile.isDirectory()) {
+//         await collectFilesRecursive(entry.path, [...parents, entry.name], files)
+//       } else if (zfile.isFile()) {
+//         files.push(entry)
+//       }
+//     }
+//   })
+//   return files
+// }
+
 class Utils {
-  static async getFilesRecursively(dirpath: string): Promise<OSFile[]> {
-    const files: OSFile[] = [] // OS.File.Entry[]
-
+  static async getFilesRecursively(dirpath: string): Promise<OS.File.Entry[]> {
+    let files: OS.File.Entry[] = []
     try {
-      const basedirObj: nsIFile = Zotero.File.pathToFile(dirpath)
-      basedirObj.normalize()
+      const zfileBaseDir: nsIFile = Zotero.File.pathToFile(dirpath)
 
-      if (!basedirObj.exists() || !basedirObj.isDirectory()) {
-        Logger.log('getFilesRecursively', `ERROR ${basedirObj.path} does not exist or is not a folder`, false, 'warn')
-        throw new Error(`${basedirObj.path} does not exist or is file`)
+      if (!zfileBaseDir.exists() || !zfileBaseDir.isDirectory()) {
+        Logger.log('getFilesRecursively', `ERROR ${zfileBaseDir.path} does not exist or is not a folder`, false, 'warn')
+        throw new Error(`${zfileBaseDir.path} does not exist or is file`)
       }
+      zfileBaseDir.normalize()
 
-      for await (const file of listFilesRecursively(basedirObj.path)) {
+      for await (const file of listFilesRecursively(zfileBaseDir.path)) {
         files.push(file)
       }
     } catch (err) {
@@ -574,6 +155,25 @@ class Utils {
 
     return files
   }
+
+  // static async getFilesRecursively(dirpath: string): Promise<OS.File.Entry[]> {
+  //   let files: OS.File.Entry[] = []
+  //   try {
+  //     const zfileBaseDir: nsIFile = Zotero.File.pathToFile(dirpath)
+  //
+  //     if (!zfileBaseDir.exists() || !zfileBaseDir.isDirectory()) {
+  //       Logger.log('getFilesRecursively', `ERROR ${zfileBaseDir.path} does not exist or is not a folder`, false, 'warn')
+  //       throw new Error(`${zfileBaseDir.path} does not exist or is file`)
+  //     }
+  //     zfileBaseDir.normalize()
+  //
+  //     await collectFilesRecursive(zfileBaseDir.path, [], files)
+  //   } catch (err) {
+  //     Logger.log('getFilesRecursively', `ERROR: ${getErrorMessage(err)}`, false, 'warn')
+  //   }
+  //
+  //   return files
+  // }
 
   static async findTaggedItems(tagstr: string): Promise<Zotero.Item[]> {
     const s = new Zotero.Search()
@@ -621,8 +221,8 @@ export class ScanMarkdownFiles {
     const filefilterstrategy = getParam.filefilterstrategy().value
 
     /// pattern to match citekey in MD file name
-    let re_file: RegExp = /^@.+\.md$/i
-    let re_title: RegExp = /^@(\S+).*\.md$/i
+    let re_file = /^@.+\.md$/i
+    let re_title = /^@(\S+).*\.md$/i
     if (filefilterstrategy === 'customfileregexp') {
       re_file = re_title = getParam.filepattern().value
     }
@@ -690,7 +290,8 @@ export class ScanMarkdownFiles {
             if (bbtyamlkeywordParam.valid) {
               /// pattern to match citekey in MD file metadata
               const re_metadata = new RegExp(`^${bbtyamlkeywordParam.value}: *(?:['"])?(\\S+?)(?:['"]|\\s|$)`, 'm')
-              const contents = (await Zotero.File.getContentsAsync(filepath)) as string
+              const contentsRaw = await Zotero.File.getContentsAsync(filepath) // as string
+              const contents = contentsRaw && typeof contentsRaw === 'string' ? contentsRaw : ''
               /// get metadata
               const contentSections = contents.split('\n---')
               const metadata = contentSections[0]
@@ -705,7 +306,8 @@ export class ScanMarkdownFiles {
             if (bbtregexpParam.valid) {
               /// pattern to match citekey in MD file contents
               const re_body = bbtregexpParam.value
-              const contents = (await Zotero.File.getContentsAsync(filepath)) as string
+              const contentsRaw = await Zotero.File.getContentsAsync(filepath) // as string
+              const contents = contentsRaw && typeof contentsRaw === 'string' ? contentsRaw : ''
               const reBody_match_res = contents.match(re_body)
               if (reBody_match_res && reBody_match_res.length > 1) {
                 entry_res.citekey_metadata = reBody_match_res[1].trim()
@@ -789,7 +391,7 @@ export class ScanMarkdownFiles {
     const filefilterstrategy = getParam.filefilterstrategy().value
 
     /// pattern to match citekey in MD file name
-    let re_file: RegExp = /^@.+\.md$/i
+    let re_file = /^@.+\.md$/i
     if (filefilterstrategy === 'customfileregexp') {
       re_file = getParam.filepattern().value
     }
@@ -838,7 +440,8 @@ export class ScanMarkdownFiles {
 
         /// get the ZoteroKey from the contents
         try {
-          const contents = (await Zotero.File.getContentsAsync(filepath)) as string
+          const contentsRaw = await Zotero.File.getContentsAsync(filepath) // as string
+          const contents = contentsRaw && typeof contentsRaw === 'string' ? contentsRaw : ''
 
           const reContents_match_res = contents.match(re_contents)
           if (reContents_match_res && reContents_match_res.length > 1 && reContents_match_res[1].trim() !== '') {
@@ -1732,692 +1335,5 @@ export class ScanMarkdownFiles {
         'info',
       )
     Logger.log('displayReportDialog - Dialog closed - dialogData', dialogData, false, 'info')
-  }
-}
-
-export class systemInterface {
-  static expandSelection(ids: 'selected' | number | number[]): number[] {
-    if (Array.isArray(ids)) return ids
-
-    if (ids === 'selected') {
-      try {
-        // return Zotero.getActiveZoteroPane().getSelectedItems(true)
-        return ztoolkit.getGlobal('ZoteroPane').getSelectedItems(true)
-      } catch (err) {
-        // zoteroPane.getSelectedItems() doesn't test whether there's a selection and errors out if not
-        Logger.log('expandSelection', `Could not get selected items: ${getErrorMessage(err)}`, false, 'warn')
-        return []
-      }
-    }
-
-    return [ids]
-  }
-
-  @trace
-  static async dumpDebuggingLog() {
-    const data = JSON.stringify(Logger.dump(), null, 1)
-    const filename = `${config.addonName.replace('-', '')}-logs.json`
-
-    const filepathstr = await new ztoolkit.FilePicker(
-      `Save ${config.addonName} Debugging Logs`,
-      'save',
-      [
-        ['JSON File(*.json)', '*.json'],
-        ['Any', '*.*'],
-      ],
-      filename,
-    ).open()
-
-    if (!filepathstr) return
-
-    // const fileObj = Zotero.File.pathToFile(pathstr)
-    // if (fileObj instanceof Components.interfaces.nsIFile) {}
-    // fileObj.normalize()
-    // fileObj.isFile()
-
-    Logger.log('saveDebuggingLog', `Saving to ${filepathstr}`, false, 'info')
-
-    await Zotero.File.putContentsAsync(filepathstr, data)
-  }
-
-  @trace
-  static async dumpJsonFile(data: string, title: string, filename: string) {
-    // saveButtonTitle
-    // saveDialogTitle
-    // fileNameSuggest
-    // dataGetter
-
-    // const data = JSON.stringify(Logger.dump(), null, 1)
-
-    // const filename = `${config.addonName.replace('-', '')}-logs.json`
-
-    if (!data) {
-      Logger.log(
-        'saveJsonFile',
-        `ERROR No data to save. \n  filename :: ${filename} \n  title :: ${title} \n  data :: ${data}`,
-        false,
-        'error',
-      )
-    }
-
-    const filepathstr = await new ztoolkit.FilePicker(
-      title,
-      'save',
-      [
-        ['JSON File(*.json)', '*.json'],
-        ['Any', '*.*'],
-      ],
-      filename,
-    ).open()
-
-    if (!filepathstr) return
-
-    // const fileObj = Zotero.File.pathToFile(pathstr)
-    // if (fileObj instanceof Components.interfaces.nsIFile) {}
-    // fileObj.normalize()
-    // fileObj.isFile()
-
-    Logger.log('saveJsonFile', `Saving to ${filepathstr}`, false, 'info')
-
-    await Zotero.File.putContentsAsync(filepathstr, data)
-  }
-
-  @trace
-  static showSelectedItemMarkdownInFilesystem(entry_res: Entry): void {
-    try {
-      const fileObj = Zotero.File.pathToFile(entry_res.path)
-      fileObj.normalize()
-      if (fileObj.isFile()) {
-        try {
-          fileObj.reveal()
-          Logger.log('showSelectedItemMarkdownInFilesystem', `Revealing ${fileObj.path}`, false, 'info')
-        } catch (err) {
-          // On platforms that don't support nsIFileObj.reveal() (e.g. Linux), launch the parent directory
-          Zotero.launchFile(fileObj.parent.path)
-          Logger.log(
-            'showSelectedItemMarkdownInFilesystem',
-            `Reveal failed, falling back to opening parent directory of ${fileObj.path}`,
-            false,
-            'warn',
-          )
-        }
-      }
-    } catch (err) {
-      Logger.log(
-        'showSelectedItemMarkdownInFilesystem',
-        `ERROR :: ${entry_res?.path} :: ${getErrorMessage(err)}`,
-        false,
-        'warn',
-      )
-    }
-  }
-
-  @trace
-  static openFileSystemPath(entry_res: Entry): void {
-    try {
-      const fileObj = Zotero.File.pathToFile(entry_res.path)
-      fileObj.normalize()
-      if (fileObj.isFile()) {
-        Zotero.launchFile(fileObj.path)
-        Logger.log('openFileSystemPath', `Revealing ${fileObj.path}`, false, 'info')
-      }
-    } catch (err) {
-      Logger.log('openFileSystemPath', `ERROR :: ${entry_res?.path} :: ${getErrorMessage(err)}`, false, 'warn')
-    }
-  }
-
-  @trace
-  static openObsidianURI(entry_res: Entry): void {
-    try {
-      const uri_spec = getParam.obsidianresolve().value
-      const vaultnameParam = getParam.obsidianvaultname()
-      const vaultKey = vaultnameParam.valid ? `vault=${vaultnameParam.value}&` : ''
-
-      const fileKey =
-        uri_spec === 'file'
-          ? `file=${encodeURIComponent(entry_res.name)}`
-          : `path=${encodeURIComponent(entry_res.path)}`
-
-      const uri = `obsidian://open?${vaultKey}${fileKey}`
-      Zotero.launchURL(uri)
-
-      Logger.log('openObsidianURI', `Launching ${entry_res.path} :: ${uri}`, false, 'info')
-    } catch (err) {
-      Logger.log('openObsidianURI', `ERROR :: ${entry_res?.path} :: ${getErrorMessage(err)}`, false, 'warn')
-    }
-  }
-
-  @trace
-  static openLogseqURI(entry_res: Entry): void {
-    try {
-      /// get filename without extension
-      const fileObj = Zotero.File.pathToFile(entry_res.path)
-      fileObj.normalize()
-      // const filename = fileObj.getRelativePath(fileObj.parent)
-      // const filename = fileObj.displayName
-      const filename = fileObj.leafName
-      const filenamebase = filename.replace(/\.md$/i, '')
-
-      /// get graph name
-      let graphName: string = ''
-      const graphNameParam = getParam.logseqgraph()
-      if (graphNameParam.valid) {
-        graphName = graphNameParam.value
-      } else {
-        /* if graph name not specified, try to get it from the path */
-        try {
-          graphName = fileObj.parent.parent.leafName
-        } catch (err) {
-          Logger.log('openLogseqURI', `ERROR :: ${entry_res?.path} :: ${getErrorMessage(err)}`, false, 'warn')
-          /* if candidate graph name not found, abort */
-          graphName = '' /// will case error below
-        }
-      }
-
-      if (graphName === '') {
-        Notifier.notify({
-          title: 'Error',
-          body: `logseq graph name not found. Set the graph name in the ${config.addonName} preferences.`,
-          type: 'error',
-        })
-        throw new Error('graphName not resolved')
-      }
-
-      /// if using re-encoded note name
-      // const fileKey = `page=${logseq_prefix_file}${filenamebase}`
-      /// if using filename
-      const fileKey = `page=${filenamebase}`
-      const uri = `logseq://graph/${graphName}?${fileKey}`
-
-      /* prefix not encoded, filename encoded */
-      Zotero.launchURL(uri)
-
-      Logger.log('openLogseqURI', `Launching ${entry_res.path} :: ${uri}`, false, 'info')
-    } catch (err) {
-      Logger.log('openLogseqURI', `ERROR :: ${entry_res?.path} :: ${getErrorMessage(err)}`, false, 'warn')
-    }
-  }
-}
-
-export class UIHelpers {
-  @trace
-  static registerWindowMenuItem_Sync() {
-    ztoolkit.Menu.register('menuTools', {
-      tag: 'menuseparator',
-    })
-    // menu->Tools menuitem
-    ztoolkit.Menu.register('menuTools', {
-      tag: 'menuitem',
-      id: `${config.addonRef}-tools-menu-sync`,
-      label: getString('menuitem-sync'),
-      oncommand: `Zotero.${config.addonInstance}.hooks.syncMarkDB();`,
-    })
-  }
-
-  @trace
-  static registerWindowMenuItem_Debug() {
-    // menu->Tools menuitem
-    ztoolkit.Menu.register('menuTools', {
-      tag: 'menuitem',
-      id: `${config.addonRef}-tools-menu-troubleshoot`,
-      label: getString('menuitem-troubleshoot'),
-      oncommand: `Zotero.${config.addonInstance}.hooks.syncMarkDBReport();`,
-    })
-    //   tag: "menuitem",
-    //   id: "zotero-itemmenu-addontemplate-test",
-    //   label: "Addon Template: Menuitem",
-    //   oncommand: "alert('Hello World! Default Menuitem.')",
-    //   icon: menuIcon,
-    // register(menuPopup: XUL.MenuPopup | keyof typeof MenuSelector, options: MenuitemOptions, insertPosition?: "before" | "after", anchorElement?: XUL.Element): false | undefined;
-    // unregister(menuId: string): void;
-  }
-
-  @trace
-  static registerRightClickMenuItem() {
-    $patch$(
-      ZoteroPane,
-      // ztoolkit.getGlobal('ZoteroPane'),
-      // ztoolkit.getGlobal('Zotero_Tabs').select('zotero-pane'),
-      'buildItemContextMenu',
-      (original) =>
-        async function ZoteroPane_buildItemContextMenu() {
-          // @ts-ignore
-          await original.apply(this, arguments)
-
-          // const doc = Zotero.getMainWindow().document
-
-          const itemMenuRevealId = '__addonRef__-itemmenu'
-          document.getElementById(itemMenuRevealId)?.remove()
-
-          const itemMenuOpenId = '__addonRef__-itemmenu'
-          document.getElementById(itemMenuOpenId)?.remove()
-
-          const itemMenuSeparatorId = '__addonRef__-itemmenu-separator'
-          document.getElementById(itemMenuSeparatorId)?.remove()
-
-          //// this ~= Zotero.getActiveZoteroPane() ////
-          // @ts-ignore
-          const selectedItemIds: number[] = this.getSelectedItems(true)
-
-          if (!selectedItemIds) return
-
-          if (selectedItemIds.length > 1) return
-
-          const itemId: number = selectedItemIds[0]
-
-          if (!DataManager.checkForZotId(itemId)) return
-
-          const entry_res_list: Entry[] = DataManager.getEntryList(itemId)
-
-          const numEntries = entry_res_list.length
-
-          if (numEntries == 0) return
-
-          const elements = new Elements(document)
-
-          const itemmenu = document.getElementById('zotero-itemmenu')
-
-          if (!itemmenu) return
-
-          let menuitemopenlabel: string
-          let openfn: (entry: Entry) => void
-
-          const protocol = getParam.mdeditor().value
-          switch (protocol) {
-            case 'obsidian':
-              menuitemopenlabel = getString('contextmenuitem-open-obsidian')
-              openfn = (entry: Entry) => systemInterface.openObsidianURI(entry)
-              break
-            case 'logseq':
-              menuitemopenlabel = getString('contextmenuitem-open-logseq')
-              openfn = (entry: Entry) => systemInterface.openLogseqURI(entry)
-              break
-            case 'system':
-              menuitemopenlabel = getString('contextmenuitem-open-default')
-              openfn = (entry: Entry) => systemInterface.openFileSystemPath(entry)
-              break
-            default:
-              menuitemopenlabel = getString('contextmenuitem-open-default')
-              openfn = (entry: Entry) => systemInterface.openFileSystemPath(entry)
-              break
-          }
-
-          itemmenu?.appendChild(elements.create('menuseparator', { id: itemMenuSeparatorId }))
-          ////WIP
-          // itemmenu?.appendChild(ztoolkit.UI.createElement(document, 'menuseparator', { id: itemMenuSeparatorId }))
-
-          if (numEntries == 1) {
-            itemmenu.appendChild(
-              elements.create('menuitem', {
-                id: itemMenuOpenId,
-                label: menuitemopenlabel,
-                // class: 'menuitem-iconic',
-                // image: 'chrome://.....svg',
-                // oncommand: () => openfn(entry_res_list[0]),systemInterface.showSelectedItemMarkdownInFilesystem(entry_res_list[0]),
-                oncommand: () => openfn(entry_res_list[0]),
-              }),
-            )
-            ////WIP
-            // itemmenu.appendChild(
-            //   ztoolkit.UI.createElement(document, 'menuitem', {
-            //     id: itemMenuOpenId,
-            //     attributes: {
-            //       label: menuitemopenlabel,
-            //     },
-            //     // properties: {}
-            //     // classList: ['icon'],
-            //     listeners: [
-            //       {
-            //         type: 'command',
-            //         listener: (event) => {
-            //           openfn(entry_res_list[0])
-            //           // event.preventDefault()
-            //         },
-            //       },
-            //     ],
-            //   }),
-            // )
-
-            itemmenu.appendChild(
-              elements.create('menuitem', {
-                id: itemMenuRevealId,
-                label: getString('contextmenuitem-reveal'),
-                oncommand: () => systemInterface.showSelectedItemMarkdownInFilesystem(entry_res_list[0]),
-              }),
-            )
-            ////WIP
-            // itemmenu.appendChild(
-            //   ztoolkit.UI.createElement(document, 'menuitem', {
-            //     id: itemMenuRevealId,
-            //     attributes: {
-            //       label: getString('contextmenuitem-reveal'),
-            //     },
-            //     // properties: {}
-            //     // classList: ['icon'],
-            //     listeners: [
-            //       {
-            //         type: 'command',
-            //         listener: (event) => {
-            //           systemInterface.showSelectedItemMarkdownInFilesystem(entry_res_list[0])
-            //           // event.preventDefault()
-            //         },
-            //       },
-            //     ],
-            //   }),
-            // )
-          } else if (numEntries > 1) {
-            const menupopupOpen = itemmenu
-              .appendChild(
-                elements.create('menu', {
-                  id: itemMenuOpenId,
-                  label: menuitemopenlabel,
-                }),
-              )
-              .appendChild(elements.create('menupopup'))
-
-            const menupopupReveal = itemmenu
-              .appendChild(
-                elements.create('menu', {
-                  id: itemMenuRevealId,
-                  label: getString('contextmenuitem-reveal'),
-                }),
-              )
-              .appendChild(elements.create('menupopup'))
-
-            entry_res_list.forEach((entry_res) => {
-              menupopupOpen.appendChild(
-                elements.create('menuitem', {
-                  label: entry_res.name,
-                  oncommand: () => openfn(entry_res),
-                }),
-              )
-              menupopupReveal.appendChild(
-                elements.create('menuitem', {
-                  label: entry_res.name,
-                  oncommand: () => systemInterface.showSelectedItemMarkdownInFilesystem(entry_res),
-                }),
-              )
-            })
-
-            ////WIP
-            // const menupopupOpen =
-            // itemmenu.appendChild(
-            //   ztoolkit.UI.createElement(document, 'menu', {
-            //     id: itemMenuOpenId,
-            //     attributes: {
-            //       label: menuitemopenlabel,
-            //     },
-            //   }),
-            // )
-            // .appendChild(
-            //   ztoolkit.UI.createElement(document, 'menupopup', {
-            //     // children: [
-            //     //   {
-            //     //     tag: 'menuitem',
-            //     //     attributes: {
-            //     //       id: 'zotero-tb-tara-create-backup',
-            //     //       label: getString('toolbar-create'),
-            //     //       class: 'menuitem-iconic',
-            //     //       style: "list-style-image: url('chrome://tara/content/icons/create_icon.png');",
-            //     //       oncommand: "alert('create');",
-            //     //     },
-            //     //   },
-            //     // ],
-            //     children: entry_res_list.map((entry_res) => {
-            //       return {
-            //         tag: 'menuitem',
-            //         attributes: {
-            //           label: entry_res.name,
-            //         },
-            //         listeners: [
-            //           {
-            //             type: 'command',
-            //             listener: (event) => {
-            //               openfn(entry_res)
-            //               // event.preventDefault()
-            //             },
-            //           },
-            //         ],
-            //       }
-            //     }),
-            //   }),
-            // )
-
-            /////REVERT ME
-
-            // entry_res_list.forEach((entry_res) => {
-            //   menupopupOpen.appendChild(
-            //     ztoolkit.UI.createElement(document, 'menuitem', {
-            //       attributes: {
-            //         label: entry_res.name,
-            //       },
-            //       listeners: [
-            //         {
-            //           type: 'command',
-            //           listener: (event) => {
-            //             openfn(entry_res)
-            //             // event.preventDefault()
-            //           },
-            //         },
-            //       ],
-            //     }),
-            //   )
-            //   // menupopupReveal.appendChild(
-            //   //   elements.create('menuitem', {
-            //   //     label: entry_res.name,
-            //   //     oncommand: () => systemInterface.showSelectedItemMarkdownInFilesystem(entry_res),
-            //   //   }),
-            //   // )
-            // })
-
-            //     const menupopupReveal = itemmenu
-            //       .appendChild(
-            //         elements.create('menu', {
-            //           id: itemMenuRevealId,
-            //           label: getString('contextmenuitem-reveal'),
-            //         }),
-            //       )
-            //       .appendChild(elements.create('menupopup'))
-            //
-            //     entry_res_list.forEach((entry_res) => {
-            //       menupopupOpen.appendChild(
-            //         elements.create('menuitem', {
-            //           label: entry_res.name,
-            //           oncommand: () => openfn(entry_res),
-            //         }),
-            //       )
-            //       menupopupReveal.appendChild(
-            //         elements.create('menuitem', {
-            //           label: entry_res.name,
-            //           oncommand: () => systemInterface.showSelectedItemMarkdownInFilesystem(entry_res),
-            //         }),
-            //       )
-            //     })
-            //   }
-          }
-        },
-    )
-  }
-
-  @trace
-  static highlightTaggedRows() {
-    /* Render primary cell
-    _renderCell
-    _renderPrimaryCell
-    https://github.com/zotero/zotero/blob/32ba987c2892e2aee6046a82c08d69145e758afd/chrome/content/zotero/elements/colorPicker.js#L178
-    https://github.com/windingwind/ZoteroStyle/blob/6b7c7c95abb7e5d75d0e1fbcc2d824c0c4e2e81a/src/events.ts#L263
-    https://github.com/ZXLYX/ZoteroStyle/blob/57fa178a1a45e710a73706f0087892cf19c9caf1/src/events.ts#L286
-     */
-    const tagstrParam = getParam.tagstr()
-    if (!tagstrParam.valid) return
-    const tagstr = tagstrParam.value
-
-    // Select all span elements with aria-label containing "Tag ObsCite."
-    const spans: NodeListOf<HTMLSpanElement> = document.querySelectorAll(`span[aria-label*="Tag ${tagstr}."]`)
-
-    // Iterate over the NodeList and change the text color to red
-    spans.forEach((span) => {
-      span.style.color = 'red'
-    })
-
-    // await ztoolkit.ItemTree.register()
-  }
-}
-
-export class prefHelpers {
-  @trace
-  static async chooseVaultFolder() {
-    const vaultpath = await new ztoolkit.FilePicker('Select Folder containing MD reading notes', 'folder').open()
-
-    try {
-      if (!vaultpath) throw new Error('No folder selected')
-
-      const vaultpathObj = Zotero.File.pathToFile(vaultpath)
-      vaultpathObj.normalize()
-
-      if (
-        vaultpath !== '' &&
-        vaultpath !== undefined &&
-        vaultpath != null &&
-        vaultpathObj.exists() &&
-        vaultpathObj.isDirectory()
-      ) {
-        setPref('sourcedir', vaultpath)
-      }
-    } catch (err) {
-      Logger.log('chooseVaultFolder', `ERROR chooseVaultFolder :: ${getErrorMessage(err)}`, false, 'warn')
-    }
-  }
-
-  static isValidRegExp(str: string): boolean {
-    try {
-      new RegExp(str)
-      return true // No error means it's a valid RegExp
-    } catch (err) {
-      Logger.log('isValidRegExp', `ERROR: RegExp is not valid:: >> ${str} <<.`, false, 'warn')
-      return false // An error indicates an invalid RegExp
-    }
-  }
-
-  static checkMetadataFormat(metadatakeyword: string): boolean {
-    if (typeof metadatakeyword === 'string' && metadatakeyword.length > 0) {
-      const found: string[] = []
-      const notallowed = [
-        "'",
-        '"',
-        ':',
-        '\n',
-        '/',
-        '\\',
-        '?',
-        '*',
-        '|',
-        '>',
-        '<',
-        ',',
-        ';',
-        '=',
-        '`',
-        '~',
-        '!',
-        '#',
-        '$',
-        '%',
-        '^',
-        '&',
-        '(',
-        ')',
-        '[',
-        ']',
-        '{',
-        '}',
-        ' ',
-      ]
-      for (const char of notallowed) {
-        if (metadatakeyword.includes(char)) {
-          found.push(char)
-        }
-      }
-      if (found.length > 0) {
-        Logger.log('checkMetadataFormat', `ERROR: metadata id cannot contain: ${found.join(' or ')}.`, false, 'warn')
-        //TODO DEBUG
-        // Notifier.showNotification(
-        //   'Warning',
-        //   `Invalid citekey metadata. metadata keyword cannot contain: ${found.join(' or ')}.`,
-        //   false,
-        // )
-        return false
-      } else {
-        return true
-      }
-    } else {
-      return true
-    }
-  }
-
-  static checkTagStr(tagstr: string): boolean {
-    if (typeof tagstr === 'string' && tagstr.length > 0) {
-      const found: string[] = []
-      const notallowed = [
-        "'",
-        '"',
-        ':',
-        '\n',
-        '\\',
-        '?',
-        '*',
-        '|',
-        '>',
-        '<',
-        ',',
-        ';',
-        '=',
-        '`',
-        '~',
-        '!',
-        // '#',
-        '$',
-        '%',
-        '^',
-        '&',
-        '(',
-        ')',
-        '[',
-        ']',
-        '{',
-        '}',
-        ' ',
-      ]
-      // '/',
-      for (const char of notallowed) {
-        if (tagstr.includes(char)) {
-          found.push(char)
-        }
-      }
-      if (found.length > 0) {
-        Logger.log('checkTagStr', `ERROR: TagStr cannot contain: ${found.join(' or ')}.`, false, 'warn')
-        //TODO DEBUG
-        // Notifier.showNotification('Warning', `Invalid tag string. Tag cannot contain: ${found.join(' or ')}.`, false)
-        return false
-      } else {
-        return true
-      }
-    } else {
-      return true
-    }
-  }
-}
-
-export class BasicExampleFactory {
-  @trace
-  static registerPrefs() {
-    const prefOptions = {
-      pluginID: config.addonID,
-      src: rootURI + 'chrome/content/preferences.xhtml',
-      label: getString('prefs-title'),
-      image: favIcon,
-      // defaultXUL: true,
-    }
-    Zotero.PreferencePanes.register(prefOptions)
   }
 }

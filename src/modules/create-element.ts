@@ -50,7 +50,7 @@ export class Elements {
     // @ts-ignore - assume that createXULElement exists on document
     // eslint-disable-next-line @stylistic/max-len
     const elt: HTMLElement = namespace === NAMESPACE.HTML ? this.document.createElement(tagName) : this.document.createXULElement(tagName)
-    let attrsclass: string = ''
+    let attrsclass = ''
     try {
       attrsclass = attrs.class as string
     } catch (err) {}
