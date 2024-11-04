@@ -3,8 +3,8 @@
     "daeda@mit.edu": {
       "updates": [
         {
-          "version": "0.1.4-beta.1",
-          "update_link": "https://github.com/daeh/zotero-markdb-connect/releases/download/v0.1.4-beta.1/mark-db-connect.xpi",
+          "version": "0.1.4",
+          "update_link": "https://github.com/daeh/zotero-markdb-connect/releases/download/v0.1.4/markdb-connect.xpi",
           "applications": {
             "zotero": {
               "strict_min_version": "6.999",
@@ -27,7 +27,7 @@
     "dev@daeh.info": {
       "updates": [
         {
-          "version": "0.1.3",
+          "version": "0.1.4",
           "update_link": "https://github.com/daeh/zotero-markdb-connect/releases/latest/download/markdb-connect.xpi",
           "applications": {
             "zotero": {

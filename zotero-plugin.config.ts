@@ -47,15 +47,15 @@ export default defineConfig({
     },
     hooks: {
       'build:makeUpdateJSON': (ctx) => {
-        try{
+        try {
           copyFileSync('build/update.json', 'update_gitignore.json')
         } catch (err) {
-          console.log("Some Error: ", err)
+          console.log('Some Error: ', err)
         }
-        try{
+        try {
           copyFileSync('build/update-beta.json', 'update-beta_gitignore.json')
         } catch (err) {
-          console.log("Some Error: ", err)
+          console.log('Some Error: ', err)
         }
       },
     },
