@@ -182,7 +182,7 @@ const config = [
   {
     /* +strict for typescript files NOT in ./src/ folder */
     files: [`**/*.{${allTsExtensions}}`],
-    ignores: [`src/**/*.{${allTsExtensions}}`, 'typing/**/*.d.ts', `**/*.config.{${allTsExtensions}}`],
+    ignores: [`src/**/*.{${allTsExtensions}}`, 'typings/**/*.d.ts', `**/*.config.{${allTsExtensions}}`],
     plugins: {
       '@typescript-eslint': typescriptEslintPlugin,
       '@stylistic': stylisticPlugin,
@@ -194,7 +194,7 @@ const config = [
   },
   {
     /* +lenient for typescript files in ./src/ folder */
-    files: [`src/**/*.{${allTsExtensions}}`, 'typing/**/*.d.ts'],
+    files: [`src/**/*.{${allTsExtensions}}`, 'typings/**/*.d.ts'],
     ignores: [`**/*.config.{${allTsExtensions}}`],
     settings: {
       // 'import/resolver': {

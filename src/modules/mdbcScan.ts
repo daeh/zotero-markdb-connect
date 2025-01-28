@@ -37,7 +37,9 @@ export class BBTHelper {
   @trace
   private static BBTReady() {
     if (
+      // @ts-ignore
       !Zotero?.BetterBibTeX?.ready ||
+      // @ts-ignore
       Zotero.BetterBibTeX.ready.pending
       // || !Zotero.BetterBibTeX.TestSupport
     ) {
@@ -52,6 +54,7 @@ export class BBTHelper {
   private static async _check() {
     // TODO don't call Zotero.BetterBibTeX.ready before checking if Zotero.BetterBibTeX exists
     // TODO make sure error is reported to summary notification (maybe just throw error)
+    // @ts-ignore
     await Zotero.BetterBibTeX.ready
     return this.BBTReady()
   }
@@ -70,6 +73,7 @@ export class BBTHelper {
   @trace
   static async getBBTdata(): Promise<BBTCitekeyRecord[]> {
     if (await this._check()) {
+      // @ts-ignore
       return this._fetchBBTdata(Zotero.BetterBibTeX as BetterBibTeX)
     } else {
       return []
@@ -181,7 +185,7 @@ class Utils {
       // @ts-ignore
       s.libraryID = Zotero.Libraries.userLibraryID
     }
-    s.addCondition('deleted', 'false' as Zotero.Search.Operator, '')
+    s.addCondition('deleted', 'false', '')
     s.addCondition('tag', 'is', tagstr)
     const itemIds = await s.search()
     return await Zotero.Items.getAsync(itemIds)
@@ -514,7 +518,7 @@ export class ScanMarkdownFiles {
       // @ts-ignore
       s.libraryID = Zotero.Libraries.userLibraryID
     }
-    s.addCondition('deleted', 'false' as Zotero.Search.Operator, '')
+    s.addCondition('deleted', 'false', '')
     const itemIds = await s.search()
 
     const BBTItems = await BBTHelper.getBBTdata()
@@ -550,7 +554,7 @@ export class ScanMarkdownFiles {
       // @ts-ignore
       s.libraryID = Zotero.Libraries.userLibraryID
     }
-    s.addCondition('deleted', 'false' as Zotero.Search.Operator, '')
+    s.addCondition('deleted', 'false', '')
     const itemIds = await s.search()
 
     let ZotItems: Zotero.Item[] = await Zotero.Items.getAsync(itemIds)
