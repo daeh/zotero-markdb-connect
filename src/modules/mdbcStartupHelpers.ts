@@ -459,7 +459,7 @@ export class wrappers {
       success = false
     }
 
-    ////TODO - check for BBT if BBT citekeys are used
+    // TODO - check for BBT if BBT citekeys are used
 
     return success
   }

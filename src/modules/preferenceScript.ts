@@ -44,7 +44,7 @@ export async function registerPrefsScripts(_window: Window) {
   }
   // await updatePrefsUI()
   // bindPrefEvents()
-  //TODO replace inline listeners with bindpreevents
+  // TODO replace inline listeners with bindpreevents
 }
 
 /*

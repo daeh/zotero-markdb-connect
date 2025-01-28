@@ -675,7 +675,7 @@ export class prefHelpers {
       }
       if (found.length > 0) {
         Logger.log('checkMetadataFormat', `ERROR: metadata id cannot contain: ${found.join(' or ')}.`, false, 'warn')
-        //TODO DEBUG
+        // TODO handle notification
         // Notifier.showNotification(
         //   'Warning',
         //   `Invalid citekey metadata. metadata keyword cannot contain: ${found.join(' or ')}.`,
@@ -731,7 +731,9 @@ export class prefHelpers {
       }
       if (found.length > 0) {
         Logger.log('checkTagStr', `ERROR: TagStr cannot contain: ${found.join(' or ')}.`, false, 'warn')
-        //TODO DEBUG
+        // TODO Issue-145 - Deal with config string validation before the preference pane is closed (rather than when the sync is run).
+        // TODO allow more
+        // Change invalid value behavior from silent reversion to default into vocal reversion to the last-valid value.
         // Notifier.showNotification('Warning', `Invalid tag string. Tag cannot contain: ${found.join(' or ')}.`, false)
         return false
       } else {

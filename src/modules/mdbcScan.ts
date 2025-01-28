@@ -50,8 +50,8 @@ export class BBTHelper {
 
   @trace
   private static async _check() {
-    ////TODO don't call Zotero.BetterBibTeX.ready before checking if Zotero.BetterBibTeX exists
-    ////TODO make sure error is reported to summary notification (maybe just throw error)
+    // TODO don't call Zotero.BetterBibTeX.ready before checking if Zotero.BetterBibTeX exists
+    // TODO make sure error is reported to summary notification (maybe just throw error)
     await Zotero.BetterBibTeX.ready
     return this.BBTReady()
   }
@@ -248,7 +248,7 @@ export class ScanMarkdownFiles {
         const filenamebase = filename.replace(re_suffix, '')
         const filepath = entry.path
 
-        ///TODO make separate fields for name (filename, filenamebase, displayname)
+        // TODO make separate fields for name (filename, filenamebase, displayname)
         /* use display name in context menu
         for obsidian, display name is the filenamebase
         for logseq, display name is the filenamebase with prefix removed and URL decoded
