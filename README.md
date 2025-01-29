@@ -252,14 +252,15 @@ Recent builds of Zotero have introduced a security notification for external lin
   - Obsidian plugin to facilitate exporting annotations from Zotero into Obsidian.
 - [Zotero 6 'Export Notes' feature](https://forums.zotero.org/discussion/93521/available-for-beta-testing-markdown-export-of-notes/p1) by Zotero
   - Zotero 6 beta feature to export notes and annotations from Zotero items as markdown files.
-- [Zotero-mdnotes](https://argentinaos.com/zotero-mdnotes/) by argenos
-  - Zotero plugin to export metadata and notes from Zotero items as markdown files.
 - [Zotero to Markdown](https://github.com/e-alizadeh/Zotero2md) by e-alizadeh
   - Python library to export annotations and notes from Zotero items as markdown files.
 - [Zotero Better Notes](https://github.com/windingwind/zotero-better-notes) by windingwind
   - A Zotero plugin for note management.
 - [Logseq Citations Plugin](https://github.com/sawhney17/logseq-citation-manager) by sawhney17
   - Logseq plugin that integrates your Zotero database with Logseq.
+
+<!-- [Zotero-mdnotes](https://argentinaos.com/zotero-mdnotes/) by argenos
+Zotero plugin to export metadata and notes from Zotero items as markdown files. -->
 
 ## Notes
 
