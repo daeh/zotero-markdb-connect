@@ -22,6 +22,9 @@ pref-filefilterstrategy-custom-desc2 = Default pattern is: ^@.+\.md$. NB optiona
 pref-matchstrategy-bbt-title = Match notes based on BetterBibTeX citekey
 pref-matchstrategy-bbt-desc = MarkDB-Connect will search for a BetterBibTeX citekey in the filename and/or metadata.
 
+pref-dbapp-obsidian-resolve-with-file-checkbox =
+    .label = Use filename instead of filepath in URI
+
 calendar-view-toggle-day = Day
     .title = Switch to day view
 

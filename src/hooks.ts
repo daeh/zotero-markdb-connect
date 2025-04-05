@@ -1,4 +1,4 @@
-import { config } from '../package.json'
+// import { config } from '../package.json'
 
 import { DataManager } from './dataGlobals'
 import { Elements } from './modules/create-element'
@@ -13,6 +13,7 @@ import { createZToolkit } from './utils/ztoolkit'
 
 async function onStartup() {
   await Promise.all([Zotero.initializationPromise, Zotero.unlockPromise, Zotero.uiReadyPromise])
+
   initLocale()
 
   await wrappers.startupVersionCheck()
@@ -28,17 +29,21 @@ async function onStartup() {
   await Promise.all(Zotero.getMainWindows().map((win) => onMainWindowLoad(win)))
 }
 
-async function onMainWindowLoad(win: Window): Promise<void> {
+async function onMainWindowLoad(win: _ZoteroTypes.MainWindow): Promise<void> {
   // Create ztoolkit for every window
   addon.data.ztoolkit = createZToolkit()
 
-  const popupWin = new ztoolkit.ProgressWindow(config.addonName, {
+  // @ts-ignore This is a moz feature
+  // win.MozXULElement.insertFTLIfNeeded(`${addon.data.config.addonRef}-mainWindow.ftl`)
+
+  const popupWin = new ztoolkit.ProgressWindow(addon.data.config.addonName, {
     closeOnClick: true,
     closeTime: -1,
   })
     .createLine({
       text: getString('startup-begin'),
       icon: Notifier.notificationTypes.addon,
+      type: 'default',
       progress: 0,
     })
     .show()
@@ -197,7 +202,8 @@ function onShutdown(): void {
 async function onPrefsEvent(type: string, data: Record<string, any>) {
   switch (type) {
     case 'load':
-      await registerPrefsScripts(data.window as Window)
+      // await registerPrefsScripts(data.window as Window)
+      registerPrefsScripts(data.window)
       break
     case 'chooseVaultFolder':
       await prefHelpers.chooseVaultFolder()

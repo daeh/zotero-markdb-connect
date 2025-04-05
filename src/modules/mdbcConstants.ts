@@ -4,7 +4,7 @@ export const paramVals = {
   filefilterstrategy: ['default', 'customfileregexp'],
   matchstrategy: ['bbtcitekeyyaml', 'bbtcitekeyregexp', 'zotitemkey'],
   mdeditor: ['system', 'obsidian', 'logseq'],
-  obsidianresolvewithfile: [false, true],
+  // obsidianresolvewithfile: [false, true],
   obsidianresolvespec: ['path', 'file'],
   grouplibraries: ['user', 'group'],
   removetags: ['keepsynced', 'addonly'],

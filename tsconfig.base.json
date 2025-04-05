@@ -1,15 +1,18 @@
 {
+  "extends": "zotero-types/entries/sandbox/",
   "compilerOptions": {
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "target": "ES2018",
     "lib": [
-      "ES2017",
+      "ESNext",
       "DOM",
       "DOM.Iterable",
       "ES2021.WeakRef"
       // "webworker",
     ],
+    "types": ["zotero-types"],
+    "outDir": "build/dist/",
 
     /*  */
     "experimentalDecorators": true,
@@ -29,6 +32,6 @@
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src", "typings", "node_modules/zotero-types"],
+  "include": ["src", "typings", "package.json", "node_modules/zotero-types"],
   "exclude": ["build", "addon", "**/*-lintignore*", "**/*_lintignore*"]
 }

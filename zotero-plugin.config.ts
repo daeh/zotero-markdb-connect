@@ -4,7 +4,7 @@ import { copyFileSync } from 'fs'
 
 export default defineConfig({
   source: ['src', 'addon'],
-  dist: 'build',
+  dist: '.scaffold/build',
   name: pkg.config.addonName,
   id: pkg.config.addonID,
   namespace: pkg.config.addonRef,
@@ -16,10 +16,6 @@ export default defineConfig({
   }`,
   xpiDownloadLink: 'https://github.com/{{owner}}/{{repo}}/releases/download/v{{version}}/{{xpiName}}.xpi',
 
-  server: {
-    asProxy: true,
-  },
-
   build: {
     assets: ['addon/**/*.*'],
     define: {
@@ -30,6 +26,9 @@ export default defineConfig({
       buildVersion: pkg.version,
       buildTime: '{{buildTime}}',
     },
+    prefs: {
+      prefix: pkg.config.prefsPrefix,
+    },
     esbuildOptions: [
       {
         entryPoints: ['src/index.ts'],
@@ -38,7 +37,7 @@ export default defineConfig({
         },
         bundle: true,
         target: 'firefox115',
-        outfile: `build/addon/chrome/content/scripts/${pkg.config.addonRef}.js`,
+        outfile: `.scaffold/build/addon/content/scripts/${pkg.config.addonRef}.js`,
       },
     ],
     // If you want to checkout update.json into the repository, uncomment the following lines:
@@ -48,12 +47,12 @@ export default defineConfig({
     hooks: {
       'build:makeUpdateJSON': (ctx) => {
         try {
-          copyFileSync('build/update.json', 'update_gitignore.json')
+          copyFileSync('.scaffold/build/update.json', 'update_gitignore.json')
         } catch (err) {
           console.log('Some Error: ', err)
         }
         try {
-          copyFileSync('build/update-beta.json', 'update-beta_gitignore.json')
+          copyFileSync('.scaffold/build/update-beta.json', 'update-beta_gitignore.json')
         } catch (err) {
           console.log('Some Error: ', err)
         }

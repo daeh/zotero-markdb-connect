@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-function-type */
+/* eslint-disable @typescript-eslint/no-unsafe-argument, @typescript-eslint/ban-types, @typescript-eslint/no-unsafe-return */
 
 export type Trampoline = Function & { disabled?: boolean }
 const trampolines: Trampoline[] = []

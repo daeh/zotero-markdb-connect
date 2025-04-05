@@ -129,7 +129,7 @@ const typescriptRulesDev = {
   '@typescript-eslint/no-floating-promises': ['warn'],
   '@typescript-eslint/require-await': ['warn'],
   // '@typescript-eslint/dot-notation': ['off'],
-  // '@typescript-eslint/no-non-null-assertion': 'off',
+  '@typescript-eslint/no-non-null-assertion': 'off',
   '@typescript-eslint/ban-ts-comment': [
     'warn',
     {
@@ -197,14 +197,6 @@ const config = [
     files: [`src/**/*.{${allTsExtensions}}`, 'typings/**/*.d.ts'],
     ignores: [`**/*.config.{${allTsExtensions}}`],
     settings: {
-      // 'import/resolver': {
-      //   node: {
-      //     extensions: ['.ts'],
-      //   },
-      //   typescript: {
-      //     extensions: ['.ts', '.d.ts'],
-      //   },
-      // },
       'import/resolver': {
         typescript: {
           project: tsconfig,
@@ -222,6 +214,19 @@ const config = [
     rules: {
       ...typescriptRules,
       ...typescriptRulesDev,
+      'no-restricted-globals': [
+        'error',
+        { message: 'Use `Zotero.getMainWindow()` instead.', name: 'window' },
+        {
+          message: 'Use `Zotero.getMainWindow().document` instead.',
+          name: 'document',
+        },
+        {
+          message: 'Use `Zotero.getActiveZoteroPane()` instead.',
+          name: 'ZoteroPane',
+        },
+        'Zotero_Tabs',
+      ],
     },
   },
   {
@@ -264,8 +269,10 @@ const config = [
   },
   {
     ignores: [
-      'build',
-      'scripts',
+      'build/**',
+      '.scaffold/**',
+      'node_modules/**',
+      'scripts/',
       '**/*.js',
       '**/*.bak',
       '**/*-lintignore*',

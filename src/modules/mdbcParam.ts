@@ -280,17 +280,15 @@ export class getParam {
   @trace
   static obsidianresolve() {
     ///TYPE: enum
-    const name: ParamKey = 'obsidianresolvewithfile'
+    const name: ParamKey = 'obsidianresolvespec'
     const valueDefault = paramVals[name][0]
     let valid = true
 
     const valueRaw = getPref(name)
 
     const valueVerified = paramVals[name].find((validName) => validName === valueRaw)
-
-    const name2: ParamKey = 'obsidianresolvespec'
-    const value2: ParamValue<'obsidianresolvespec'> = valueVerified ? paramVals[name2][1] : paramVals[name2][0]
-    const param = { name: name2, value: value2, valid }
+    const value: ParamValue<'obsidianresolvespec'> = valueVerified ? valueVerified : valueDefault
+    const param = { name, value, valid }
 
     if (valueVerified) {
     } else {

@@ -307,28 +307,200 @@ export class UIHelpers {
     // unregister(menuId: string): void;
   }
 
-  @trace
   static registerRightClickMenuItem() {
     $patch$(
-      ZoteroPane,
-      // ztoolkit.getGlobal('ZoteroPane'),
-      // ztoolkit.getGlobal('Zotero_Tabs').select('zotero-pane'),
+      Zotero.getActiveZoteroPane(),
       'buildItemContextMenu',
       (original) =>
         async function ZoteroPane_buildItemContextMenu() {
           // @ts-ignore
           await original.apply(this, arguments)
 
+          /*
+          const doc = Zotero.getMainWindow().document
+
+          const elements2 = new Elements(doc)
+          const itemmenu2 = doc.getElementById('zotero-itemmenu')
+
+          itemmenu2?.appendChild(elements2.create('menuseparator'))
+
+          itemmenu2?.appendChild(
+            elements2.create('menuitem', {
+              id: 'testeee',
+              label: 'whatttt',
+              // class: 'menuitem-iconic',
+              // image: 'chrome://.....svg',
+              // oncommand: () => openfn(entry_res_list[0]),systemInterface.showSelectedItemMarkdownInFilesystem(entry_res_list[0]),
+            }),
+          )
+           */
+
+          const doc = Zotero.getMainWindow().document
+
+          const itemMenuRevealId = '__addonRef__-itemmenu'
+          doc.getElementById(itemMenuRevealId)?.remove()
+
+          const itemMenuOpenId = '__addonRef__-itemmenu'
+          doc.getElementById(itemMenuOpenId)?.remove()
+
+          const itemMenuSeparatorId = '__addonRef__-itemmenu-separator'
+          doc.getElementById(itemMenuSeparatorId)?.remove()
+
+          //// this ~= Zotero.getActiveZoteroPane() ////
+          // @ts-ignore
+          const selectedItemIds: number[] = this.getSelectedItems(true)
+
+          if (!selectedItemIds) return
+
+          if (selectedItemIds.length > 1) return
+
+          const itemId: number = selectedItemIds[0]
+
+          // doc.getElementById('testeee')?.remove()
+          // const itemmenu2 = doc.getElementById('zotero-itemmenu')
+          // const elements2 = new Elements(doc)
+          // itemmenu2?.appendChild(
+          //   elements2.create('menuitem', {
+          //     id: 'testeee',
+          //     label: `TEST5: ${DataManager.zotIds()[0]}`,
+          //     // label: `TEST5: ${DataManager.checkForZotId(itemId)}`,
+          //     // class: 'menuitem-iconic',
+          //     // image: 'chrome://.....svg',
+          //     // oncommand: () => openfn(entry_res_list[0]),systemInterface.showSelectedItemMarkdownInFilesystem(entry_res_list[0]),
+          //   }),
+          // )
+
+          if (!DataManager.checkForZotId(itemId)) return
+
+          const entry_res_list: Entry[] = DataManager.getEntryList(itemId)
+
+          const numEntries = entry_res_list.length
+
+          if (numEntries == 0) return
+
+          // const elements = new Elements(doc)
+          //
+          // const itemmenu = doc.getElementById('zotero-itemmenu')
+
+          const elements = new Elements(doc)
+          const itemmenu = doc.getElementById('zotero-itemmenu')
+
+          if (!itemmenu) return
+
+          let menuitemopenlabel: string
+          let openfn: (entry: Entry) => void
+
+          const protocol = getParam.mdeditor().value
+          switch (protocol) {
+            case 'obsidian':
+              menuitemopenlabel = getString('contextmenuitem-open-obsidian')
+              openfn = (entry: Entry) => systemInterface.openObsidianURI(entry)
+              break
+            case 'logseq':
+              menuitemopenlabel = getString('contextmenuitem-open-logseq')
+              openfn = (entry: Entry) => systemInterface.openLogseqURI(entry)
+              break
+            case 'system':
+              menuitemopenlabel = getString('contextmenuitem-open-default')
+              openfn = (entry: Entry) => systemInterface.openFileSystemPath(entry)
+              break
+            default:
+              menuitemopenlabel = getString('contextmenuitem-open-default')
+              openfn = (entry: Entry) => systemInterface.openFileSystemPath(entry)
+              break
+          }
+
+          itemmenu.appendChild(elements.create('menuseparator', { id: itemMenuSeparatorId }))
+
+          if (numEntries == 1) {
+            itemmenu.appendChild(
+              elements.create('menuitem', {
+                id: itemMenuOpenId,
+                label: menuitemopenlabel,
+                // class: 'menuitem-iconic',
+                // image: 'chrome://.....svg',
+                // oncommand: () => openfn(entry_res_list[0]),systemInterface.showSelectedItemMarkdownInFilesystem(entry_res_list[0]),
+                oncommand: () => openfn(entry_res_list[0]),
+              }),
+            )
+
+            itemmenu.appendChild(
+              elements.create('menuitem', {
+                id: itemMenuRevealId,
+                label: getString('contextmenuitem-reveal'),
+                oncommand: () => systemInterface.showSelectedItemMarkdownInFilesystem(entry_res_list[0]),
+              }),
+            )
+          } else if (numEntries > 1) {
+            const menupopupOpen = itemmenu
+              .appendChild(
+                elements.create('menu', {
+                  id: itemMenuOpenId,
+                  label: menuitemopenlabel,
+                }),
+              )
+              .appendChild(elements.create('menupopup'))
+
+            const menupopupReveal = itemmenu
+              .appendChild(
+                elements.create('menu', {
+                  id: itemMenuRevealId,
+                  label: getString('contextmenuitem-reveal'),
+                }),
+              )
+              .appendChild(elements.create('menupopup'))
+
+            entry_res_list.forEach((entry_res) => {
+              menupopupOpen.appendChild(
+                elements.create('menuitem', {
+                  label: entry_res.name,
+                  oncommand: () => openfn(entry_res),
+                }),
+              )
+              menupopupReveal.appendChild(
+                elements.create('menuitem', {
+                  label: entry_res.name,
+                  oncommand: () => systemInterface.showSelectedItemMarkdownInFilesystem(entry_res),
+                }),
+              )
+            })
+          }
+        },
+    )
+  }
+
+  @trace
+  static registerRightClickMenuItem2() {
+    // https://github.com/retorquere/zotero-open-pdf/blob/3440471098bf1b4315317de0381065b3adf61cd4/lib.ts#L96
+    // $patch$(Zotero_LocateMenu, 'buildContextMenu', original => async function Zotero_LocateMenu_buildContextMenu(menu: HTMLElement, _showIcons: boolean): Promise<void> {
+
+    // https://github.com/retorquere/zotero-pmcid-fetcher/blob/59449449406e4d0706030184d0c06f02fe14a1e1/lib.ts#L3
+    // patch(Zotero.getActiveZoteroPane(), 'buildItemContextMenu', original => async function ZoteroPane_buildItemContextMenu() {
+    // await original.apply(this, arguments) // eslint-disable-line prefer-rest-params
+    $patch$(
+      Zotero.getActiveZoteroPane(),
+      // ztoolkit.getGlobal('ZoteroPane'),
+      // ztoolkit.getGlobal('Zotero_Tabs').select('zotero-pane'),
+      'buildItemContextMenu',
+      (original) =>
+        async function ZoteroPane_buildItemContextMenu() {
+          // @ts-ignore
+          // await original.apply(this, arguments)
+          this.document = Zotero.getMainWindow().document
+          console.log(Zotero.getMainWindow().document)
+          // @ts-ignore
+          original.apply(this, arguments)
+
           // const doc = Zotero.getMainWindow().document
 
           const itemMenuRevealId = '__addonRef__-itemmenu'
-          document.getElementById(itemMenuRevealId)?.remove()
+          Zotero.getMainWindow().document.getElementById(itemMenuRevealId)?.remove()
 
           const itemMenuOpenId = '__addonRef__-itemmenu'
-          document.getElementById(itemMenuOpenId)?.remove()
+          Zotero.getMainWindow().document.getElementById(itemMenuOpenId)?.remove()
 
           const itemMenuSeparatorId = '__addonRef__-itemmenu-separator'
-          document.getElementById(itemMenuSeparatorId)?.remove()
+          Zotero.getMainWindow().document.getElementById(itemMenuSeparatorId)?.remove()
 
           //// this ~= Zotero.getActiveZoteroPane() ////
           // @ts-ignore
@@ -348,9 +520,9 @@ export class UIHelpers {
 
           if (numEntries == 0) return
 
-          const elements = new Elements(document)
+          const elements = new Elements(Zotero.getMainWindow().document)
 
-          const itemmenu = document.getElementById('zotero-itemmenu')
+          const itemmenu = Zotero.getMainWindow().document.getElementById('zotero-itemmenu')
 
           if (!itemmenu) return
 
@@ -588,7 +760,9 @@ export class UIHelpers {
     const tagstr = tagstrParam.value
 
     // Select all span elements with aria-label containing "Tag ObsCite."
-    const spans: NodeListOf<HTMLSpanElement> = document.querySelectorAll(`span[aria-label*="Tag ${tagstr}."]`)
+    const spans: NodeListOf<HTMLSpanElement> = Zotero.getMainWindow().document.querySelectorAll(
+      `span[aria-label*="Tag ${tagstr}."]`,
+    )
 
     // Iterate over the NodeList and change the text color to red
     spans.forEach((span) => {
@@ -748,13 +922,13 @@ export class prefHelpers {
 export class Registrar {
   @trace
   static registerPrefs() {
-    const prefOptions = {
-      pluginID: config.addonID,
-      src: rootURI + 'chrome/content/preferences.xhtml',
+    Zotero.PreferencePanes.register({
+      pluginID: addon.data.config.addonID,
+      src: rootURI + 'content/preferences.xhtml',
       label: getString('prefs-title'),
-      image: favIcon,
+      image: `chrome://${addon.data.config.addonRef}/content/icons/favicon.png`,
+      // image: favIcon,
       // defaultXUL: true,
-    }
-    Zotero.PreferencePanes.register(prefOptions)
+    })
   }
 }

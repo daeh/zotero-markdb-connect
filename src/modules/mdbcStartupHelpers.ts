@@ -115,7 +115,8 @@ export class wrappers {
         let test0 = getPref('sourcedir')
         // Logger.log('startupVersionCheck - preprerename1 - test0', test0, false, 'debug')
         if (typeof test0 !== 'string' || test0 === '') {
-          let test1 = getPref('source_dir')
+          // @ts-ignore old pref key
+          let test1 = getPref('source_dir') // preference key prior to v...
           // Logger.log('startupVersionCheck - preprerename1 - test1', test1, false, 'debug')
           if (test1 && typeof test1 === 'string' && test1.length > 0) {
             // Logger.log('startupVersionCheck - preprerename1 - AMHERE0', test1, false, 'debug')
@@ -140,17 +141,17 @@ export class wrappers {
       /// sourcedir
       try {
         if (preprerename1) {
-          const val = getPref('source_dir') // as string
+          // @ts-ignore old pref key
+          const val = getPref('source_dir') // preference key prior to v...
           // Logger.log('startupVersionCheck - sourcedir - val', val, false, 'debug')
-          if (val) {
-            // Logger.log('startupVersionCheck - sourcedir - AMHERE', val, false, 'debug')
+          if (val && typeof val === 'string' && val.length > 0) {
             setPref('sourcedir', val)
             getParam.sourcedir()
           }
         } else if (prezot7) {
           const val = Zotero.Prefs.get('extensions.mdbconnect.source_dir', true) // as string
           // Logger.log('startupVersionCheck - sourcedir - val2', val, false, 'debug')
-          if (val) {
+          if (val && typeof val === 'string' && val.length > 0) {
             // Logger.log('startupVersionCheck - sourcedir - AMHERE2', val, false, 'debug')
             setPref('sourcedir', val)
             getParam.sourcedir()
@@ -241,7 +242,8 @@ export class wrappers {
       /// bbtyamlkeyword
       try {
         if (preprerename1) {
-          const val = getPref('metadatakeyword') // as string
+          // @ts-ignore old pref key
+          const val = getPref('metadatakeyword') // preference key prior to v...
           if (val && typeof val === 'string') {
             setPref('bbtyamlkeyword', val)
           }
@@ -260,7 +262,8 @@ export class wrappers {
       /// zotkeyregexp
       try {
         if (preprerename1) {
-          const val = getPref('zotkeyregex') // as string
+          // @ts-ignore old pref key
+          const val = getPref('zotkeyregex') // preference key prior to v...
           if (val && typeof val === 'string') {
             setPref('zotkeyregexp', val)
           }
@@ -279,13 +282,14 @@ export class wrappers {
       /// mdeditor
       try {
         if (preprerename1) {
-          const val = getPref('vaultresolution') // as string
+          // @ts-ignore old pref key
+          const val = getPref('vaultresolution') // preference key prior to v...
           if (val === 'path') {
             setPref('mdeditor', 'obsidian')
-            setPref('obsidianresolvewithfile', false)
+            setPref('obsidianresolvespec', 'path')
           } else if (val === 'file') {
             setPref('mdeditor', 'obsidian')
-            setPref('obsidianresolvewithfile', true)
+            setPref('obsidianresolvespec', 'file')
             getParam.obsidianresolve()
           } else if (val === 'logseq') {
             setPref('mdeditor', 'logseq')
@@ -299,10 +303,10 @@ export class wrappers {
           const val = Zotero.Prefs.get('extensions.mdbconnect.vaultresolution', true) // as string
           if (val === 'path') {
             setPref('mdeditor', 'obsidian')
-            setPref('obsidianresolvewithfile', false)
+            setPref('obsidianresolvespec', 'path')
           } else if (val === 'file') {
             setPref('mdeditor', 'obsidian')
-            setPref('obsidianresolvewithfile', true)
+            setPref('obsidianresolvespec', 'file')
             getParam.obsidianresolve()
           } else if (val === 'logseq') {
             setPref('mdeditor', 'logseq')
@@ -320,7 +324,8 @@ export class wrappers {
       /// obsidianvaultname
       try {
         if (preprerename1) {
-          const val = getPref('vaultname') // && typeof val === 'string' as string
+          // @ts-ignore old pref key
+          const val = getPref('vaultname') // preference key prior to v... // && typeof val === 'string' as string
           if (val && typeof val === 'string') {
             setPref('obsidianvaultname', val)
           }
@@ -406,7 +411,7 @@ export class wrappers {
           getParam.tagstr()
         } else if (prezot7) {
           const val = Zotero.Prefs.get('extensions.mdbconnect.tagstr', true) // as string
-          if (val) {
+          if (val && typeof val === 'string' && val.length > 0) {
             setPref('tagstr', val)
           }
           getParam.tagstr()
@@ -458,6 +463,8 @@ export class wrappers {
     if (!getParam.sourcedir().valid) {
       success = false
     }
+
+    getParam.obsidianresolve()
 
     // TODO - check for BBT if BBT citekeys are used
 

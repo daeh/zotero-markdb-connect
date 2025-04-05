@@ -19,7 +19,7 @@ declare namespace _ZoteroTypes {
       "zotkeyregexp": string;
       "mdeditor": string;
       "obsidianvaultname": string;
-      "obsidianresolvewithfile": string;
+      "obsidianresolvespec": string;
       "logseqgraph": string;
       "logseqprefix": string;
       "grouplibraries": string;

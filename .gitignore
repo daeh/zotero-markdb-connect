@@ -1,11 +1,14 @@
 ### Local config files ###
-.env
+
+
+# dot files
+.DS_Store
 
 ### Runtime ###
 node_modules/
-build/
+
 dist/
-logs/
+
 yarn.lock
 .DS_Store
 
@@ -14,7 +17,18 @@ yarn.lock
 # .idea/
 
 ### Generated files ###
+eslint.config.js
 
-
+# Node.js
 node_modules
-.scaffold
+pnpm-lock.yaml
+yarn.lock
+
+# TSC
+tsconfig.tsbuildinfo
+
+# Scaffold
+.env
+.scaffold/
+build/
+logs/
