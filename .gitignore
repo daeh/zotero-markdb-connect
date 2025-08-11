@@ -32,3 +32,5 @@ tsconfig.tsbuildinfo
 .scaffold/
 build/
 logs/
+
+VSCProject.code-workspace

@@ -86,7 +86,7 @@ const baseRules = {
   ],
   '@stylistic/indent': ['error', 2, { SwitchCase: 1 }],
   '@stylistic/semi': ['error', 'never'],
-  '@stylistic/quotes': ['warn', 'single', { avoidEscape: true, allowTemplateLiterals: false }],
+  '@stylistic/quotes': ['warn', 'single', { avoidEscape: true, allowTemplateLiterals: 'never' }],
   '@stylistic/object-curly-spacing': ['warn', 'always'],
   '@stylistic/array-element-newline': ['error', 'consistent'],
   // '@stylistic/multiline-ternary': ['warn', 'always'],
