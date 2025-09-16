@@ -36,7 +36,7 @@ Opens an existing markdown note in [Obsidian](https://obsidian.md), [logseq](htt
 ## Installation
 
 - Download the plugin (the `.xpi` file) from the [latest release](https://github.com/daeh/zotero-markdb-connect/releases/latest)
-- Open Zotero (version 7.x of 8.x)
+- Open Zotero (version 7.x or 8.x)
 - From `Tools -> Plugins`
 - Select `Install Add-on From File...` from the gear icon ⛭
 - Choose the `.xpi` file you downloaded (e.g. `markdb-connect.xpi`)
