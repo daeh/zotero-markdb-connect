@@ -5,7 +5,7 @@ import { Elements } from './modules/create-element'
 import { Logger } from './modules/mdbcLogger'
 import { ScanMarkdownFiles } from './modules/mdbcScan'
 import { wrappers } from './modules/mdbcStartupHelpers'
-import { Notifier, prefHelpers, Registrar, systemInterface, UIHelpers } from './modules/mdbcUX'
+import { KeyboardShortcuts, Notifier, prefHelpers, Registrar, systemInterface, UIHelpers } from './modules/mdbcUX'
 import { unpatch as $unpatch$ } from './modules/monkey-patch'
 import { registerPrefsScripts } from './modules/preferenceScript'
 import { getString, initLocale } from './utils/locale'
@@ -78,6 +78,8 @@ async function onMainWindowLoad(win: _ZoteroTypes.MainWindow): Promise<void> {
   // unregister(menuId: string): void;
 
   UIHelpers.registerRightClickMenuItem()
+
+  KeyboardShortcuts.registerShortcuts()
 
   popupWin.changeLine({
     progress: 100,
@@ -229,10 +231,15 @@ async function onPrefsEvent(type: string, data: Record<string, any>) {
 // Keep in mind hooks only do dispatch. Don't add code that does real jobs in hooks.
 // Otherwise the code would be hard to read and maintain.
 
+function openSelectedItemNote() {
+  KeyboardShortcuts.openSelectedItemNote()
+}
+
 /*
  * E.g.:
  * Zotero.MDBC.hooks.DataStore()
  * Zotero.MDBC.hooks.Logs()
+ * Zotero.MDBC.hooks.openSelectedItemNote()
  */
 export default {
   onStartup,
@@ -243,6 +250,7 @@ export default {
   syncMarkDB,
   syncMarkDBReport,
   syncMarkDBSaveDebug,
+  openSelectedItemNote,
   Logs,
   DataStore,
   Data,

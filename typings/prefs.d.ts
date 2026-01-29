@@ -25,6 +25,7 @@ declare namespace _ZoteroTypes {
       "grouplibraries": string;
       "removetags": string;
       "tagstr": string;
+      "shortcutOpenNote": string;
     };
   }
 }

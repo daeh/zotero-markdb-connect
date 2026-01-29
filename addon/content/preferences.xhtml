@@ -15,7 +15,7 @@
 </linkset>
 <vbox
   id="zotero-prefpane-__addonRef__"
-  onload="Zotero.__addonInstance__.hooks.onPrefsEvent('load', { window });">
+  onload="Zotero.__addonInstance__.hooks.onPrefsEvent('load', { window })">
   <groupbox>
     <!--<label class="mdbc-pref-text-center"><html:h1 data-l10n-id="pref-title"> </html:h1></label>-->
     <!--<caption-->
@@ -47,7 +47,7 @@
           class="mdbc-pref-textbox-flex1" />
         <button
           label="Choose"
-          oncommand="return Zotero.__addonInstance__.hooks.onPrefsEvent('chooseVaultFolder');" />
+          oncommand="return Zotero.__addonInstance__.hooks.onPrefsEvent('chooseVaultFolder')" />
       </hbox>
       <label>__addonName__ will search this directory recursively for markdown files.</label>
     </groupbox>
@@ -63,7 +63,10 @@
         value="default"
         label="Default File Filter"
         class="mdbc-pref-radio-main"
-        oncommand="document.getElementById('zotero-prefpane-__addonRef__-filefilterstrategy-custom-options').setAttribute('style', 'opacity: 30%;'); document.getElementById('zotero-prefpane-__addonRef__-filefilterstrategy-default-options').setAttribute('style', 'opacity: 100%;');" />
+        oncommand="
+          document.getElementById('zotero-prefpane-__addonRef__-filefilterstrategy-custom-options').setAttribute('style', 'opacity: 30%;')
+          document.getElementById('zotero-prefpane-__addonRef__-filefilterstrategy-default-options').setAttribute('style', 'opacity: 100%;')
+        " />
       <html:div
         class="mdbc-pref-options-div"
         id="zotero-prefpane-__addonRef__-filefilterstrategy-default-options">
@@ -84,7 +87,10 @@
         value="customfileregexp"
         label="Custom File Filter"
         class="mdbc-pref-radio-main"
-        oncommand="document.getElementById('zotero-prefpane-__addonRef__-filefilterstrategy-custom-options').setAttribute('style', 'opacity: 100%;'); document.getElementById('zotero-prefpane-__addonRef__-filefilterstrategy-default-options').setAttribute('style', 'opacity: 30%;');" />
+        oncommand="
+          document.getElementById('zotero-prefpane-__addonRef__-filefilterstrategy-custom-options').setAttribute('style', 'opacity: 100%;')
+          document.getElementById('zotero-prefpane-__addonRef__-filefilterstrategy-default-options').setAttribute('style', 'opacity: 30%;')
+        " />
       <html:div
         class="mdbc-pref-options-div"
         id="zotero-prefpane-__addonRef__-filefilterstrategy-custom-options">
@@ -100,7 +106,7 @@
             id="zotero-prefpane-__addonRef__-filepattern"
             preference="filepattern"
             class="mdbc-pref-textbox-partialwidth"
-            onchange="return Zotero.__addonInstance__.hooks.onPrefsEvent('checkRegExpValid', {value: this.value})" /><html:span class="mdbc-pref-options-span-right mdbc-pref-options-code-span"
+            onchange="return Zotero.__addonInstance__.hooks.onPrefsEvent('checkRegExpValid', { value: this.value })" /><html:span class="mdbc-pref-options-span-right mdbc-pref-options-code-span"
             ><html:code>/i</html:code></html:span
           >
         </hbox>
@@ -131,7 +137,11 @@
           value="bbtcitekeyyaml"
           label="BetterBibTeX citekey - taken from YAML metadata"
           class="mdbc-pref-radio-main"
-          oncommand="document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-bbtcitekeyyaml-options').setAttribute('style', 'opacity: 100%;'); document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-bbtcitekeyregexp-options').setAttribute('style', 'opacity: 30%;'); document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-zotid-options').setAttribute('style', 'opacity: 30%;');" />
+          oncommand="
+            document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-bbtcitekeyyaml-options').setAttribute('style', 'opacity: 100%;')
+            document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-bbtcitekeyregexp-options').setAttribute('style', 'opacity: 30%;')
+            document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-zotid-options').setAttribute('style', 'opacity: 30%;')
+          " />
 
         <html:div
           class="mdbc-pref-options-div"
@@ -149,7 +159,7 @@
               id="zotero-prefpane-__addonRef__-bbtyamlkeyword"
               preference="bbtyamlkeyword"
               class="mdbc-pref-textbox-partialwidth"
-              onchange="Zotero.__addonInstance__.hooks.onPrefsEvent('checkMetadataFormat', {value: this.value})" /><html:span class="mdbc-pref-options-span-right"> </html:span>
+              onchange="Zotero.__addonInstance__.hooks.onPrefsEvent('checkMetadataFormat', { value: this.value })" /><html:span class="mdbc-pref-options-span-right"> </html:span>
           </hbox>
           <description class="mdbc-pref-description-indent"
             >If you want to extract the citekey from a markdown note's metadata, indicate the keyword here. A common value is: '<html:code>citekey</html:code>'.</description
@@ -167,7 +177,11 @@
           value="bbtcitekeyregexp"
           label="BetterBibTeX citekey - captured with custom RegExp"
           class="mdbc-pref-radio-main"
-          oncommand="document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-bbtcitekeyyaml-options').setAttribute('style', 'opacity: 30%;'); document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-bbtcitekeyregexp-options').setAttribute('style', 'opacity: 100%;'); document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-zotid-options').setAttribute('style', 'opacity: 30%;');" />
+          oncommand="
+            document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-bbtcitekeyyaml-options').setAttribute('style', 'opacity: 30%;')
+            document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-bbtcitekeyregexp-options').setAttribute('style', 'opacity: 100%;')
+            document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-zotid-options').setAttribute('style', 'opacity: 30%;')
+          " />
 
         <html:div
           class="mdbc-pref-options-div"
@@ -184,7 +198,7 @@
               id="zotero-prefpane-__addonRef__-bbtregexp"
               preference="bbtregexp"
               class="mdbc-pref-textbox-partialwidth"
-              onchange="return Zotero.__addonInstance__.hooks.onPrefsEvent('checkRegExpValid', {value: this.value})" /><html:span class="mdbc-pref-options-span-right mdbc-pref-options-code-span"
+              onchange="return Zotero.__addonInstance__.hooks.onPrefsEvent('checkRegExpValid', { value: this.value })" /><html:span class="mdbc-pref-options-span-right mdbc-pref-options-code-span"
               ><html:code>/m</html:code></html:span
             >
           </hbox>
@@ -206,7 +220,11 @@
           value="zotitemkey"
           label="Zotero-Item-Key - captured with custom RegExp"
           class="mdbc-pref-radio-main"
-          oncommand="document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-bbtcitekeyyaml-options').setAttribute('style', 'opacity: 30%;'); document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-bbtcitekeyregexp-options').setAttribute('style', 'opacity: 30%;'); document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-zotid-options').setAttribute('style', 'opacity: 100%;');" />
+          oncommand="
+            document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-bbtcitekeyyaml-options').setAttribute('style', 'opacity: 30%;')
+            document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-bbtcitekeyregexp-options').setAttribute('style', 'opacity: 30%;')
+            document.getElementById('zotero-prefpane-__addonRef__-matchstrategy-zotid-options').setAttribute('style', 'opacity: 100%;')
+          " />
 
         <html:div
           class="mdbc-pref-options-div"
@@ -223,7 +241,7 @@
               id="zotero-prefpane-__addonRef__-zotkeyregexp"
               preference="zotkeyregexp"
               class="mdbc-pref-textbox-partialwidth"
-              onchange="return Zotero.__addonInstance__.hooks.onPrefsEvent('checkRegExpValid', {value: this.value})" /><html:span class="mdbc-pref-options-span-right mdbc-pref-options-code-span"
+              onchange="return Zotero.__addonInstance__.hooks.onPrefsEvent('checkRegExpValid', { value: this.value })" /><html:span class="mdbc-pref-options-span-right mdbc-pref-options-code-span"
               ><html:code>/m</html:code></html:span
             >
           </hbox>
@@ -255,7 +273,11 @@
           value="obsidian"
           label="Obsidian"
           class="mdbc-pref-radio-main"
-          oncommand="document.getElementById('zotero-prefpane-__addonRef__-mdeditor-obsidian-options').setAttribute('style', 'opacity: 100%;'); document.getElementById('zotero-prefpane-__addonRef__-mdeditor-logseq-options').setAttribute('style', 'opacity: 30%;'); document.getElementById('zotero-prefpane-__addonRef__-mdeditor-system-options').setAttribute('style', 'opacity: 30%;');" />
+          oncommand="
+            document.getElementById('zotero-prefpane-__addonRef__-mdeditor-obsidian-options').setAttribute('style', 'opacity: 100%;')
+            document.getElementById('zotero-prefpane-__addonRef__-mdeditor-logseq-options').setAttribute('style', 'opacity: 30%;')
+            document.getElementById('zotero-prefpane-__addonRef__-mdeditor-system-options').setAttribute('style', 'opacity: 30%;')
+          " />
 
         <html:div
           class="mdbc-pref-options-div"
@@ -312,7 +334,11 @@
           value="logseq"
           label="logseq"
           class="mdbc-pref-radio-main"
-          oncommand="document.getElementById('zotero-prefpane-__addonRef__-mdeditor-obsidian-options').setAttribute('style', 'opacity: 30%;'); document.getElementById('zotero-prefpane-__addonRef__-mdeditor-logseq-options').setAttribute('style', 'opacity: 100%;'); document.getElementById('zotero-prefpane-__addonRef__-mdeditor-system-options').setAttribute('style', 'opacity: 30%;');" />
+          oncommand="
+            document.getElementById('zotero-prefpane-__addonRef__-mdeditor-obsidian-options').setAttribute('style', 'opacity: 30%;')
+            document.getElementById('zotero-prefpane-__addonRef__-mdeditor-logseq-options').setAttribute('style', 'opacity: 100%;')
+            document.getElementById('zotero-prefpane-__addonRef__-mdeditor-system-options').setAttribute('style', 'opacity: 30%;')
+          " />
 
         <html:div
           class="mdbc-pref-options-div"
@@ -362,7 +388,11 @@
           value="system"
           label="System's Default Editor"
           class="mdbc-pref-radio-main"
-          oncommand="document.getElementById('zotero-prefpane-__addonRef__-mdeditor-obsidian-options').setAttribute('style', 'opacity: 30%;'); document.getElementById('zotero-prefpane-__addonRef__-mdeditor-logseq-options').setAttribute('style', 'opacity: 30%;'); document.getElementById('zotero-prefpane-__addonRef__-mdeditor-system-options').setAttribute('style', 'opacity: 100%;');" />
+          oncommand="
+            document.getElementById('zotero-prefpane-__addonRef__-mdeditor-obsidian-options').setAttribute('style', 'opacity: 30%;')
+            document.getElementById('zotero-prefpane-__addonRef__-mdeditor-logseq-options').setAttribute('style', 'opacity: 30%;')
+            document.getElementById('zotero-prefpane-__addonRef__-mdeditor-system-options').setAttribute('style', 'opacity: 100%;')
+          " />
 
         <html:div
           class="mdbc-pref-options-div"
@@ -381,6 +411,26 @@
       Advanced Settings
     </caption>
 
+    <!-- keyboard shortcut to open linked note -->
+    <label class="mdbc-pref-subsection-title">Keyboard Shortcut to Open Linked Note</label>
+    <html:div class="mdbc-pref-options-div">
+      <groupbox>
+        <description>Define a keyboard shortcut to quickly open the linked markdown note for the selected Zotero item.</description>
+        <hbox class="mdbc-pref-hbox-indent">
+          <html:span class="mdbc-pref-options-span-first">Shortcut:</html:span>
+          <button
+            id="zotero-prefpane-__addonRef__-shortcutOpenNote-btn"
+            label="[Click to record]" />
+          <button
+            id="zotero-prefpane-__addonRef__-shortcutOpenNote-clear"
+            label="Clear" />
+        </hbox>
+        <description class="mdbc-pref-description-indent">Click the button and press your desired key combination.</description>
+      </groupbox>
+    </html:div>
+
+    <!--<separator />-->
+
     <!-- tag name -->
     <label class="mdbc-pref-subsection-title">Specify a Custom Tag Name?</label>
     <html:div class="mdbc-pref-options-div">
@@ -393,7 +443,7 @@
             id="zotero-prefpane-__addonRef__-tagstr"
             preference="tagstr"
             class="mdbc-pref-textbox-partialwidth"
-            onchange="Zotero.__addonInstance__.hooks.onPrefsEvent('checkTagStr', {value: this.value})" /><html:span class="mdbc-pref-options-span-right"> </html:span>
+            onchange="Zotero.__addonInstance__.hooks.onPrefsEvent('checkTagStr', { value: this.value })" /><html:span class="mdbc-pref-options-span-right"> </html:span>
         </hbox>
       </groupbox>
     </html:div>
@@ -476,7 +526,7 @@
         <button
           id="zotero-prefpane-__addonRef__-gitissue-button"
           label="Open Issue on GitHub"
-          oncommand="Zotero.launchURL('https://github.com/daeh/zotero-markdb-connect/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc');" />
+          oncommand="Zotero.launchURL('https://github.com/daeh/zotero-markdb-connect/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc')" />
       </groupbox>
     </html:div>
 

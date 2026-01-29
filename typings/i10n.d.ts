@@ -33,6 +33,7 @@ export type FluentMessageId =
   | 'prefs-title'
   | 'report-savedebuglogs'
   | 'report-syncdebug'
+  | 'shortcut-open-note-notify'
   | 'startup-begin'
   | 'startup-finish'
   | 'startup-syncing';

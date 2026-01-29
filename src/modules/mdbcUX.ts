@@ -1,7 +1,7 @@
 import { config } from '../../package.json'
 import { DataManager } from '../dataGlobals'
 import { getString } from '../utils/locale'
-import { setPref } from '../utils/prefs'
+import { getPref, setPref } from '../utils/prefs'
 
 import { Elements } from './create-element'
 import { getErrorMessage, Logger, trace } from './mdbcLogger'
@@ -930,5 +930,133 @@ export class Registrar {
       // image: favIcon,
       // defaultXUL: true,
     })
+  }
+}
+
+export class KeyboardShortcuts {
+  private static currentCallback: ((ev: KeyboardEvent, options: { keyboard?: unknown }) => void) | null = null
+  private static currentShortcut: string | null = null
+
+  @trace
+  static registerShortcuts() {
+    const pref = getPref('shortcutOpenNote')
+    const shortcut = pref && pref.trim() !== '' ? pref.trim() : null
+
+    // Unregister old callback if exists
+    if (this.currentCallback) {
+      ztoolkit.Keyboard.unregister(this.currentCallback)
+      this.currentCallback = null
+      this.currentShortcut = null
+    }
+
+    if (!shortcut) {
+      return
+    }
+
+    this.currentShortcut = shortcut
+
+    this.currentCallback = (ev, keyOptions) => {
+      if (keyOptions.keyboard) {
+        const kb = keyOptions.keyboard as { equals: (s: string) => boolean }
+
+        // Block accel+A (Select All) to prevent freezing with large selections
+        if (kb.equals('accel,a')) {
+          return
+        }
+
+        const targetName = (ev.target as HTMLElement)?.localName?.toLowerCase() || ''
+        if (['input', 'textarea', 'select', 'search-textbox', 'textbox'].includes(targetName)) {
+          return
+        }
+
+        if (kb.equals(this.currentShortcut!)) {
+          this.openSelectedItemNote()
+        }
+      }
+    }
+
+    ztoolkit.Keyboard.register(this.currentCallback)
+  }
+
+  @trace
+  static openSelectedItemNote() {
+    try {
+      const selectedItemIds = systemInterface.expandSelection('selected')
+
+      if (selectedItemIds.length === 0) {
+        Notifier.notify({
+          title: 'No Selection',
+          body: 'No Zotero item is selected.',
+          type: 'warn',
+        })
+        return
+      }
+
+      if (selectedItemIds.length > 1) {
+        Notifier.notify({
+          title: 'Multiple Selection',
+          body: 'Please select only one item to open its linked note.',
+          type: 'warn',
+        })
+        return
+      }
+
+      const itemId = selectedItemIds[0]
+
+      if (!DataManager.checkForZotId(itemId)) {
+        Notifier.notify({
+          title: 'No Linked Note',
+          body: 'No markdown note is linked to this Zotero item.',
+          type: 'warn',
+        })
+        return
+      }
+
+      const entryList: Entry[] = DataManager.getEntryList(itemId)
+
+      if (entryList.length === 0) {
+        Notifier.notify({
+          title: 'No Linked Note',
+          body: 'No markdown note is linked to this Zotero item.',
+          type: 'warn',
+        })
+        return
+      }
+
+      // Open the first linked note (same behavior as single-entry context menu)
+      const entry = entryList[0]
+      const protocol = getParam.mdeditor().value
+
+      switch (protocol) {
+        case 'obsidian':
+          systemInterface.openObsidianURI(entry)
+          break
+        case 'logseq':
+          systemInterface.openLogseqURI(entry)
+          break
+        case 'system':
+          systemInterface.openFileSystemPath(entry)
+          break
+        default:
+          systemInterface.openFileSystemPath(entry)
+          break
+      }
+
+      // Notify user if there are multiple notes (they can use context menu for others)
+      if (entryList.length > 1) {
+        Notifier.notify({
+          title: 'Multiple Notes',
+          body: `Opening first of ${entryList.length} linked notes. Use context menu for others.`,
+          type: 'info',
+        })
+      }
+    } catch (err) {
+      Logger.log('openSelectedItemNote', `ERROR: ${getErrorMessage(err)}`, false, 'error')
+      Notifier.notify({
+        title: 'Error',
+        body: `Failed to open linked note: ${getErrorMessage(err)}`,
+        type: 'error',
+      })
+    }
   }
 }

@@ -15,3 +15,5 @@ prefs-title = MarkDB-Connect
 
 report-syncdebug = Run Sync with Data Logging
 report-savedebuglogs = Save Full Debugging Logs
+
+shortcut-open-note-notify = Opening linked note...

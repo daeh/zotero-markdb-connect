@@ -27,3 +27,5 @@ pref('logseqprefix', '')
 pref('grouplibraries', 'user') // ['user', 'group'][0]
 pref('removetags', 'keepsynced') // ['keepsynced', 'addonly'][0]
 pref('tagstr', 'ObsCite')
+
+pref('shortcutOpenNote', 'accel,shift,p') // keyboard shortcut to open linked note, e.g. 'accel,shift,p' or 'shift,o'

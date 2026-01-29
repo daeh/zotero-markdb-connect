@@ -1,13 +1,5 @@
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/daeh/zotero-markdb-connect?style=for-the-badge)](https://github.com/daeh/zotero-markdb-connect/releases/latest) [![GitHub Downloads all releases](https://img.shields.io/github/downloads/daeh/zotero-markdb-connect/total?style=for-the-badge&color=forestgreen)](https://github.com/daeh/zotero-markdb-connect/releases/latest) [![GitHub Downloads (latest release)](https://img.shields.io/github/downloads/daeh/zotero-markdb-connect/latest/total?style=for-the-badge)](https://github.com/daeh/zotero-markdb-connect/releases/latest)
 
-<!-- [![GitHub Downloads release (by tag)](https://img.shields.io/github/downloads/daeh/zotero-markdb-connect/v0.0.25/total?style=for-the-badge)](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.0.27) -->
-
-<!-- [![GitHub release (with filter)](https://img.shields.io/github/v/release/daeh/zotero-markdb-connect?style=for-the-badge&filter=*v0.1.7*)](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.1.7) [![GitHub all releases](https://img.shields.io/github/downloads/daeh/zotero-markdb-connect/total?style=for-the-badge&color=forestgreen)](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.1.7) -->
-
-<!-- [![GitHub release (latest by SemVer including pre-releases)](https://img.shields.io/github/downloads-pre/daeh/zotero-markdb-connect/latest/total?style=for-the-badge&label=downloads@prerelease)](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.1.7) [![GitHub release (by tag)](https://img.shields.io/github/downloads/daeh/zotero-markdb-connect/v0.0.25/total?style=for-the-badge)](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.0.27) -->
-
-<!-- [![GitHub release (latest by date)](https://img.shields.io/github/v/release/daeh/zotero-markdb-connect?style=for-the-badge)](https://github.com/daeh/zotero-markdb-connect/releases/latest) [![GitHub all releases](https://img.shields.io/github/downloads/daeh/zotero-markdb-connect/total?style=for-the-badge&color=forestgreen)](https://github.com/daeh/zotero-markdb-connect/releases/latest) -->
-
 # MarkDB-Connect (Zotero Markdown DataBase Connect)
 
 [![zotero target version](https://img.shields.io/badge/Zotero-7-green?style=flat-square&logo=zotero&logoColor=CC2936)](https://www.zotero.org) [![Using Zotero Plugin Template](https://img.shields.io/badge/Using-Zotero%20Plugin%20Template-blue?style=flat-square&logo=github)](https://github.com/windingwind/zotero-plugin-template)
