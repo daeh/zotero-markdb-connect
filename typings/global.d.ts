@@ -1,16 +1,18 @@
-declare const _globalThis: {
-  [key: string]: any
-  Zotero: _ZoteroTypes.Zotero
-  ztoolkit: ZToolkit
-  addon: typeof addon
+import type Addon from '../src/addon'
+import type { createZToolkit } from '../src/utils/ztoolkit'
+
+declare global {
+  type ZToolkit = ReturnType<typeof createZToolkit>
+  const ztoolkit: ZToolkit
+  const rootURI: string
+  const addon: Addon
+
+  const _globalThis: {
+    [key: string]: any
+    Zotero: _ZoteroTypes.Zotero
+    ztoolkit: ZToolkit
+    addon: typeof addon
+  }
+
+  const __env__: 'production' | 'development'
 }
-
-declare type ZToolkit = ReturnType<typeof import('../src/utils/ztoolkit').createZToolkit>
-
-declare const ztoolkit: ZToolkit
-
-declare const rootURI: string
-
-declare const addon: import('../src/addon').default
-
-declare const __env__: 'production' | 'development'

@@ -4,6 +4,7 @@
 // @ts-nocheck
 export type FluentMessageId =
   | 'calendar-view-toggle-day'
+  | 'context-submenu'
   | 'contextmenuitem-open-default'
   | 'contextmenuitem-open-logseq'
   | 'contextmenuitem-open-obsidian'

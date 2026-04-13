@@ -1,6 +1,8 @@
-import { defineConfig } from 'zotero-plugin-scaffold'
-import pkg from './package.json'
 import { copyFileSync } from 'fs'
+
+import { defineConfig } from 'zotero-plugin-scaffold'
+
+import pkg from './package.json'
 
 export default defineConfig({
   source: ['src', 'addon'],
@@ -45,7 +47,7 @@ export default defineConfig({
       hash: false,
     },
     hooks: {
-      'build:makeUpdateJSON': (ctx) => {
+      'build:makeUpdateJSON': (_ctx) => {
         try {
           copyFileSync('.scaffold/build/update.json', 'update_gitignore.json')
         } catch (err) {

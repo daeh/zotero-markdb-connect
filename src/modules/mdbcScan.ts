@@ -140,7 +140,7 @@ const listFilesRecursively = async function* (dirpath: string): AsyncGenerator<O
 
 class Utils {
   static async getFilesRecursively(dirpath: string): Promise<OS.File.Entry[]> {
-    let files: OS.File.Entry[] = []
+    const files: OS.File.Entry[] = []
     try {
       const zfileBaseDir: nsIFile = Zotero.File.pathToFile(dirpath)
 
@@ -557,7 +557,7 @@ export class ScanMarkdownFiles {
     s.addCondition('deleted', 'false', '')
     const itemIds = await s.search()
 
-    let ZotItems: Zotero.Item[] = await Zotero.Items.getAsync(itemIds)
+    const ZotItems: Zotero.Item[] = await Zotero.Items.getAsync(itemIds)
 
     const keymap = ZotItems.reduce((accumulator: Record<string, number[]>, zotitem) => {
       if (!itemIds.includes(zotitem.id)) {

@@ -2,12 +2,12 @@ import { dirname, resolve } from 'path'
 import { fileURLToPath } from 'url'
 
 import stylisticPlugin from '@stylistic/eslint-plugin'
-import typescriptEslintPlugin from '@typescript-eslint/eslint-plugin'
-import typescriptEslintParser from '@typescript-eslint/parser'
+import zotero from '@zotero-plugin/eslint-config'
 import prettierConfig from 'eslint-config-prettier'
-import importPlugin from 'eslint-plugin-import'
+import importPlugin from 'eslint-plugin-import-x'
 import prettierPlugin from 'eslint-plugin-prettier'
 import globals from 'globals'
+import tseslint from 'typescript-eslint'
 
 const projectDirname = dirname(fileURLToPath(import.meta.url))
 
@@ -16,34 +16,42 @@ const context = (() => {
   if (process.env.NODE_ENV === 'development') return 'development'
   if (process.env.NODE_ENV === 'production') return 'production'
   if (process.env.NODE_ENV === 'repo') return 'repository'
-  new Error('Invalid NODE_ENV')
   return 'error'
 })()
-
-const projectFilesToIgnore =
-  context === 'repository' ? [] : ['.release-it.ts', 'zotero-plugin.config.ts', '*.config.mjs']
 
 const tsconfig = (() => {
   if (context === 'default') return './tsconfig.json'
   if (context === 'development') return './tsconfig.dev.json'
   if (context === 'production') return './tsconfig.prod.json'
   if (context === 'repository') return './tsconfig.repo.json'
-  new Error('Invalid context')
   return 'error'
 })()
+
+const projectFilesToIgnore =
+  context === 'repository' ? [] : ['.release-it.ts', 'zotero-plugin.config.ts', '*.config.mjs']
 
 console.log(`env: ${process.env.NODE_ENV}, context: ${context}, tsconfig: ${tsconfig}`)
 
 const allTsExtensionsArray = ['ts', 'mts', 'cts', 'tsx', 'mtsx']
 const allJsExtensionsArray = ['js', 'mjs', 'cjs', 'jsx', 'mjsx']
 const allTsExtensions = allTsExtensionsArray.join(',')
-const allJsExtensions = allJsExtensionsArray.join(',')
 const allExtensions = [...allTsExtensionsArray, ...allJsExtensionsArray].join(',')
+
+// Merge rules across a typescript-eslint config array (v8 returns an array of
+// entries; rules may be split across multiple entries).
+const mergeRules = (configArray) => configArray.reduce((acc, entry) => ({ ...acc, ...(entry.rules ?? {}) }), {})
+
+const typeCheckedPresetRules = {
+  ...mergeRules(tseslint.configs.recommendedTypeChecked),
+  ...mergeRules(tseslint.configs.stylisticTypeChecked),
+}
+
+const strictTypeCheckedPresetRules = mergeRules(tseslint.configs.strictTypeChecked)
 
 const importRules = {
   ...importPlugin.flatConfigs.recommended.rules,
-  'import/no-unresolved': 'error',
-  'import/namespace': 'off',
+  'import-x/no-unresolved': 'error',
+  'import-x/namespace': 'off',
   'sort-imports': [
     'error',
     {
@@ -54,25 +62,14 @@ const importRules = {
       memberSyntaxSortOrder: ['none', 'all', 'multiple', 'single'],
     },
   ],
-  'import/order': [
+  'import-x/order': [
     'error',
     {
-      'groups': [
-        'builtin', // Built-in imports (come from NodeJS native) go first
-        'external', // External imports
-        'internal', // Absolute imports
-        'parent', // Relative imports
-        'sibling', // Relative imports
-        // ['sibling', 'parent'], // Relative imports, the sibling and parent types they can be mingled together
-        'index', // index imports
-        'type', // type imports
-        'object', // object imports
-        'unknown', // unknown
-      ],
+      'groups': ['builtin', 'external', 'internal', 'parent', 'sibling', 'index', 'type', 'object', 'unknown'],
       'newlines-between': 'always',
       'alphabetize': {
         order: 'asc',
-        caseInsensitive: true, // ignore case
+        caseInsensitive: true,
       },
     },
   ],
@@ -89,31 +86,6 @@ const baseRules = {
   '@stylistic/quotes': ['warn', 'single', { avoidEscape: true, allowTemplateLiterals: 'never' }],
   '@stylistic/object-curly-spacing': ['warn', 'always'],
   '@stylistic/array-element-newline': ['error', 'consistent'],
-  // '@stylistic/multiline-ternary': ['warn', 'always'],
-}
-
-const typescriptRules = {
-  ...prettierConfig.rules,
-  ...typescriptEslintPlugin.configs.recommended.rules,
-  ...typescriptEslintPlugin.configs['recommended-type-checked'].rules,
-  //
-  // ...typescriptEslintPlugin.configs.strict.rules,
-  // ...typescriptEslintPlugin.configs['strict-type-checked'].rules,
-  //
-  ...typescriptEslintPlugin.configs['stylistic-type-checked'].rules,
-  ...stylisticPlugin.configs['disable-legacy'].rules,
-  ...importRules,
-  ...baseRules,
-}
-
-const javascriptRules = {
-  ...prettierConfig.rules,
-  ...typescriptEslintPlugin.configs.recommended.rules,
-  ...typescriptEslintPlugin.configs.strict.rules,
-  ...typescriptEslintPlugin.configs.stylistic.rules,
-  ...stylisticPlugin.configs['disable-legacy'].rules,
-  ...importRules,
-  ...baseRules,
 }
 
 const typescriptRulesDev = {
@@ -128,7 +100,6 @@ const typescriptRulesDev = {
   '@typescript-eslint/no-inferrable-types': ['off'],
   '@typescript-eslint/no-floating-promises': ['warn'],
   '@typescript-eslint/require-await': ['warn'],
-  // '@typescript-eslint/dot-notation': ['off'],
   '@typescript-eslint/no-non-null-assertion': 'off',
   '@typescript-eslint/ban-ts-comment': [
     'warn',
@@ -142,144 +113,108 @@ const typescriptRulesDev = {
   '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
 }
 
-const javascriptRulesDev = {}
-
-const config = [
-  {
-    /* setup parser for all files */
-    files: [`**/*.{${allExtensions}}`],
-    languageOptions: {
-      parser: typescriptEslintParser,
-      parserOptions: {
-        ecmaVersion: 'latest', // 2024 sets the ecmaVersion parser option to 15
-        sourceType: 'module',
-        tsconfigRootDir: resolve(projectDirname),
-        project: tsconfig,
-      },
-    },
-  },
-  {
-    /* all typescript files, except config files */
-    files: [`**/*.{${allTsExtensions}}`],
-    ignores: [`**/*.config.{${allTsExtensions}}`],
-    languageOptions: {
-      globals: {
-        ...globals.browser,
-        // ...globals.node,
-        ...globals.es2021,
-      },
-    },
-    plugins: {
-      '@typescript-eslint': typescriptEslintPlugin,
-      '@stylistic': stylisticPlugin,
-      'import': importPlugin,
-      'prettier': prettierPlugin,
-    },
-    rules: {
-      ...typescriptRules,
-    },
-  },
-  {
-    /* +strict for typescript files NOT in ./src/ folder */
-    files: [`**/*.{${allTsExtensions}}`],
-    ignores: [`src/**/*.{${allTsExtensions}}`, 'typings/**/*.d.ts', `**/*.config.{${allTsExtensions}}`],
-    plugins: {
-      '@typescript-eslint': typescriptEslintPlugin,
-      '@stylistic': stylisticPlugin,
-    },
-    rules: {
-      ...typescriptEslintPlugin.configs.strict.rules,
-      ...typescriptEslintPlugin.configs['strict-type-checked'].rules,
-    },
-  },
-  {
-    /* +lenient for typescript files in ./src/ folder */
-    files: [`src/**/*.{${allTsExtensions}}`, 'typings/**/*.d.ts'],
-    ignores: [`**/*.config.{${allTsExtensions}}`],
-    settings: {
-      'import/resolver': {
-        typescript: {
+export default zotero({
+  overrides: [
+    // 1. Parser + tsconfig injection for all TS files.
+    {
+      files: [`**/*.{${allTsExtensions}}`],
+      languageOptions: {
+        parserOptions: {
           project: tsconfig,
-          alwaysTryTypes: true,
+          tsconfigRootDir: resolve(projectDirname),
+          ecmaVersion: 'latest',
+          sourceType: 'module',
         },
-        node: {
-          extensions: ['.ts', '.tsx'],
-          moduleDirectory: ['node_modules', 'src/'],
-        },
-      },
-      'import/parsers': {
-        '@typescript-eslint/parser': ['.ts', '.tsx'],
       },
     },
-    rules: {
-      ...typescriptRules,
-      ...typescriptRulesDev,
-      'no-restricted-globals': [
-        'error',
-        { message: 'Use `Zotero.getMainWindow()` instead.', name: 'window' },
-        {
-          message: 'Use `Zotero.getMainWindow().document` instead.',
-          name: 'document',
+
+    // 2. Re-layer type-checked presets that the shared config omits.
+    //    Applies to all TS files (inside and outside src/).
+    {
+      files: [`**/*.{${allTsExtensions}}`],
+      ignores: [`**/*.config.{${allTsExtensions}}`],
+      rules: {
+        ...typeCheckedPresetRules,
+        ...prettierConfig.rules,
+        ...stylisticPlugin.configs['disable-legacy'].rules,
+      },
+    },
+
+    // 3. +strict-type-checked tier for TS files OUTSIDE src/ and typings/.
+    {
+      files: [`**/*.{${allTsExtensions}}`],
+      ignores: [`src/**/*.{${allTsExtensions}}`, 'typings/**/*.d.ts', `**/*.config.{${allTsExtensions}}`],
+      rules: strictTypeCheckedPresetRules,
+    },
+
+    // 4. Import rules + stylistic/prettier base rules for all lintable files.
+    {
+      files: [`**/*.{${allExtensions}}`],
+      plugins: {
+        '@stylistic': stylisticPlugin,
+        'import-x': importPlugin,
+        'prettier': prettierPlugin,
+      },
+      settings: {
+        'import-x/resolver': {
+          typescript: { project: tsconfig, alwaysTryTypes: true },
+          node: { extensions: ['.ts', '.tsx'], moduleDirectory: ['node_modules', 'src/'] },
         },
-        {
-          message: 'Use `Zotero.getActiveZoteroPane()` instead.',
-          name: 'ZoteroPane',
+        'import-x/parsers': {
+          '@typescript-eslint/parser': ['.ts', '.tsx'],
         },
-        'Zotero_Tabs',
+      },
+      rules: {
+        ...importRules,
+        ...baseRules,
+      },
+    },
+
+    // 5. Lenient rules + no-restricted-globals for src/ and typings/.
+    //    Layered last so it overrides the stricter presets above.
+    {
+      files: [`src/**/*.{${allTsExtensions}}`, 'typings/**/*.d.ts'],
+      ignores: [`**/*.config.{${allTsExtensions}}`],
+      rules: {
+        ...typescriptRulesDev,
+        'no-empty': 'off',
+        'no-restricted-globals': [
+          'error',
+          { message: 'Use `Zotero.getMainWindow()` instead.', name: 'window' },
+          { message: 'Use `Zotero.getMainWindow().document` instead.', name: 'document' },
+          { message: 'Use `Zotero.getActiveZoteroPane()` instead.', name: 'ZoteroPane' },
+          'Zotero_Tabs',
+        ],
+      },
+    },
+
+    // 6. Node globals for config files and build scripts (repo-lint mode).
+    {
+      files: [`**/*.config.{${allJsExtensionsArray.join(',')}}`, `**/*.config.{${allTsExtensions}}`, '.release-it.ts'],
+      languageOptions: {
+        globals: {
+          ...globals.node,
+        },
+      },
+      rules: {
+        '@typescript-eslint/no-unsafe-assignment': 'off',
+        '@typescript-eslint/no-unsafe-member-access': 'off',
+      },
+    },
+
+    // 7. Final ignores.
+    {
+      ignores: [
+        'build/**',
+        '.scaffold/**',
+        'node_modules/**',
+        'scripts/',
+        '**/*.js',
+        '**/*.bak',
+        '**/*-lintignore*',
+        '**/*_lintignore*',
+        ...projectFilesToIgnore,
       ],
     },
-  },
-  {
-    /* config files: javascript */
-    files: [`**/*.config.{${allJsExtensions}}`],
-    settings: {
-      'import/resolver': {
-        node: {},
-        typescript: {
-          extensions: ['.ts', '.d.ts'],
-        },
-      },
-      // 'import/ignore': ['node_modules/firebase'],
-    },
-    // languageOptions: {
-    //   globals: {
-    //     ...globals.browser,
-    //     ...globals.node,
-    //     ...globals.es2021,
-    //   },
-    // },
-    // 'import/resolver': {
-    //   // node: {},
-    //   typescript: {
-    //     extensions: ['.ts', '.d.ts'],
-    //   },
-    // },
-    plugins: {
-      '@typescript-eslint': typescriptEslintPlugin,
-      '@stylistic': stylisticPlugin,
-      'import': importPlugin,
-      'prettier': prettierPlugin,
-    },
-    rules: {
-      ...javascriptRules,
-      '@typescript-eslint/no-unsafe-assignment': ['off'],
-      '@typescript-eslint/no-unused-vars': ['off'],
-      '@typescript-eslint/no-unsafe-member-access': ['off'],
-    },
-  },
-  {
-    ignores: [
-      'build/**',
-      '.scaffold/**',
-      'node_modules/**',
-      'scripts/',
-      '**/*.js',
-      '**/*.bak',
-      '**/*-lintignore*',
-      '**/*_lintignore*',
-      ...projectFilesToIgnore,
-    ],
-  },
-]
-
-export default config
+  ],
+})

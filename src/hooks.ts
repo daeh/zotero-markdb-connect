@@ -1,12 +1,10 @@
 // import { config } from '../package.json'
 
 import { DataManager } from './dataGlobals'
-import { Elements } from './modules/create-element'
 import { Logger } from './modules/mdbcLogger'
 import { ScanMarkdownFiles } from './modules/mdbcScan'
 import { wrappers } from './modules/mdbcStartupHelpers'
 import { KeyboardShortcuts, Notifier, prefHelpers, Registrar, systemInterface, UIHelpers } from './modules/mdbcUX'
-import { unpatch as $unpatch$ } from './modules/monkey-patch'
 import { registerPrefsScripts } from './modules/preferenceScript'
 import { getString, initLocale } from './utils/locale'
 import { createZToolkit } from './utils/ztoolkit'
@@ -20,12 +18,6 @@ async function onStartup() {
 
   Registrar.registerPrefs()
 
-  // BasicExampleFactory.registerNotifier()
-
-  // registerPreferenceStyleSheet()
-
-  // await onMainWindowLoad(window)
-
   await Promise.all(Zotero.getMainWindows().map((win) => onMainWindowLoad(win)))
 }
 
@@ -33,8 +25,9 @@ async function onMainWindowLoad(win: _ZoteroTypes.MainWindow): Promise<void> {
   // Create ztoolkit for every window
   addon.data.ztoolkit = createZToolkit()
 
-  // @ts-ignore This is a moz feature
-  // win.MozXULElement.insertFTLIfNeeded(`${addon.data.config.addonRef}-mainWindow.ftl`)
+  // needed so MenuManager can resolve our l10n IDs
+  // @ts-ignore MozXULElement is a Gecko global, not in lib.dom
+  win.MozXULElement.insertFTLIfNeeded(`${addon.data.config.addonRef}-addon.ftl`)
 
   const popupWin = new ztoolkit.ProgressWindow(addon.data.config.addonName, {
     closeOnClick: true,
@@ -66,16 +59,7 @@ async function onMainWindowLoad(win: _ZoteroTypes.MainWindow): Promise<void> {
   UIHelpers.registerWindowMenuItem_Sync()
   if (!DataManager.isClean() || DataManager.numberRecords() === 0 || addon.data.env === 'development') {
     UIHelpers.registerWindowMenuItem_Debug()
-  } else {
-    ///WIP
-    // try {
-    //   ztoolkit.Menu.unregister(`${config.addonRef}-tools-menu-troubleshoot`)
-    // } catch (err) {
-    //   Logger.log('toolsmenu', `ERROR: unregister :: ${err}`)
-    // }
   }
-  // register(menuPopup: XUL.MenuPopup | keyof typeof MenuSelector, options: MenuitemOptions, insertPosition?: "before" | "after", anchorElement?: XUL.Element): false | undefined;
-  // unregister(menuId: string): void;
 
   UIHelpers.registerRightClickMenuItem()
 
@@ -180,8 +164,6 @@ function Logs() {
 }
 
 async function onMainWindowUnload(win: Window): Promise<void> {
-  Elements.removeAll()
-  $unpatch$()
   ztoolkit.unregisterAll()
   addon.data.dialog?.window?.close()
 }

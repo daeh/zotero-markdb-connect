@@ -13,7 +13,7 @@ export class getParam {
     const name = 'sourcedir'
     const valueDefault = ''
     let valid = false
-    let msg: string[] = []
+    const msg: string[] = []
 
     const param = { name, value: valueDefault, valid, msg: '' }
 
@@ -149,7 +149,7 @@ export class getParam {
     const valueDefault = ''
     let verified = false
     let valid = false
-    let msg: string[] = []
+    const msg: string[] = []
     let value = valueDefault
 
     const valueRaw = getPref(name)
@@ -258,7 +258,7 @@ export class getParam {
     ///TYPE: enum
     const name: ParamKey = 'mdeditor'
     const valueDefault = paramVals[name][0]
-    let valid = true
+    const valid = true
 
     const valueRaw = getPref(name)
 
@@ -282,7 +282,7 @@ export class getParam {
     ///TYPE: enum
     const name: ParamKey = 'obsidianresolvespec'
     const valueDefault = paramVals[name][0]
-    let valid = true
+    const valid = true
 
     const valueRaw = getPref(name)
 
@@ -309,7 +309,7 @@ export class getParam {
     let value = valueDefault
     let verified = false
     let valid = false
-    let msg: string[] = []
+    const msg: string[] = []
 
     const valueRaw = getPref(name)
     msg.push(`pref value: >>${valueRaw}<<.`)
@@ -351,7 +351,7 @@ export class getParam {
     let value = valueDefault
     let verified = false
     let valid = false
-    let msg: string[] = []
+    const msg: string[] = []
 
     const valueRaw = getPref(name)
     msg.push(`pref value: >>${valueRaw}<<.`)
@@ -393,7 +393,7 @@ export class getParam {
     let value = valueDefault
     let verified = false
     let valid = false
-    let msg: string[] = []
+    const msg: string[] = []
 
     const valueRaw = getPref(name)
     msg.push(`pref value: >>${valueRaw}<<.`)
@@ -432,7 +432,7 @@ export class getParam {
     ///TYPE: enum
     const name: ParamKey = 'grouplibraries'
     const valueDefault = paramVals[name][0]
-    let valid = true
+    const valid = true
 
     const valueRaw = getPref(name)
 
@@ -456,7 +456,7 @@ export class getParam {
     ///TYPE: enum
     const name: ParamKey = 'removetags'
     const valueDefault = paramVals[name][0]
-    let valid = true
+    const valid = true
 
     const valueRaw = getPref(name)
 
@@ -483,7 +483,7 @@ export class getParam {
     let value = valueDefault
     let verified = false
     let valid = true
-    let msg: string[] = []
+    const msg: string[] = []
 
     const valueRaw = getPref(name)
     msg.push(`pref value: >>${valueRaw}<<.`)
@@ -522,7 +522,7 @@ export class getParam {
     ///TYPE: enum
     const name: ParamKey = 'debugmode'
     const valueDefault = paramVals[name][0]
-    let valid = true
+    const valid = true
 
     const valueRaw = getPref(name)
 

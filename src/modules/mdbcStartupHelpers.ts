@@ -8,9 +8,9 @@ import { Notifier } from './mdbcUX'
 
 export class wrappers {
   @trace
-  static async fetchAndParseJsonFromGitHub(): Promise<any> {
+  static async fetchAndParseJsonFromGitHub(): Promise<'match' | 'mismatch' | 'error'> {
     const url = config.updateJSON
-    let status: 'match' | 'mismatch' | 'error' = 'error'
+    let status: 'match' | 'mismatch' | 'error'
     try {
       // Fetch data from the GitHub repository
       const response = await Zotero.HTTP.request('GET', url, {})
@@ -25,21 +25,13 @@ export class wrappers {
         const jsonData = JSON.parse(response.responseText)
         const addonIds = Object.keys(jsonData.addons)
         status = config.addonID === 'dev@daeh.info' && addonIds.includes('daeda@mit.edu') ? 'mismatch' : 'match'
-        // status = addonIds.includes(config.addonID) ? 'match' : 'mismatch'
         Logger.log('fetchAndParseJsonFromGitHub', `JSON data: ${JSON.stringify(Object.keys(jsonData))}`, false, 'debug')
       } catch (jsonError) {
-        throw new Error('Failed to parse JSON data')
+        throw new Error('Failed to parse JSON data', { cause: jsonError })
       }
     } catch (error) {
       // Handle network errors or other issues
-      ///TEMP
-      let message: string
-      try {
-        // @ts-ignore
-        message = error.message
-      } catch (err) {
-        message = 'error'
-      }
+      const message = getErrorMessage(error)
       Logger.log('fetchAndParseJsonFromGitHub', `Error fetching JSON data: ${message}`, false, 'error')
       throw error // Re-throw the error if you want to handle it outside this function
     }
@@ -66,8 +58,7 @@ export class wrappers {
       configurationVersionThis.release = versionThis_rematch.groups.release ? versionThis_rematch.groups.release : ''
     }
 
-    let configurationVersionPreviousStr: any = ''
-    let configurationVersionPrevious = {
+    const configurationVersionPrevious = {
       major: 0,
       minor: 0,
       patch: 0,
@@ -75,20 +66,22 @@ export class wrappers {
       str: '',
     }
     try {
-      configurationVersionPreviousStr = getPref('configuration')
+      const configurationVersionPreviousStr = getPref('configuration')
       if (typeof configurationVersionPreviousStr === 'string') {
         configurationVersionPrevious.str = configurationVersionPreviousStr
-      }
-      if (typeof configurationVersionPreviousStr === 'string' && version_re.test(configurationVersionPreviousStr)) {
-        const version_rematch = version_re.exec(configurationVersionPreviousStr)
-        if (version_rematch?.groups) {
-          configurationVersionPrevious.major = parseInt(version_rematch.groups.major)
-          configurationVersionPrevious.minor = parseInt(version_rematch.groups.minor)
-          configurationVersionPrevious.patch = parseInt(version_rematch.groups.patch)
-          configurationVersionPrevious.release = version_rematch.groups.release ? version_rematch.groups.release : ''
+        if (version_re.test(configurationVersionPreviousStr)) {
+          const version_rematch = version_re.exec(configurationVersionPreviousStr)
+          if (version_rematch?.groups) {
+            configurationVersionPrevious.major = parseInt(version_rematch.groups.major)
+            configurationVersionPrevious.minor = parseInt(version_rematch.groups.minor)
+            configurationVersionPrevious.patch = parseInt(version_rematch.groups.patch)
+            configurationVersionPrevious.release = version_rematch.groups.release ? version_rematch.groups.release : ''
+          }
         }
       }
-    } catch (err) {}
+    } catch (err) {
+      Logger.log('findPreviousVersion', `Error reading previous version: ${getErrorMessage(err)}`, false, 'warn')
+    }
 
     return {
       app: configurationVersionThis,
@@ -112,11 +105,11 @@ export class wrappers {
         !['-rc.1'].includes(versionParse.config.release)
 
       if (!preprerename1) {
-        let test0 = getPref('sourcedir')
+        const test0 = getPref('sourcedir')
         // Logger.log('startupVersionCheck - preprerename1 - test0', test0, false, 'debug')
         if (typeof test0 !== 'string' || test0 === '') {
           // @ts-ignore old pref key
-          let test1 = getPref('source_dir') // preference key prior to v...
+          const test1 = getPref('source_dir') // preference key prior to v...
           // Logger.log('startupVersionCheck - preprerename1 - test1', test1, false, 'debug')
           if (test1 && typeof test1 === 'string' && test1.length > 0) {
             // Logger.log('startupVersionCheck - preprerename1 - AMHERE0', test1, false, 'debug')
@@ -125,9 +118,9 @@ export class wrappers {
         }
       }
       if (!preprerename1 && !prezot7) {
-        let test0 = getPref('sourcedir')
+        const test0 = getPref('sourcedir')
         if (typeof test0 !== 'string' || test0 === '') {
-          let test1 = Zotero.Prefs.get('extensions.mdbconnect.source_dir', true)
+          const test1 = Zotero.Prefs.get('extensions.mdbconnect.source_dir', true)
           if (test1 && typeof test1 === 'string' && test1.length > 0) {
             prezot7 = true
           }
