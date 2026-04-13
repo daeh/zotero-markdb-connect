@@ -392,7 +392,6 @@ export class UIHelpers {
         },
       ],
     })
-
     ;(Zotero as any).MenuManager.registerMenu({
       menuID: `${config.addonID}-itemmenu-reveal`,
       pluginID: config.addonID,
@@ -413,7 +412,6 @@ export class UIHelpers {
         },
       ],
     })
-
     ;(Zotero as any).MenuManager.registerMenu({
       menuID: `${config.addonID}-itemmenu-open-submenu`,
       pluginID: config.addonID,
@@ -436,7 +434,6 @@ export class UIHelpers {
         },
       ],
     })
-
     ;(Zotero as any).MenuManager.registerMenu({
       menuID: `${config.addonID}-itemmenu-reveal-submenu`,
       pluginID: config.addonID,
@@ -467,7 +464,7 @@ export class UIHelpers {
       const pane = Zotero.getActiveZoteroPane()
       if (!pane) return null
       const items = pane.getSelectedItems()
-      if (!items || items.length !== 1) return null
+      if (items?.length !== 1) return null
       const itemId = items[0].id
       if (!DataManager.checkForZotId(itemId)) return null
       const entries = DataManager.getEntryList(itemId)

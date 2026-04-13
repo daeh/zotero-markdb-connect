@@ -420,7 +420,7 @@ export class wrappers {
       /// migrate BBT-prefixed pref keys to new names
       try {
         // matchstrategy values
-        const matchVal = getPref('matchstrategy') as string
+        const matchVal = getPref('matchstrategy')
         if (matchVal === 'bbtcitekey' || matchVal === 'bbtcitekeyyaml') {
           setPref('matchstrategy', 'citekeyyaml')
         } else if (matchVal === 'bbtcitekeyregexp') {

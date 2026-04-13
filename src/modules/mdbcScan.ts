@@ -461,7 +461,7 @@ export class ScanMarkdownFiles {
       }
       let citationKey = ''
       try {
-        citationKey = (zotitem.getField('citationKey') as string) || ''
+        citationKey = zotitem.getField('citationKey') || ''
       } catch {
         // citationKey field may not exist on certain item types
       }
