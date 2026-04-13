@@ -209,8 +209,10 @@ export class wrappers {
       try {
         if (preprerename1) {
           const val = getPref('matchstrategy') // as string
-          if (val === 'bbtcitekey') {
-            setPref('matchstrategy', 'bbtcitekeyyaml')
+          if (val === 'bbtcitekey' || val === 'bbtcitekeyyaml') {
+            setPref('matchstrategy', 'citekeyyaml')
+          } else if (val === 'bbtcitekeyregexp') {
+            setPref('matchstrategy', 'citekeyregexp')
           } else if (val && typeof val === 'string' && paramVals.matchstrategy.find((validName) => validName === val)) {
             setPref('matchstrategy', val)
           } else {
@@ -219,8 +221,10 @@ export class wrappers {
           getParam.matchstrategy()
         } else if (prezot7) {
           const val = Zotero.Prefs.get('extensions.mdbconnect.matchstrategy', true) // as string
-          if (val === 'bbtcitekey') {
-            setPref('matchstrategy', 'bbtcitekeyyaml')
+          if (val === 'bbtcitekey' || val === 'bbtcitekeyyaml') {
+            setPref('matchstrategy', 'citekeyyaml')
+          } else if (val === 'bbtcitekeyregexp') {
+            setPref('matchstrategy', 'citekeyregexp')
           } else if (val && typeof val === 'string' && paramVals.matchstrategy.find((validName) => validName === val)) {
             setPref('matchstrategy', val)
           } else {
@@ -232,24 +236,24 @@ export class wrappers {
         Logger.log('startupDependencyCheck', `matchstrategy ERROR: ${getErrorMessage(err)}`, false, 'error')
       }
 
-      /// bbtyamlkeyword
+      /// yamlkeyword (formerly bbtyamlkeyword)
       try {
         if (preprerename1) {
           // @ts-ignore old pref key
           const val = getPref('metadatakeyword') // preference key prior to v...
           if (val && typeof val === 'string') {
-            setPref('bbtyamlkeyword', val)
+            setPref('yamlkeyword', val)
           }
-          getParam.bbtyamlkeyword()
+          getParam.yamlkeyword()
         } else if (prezot7) {
           const val = Zotero.Prefs.get('extensions.mdbconnect.metadatakeyword', true) // as string
           if (val && typeof val === 'string') {
-            setPref('bbtyamlkeyword', val)
+            setPref('yamlkeyword', val)
           }
-          getParam.bbtyamlkeyword()
+          getParam.yamlkeyword()
         }
       } catch (err) {
-        Logger.log('startupDependencyCheck', `bbtyamlkeyword ERROR: ${getErrorMessage(err)}`, false, 'error')
+        Logger.log('startupDependencyCheck', `yamlkeyword ERROR: ${getErrorMessage(err)}`, false, 'error')
       }
 
       /// zotkeyregexp
@@ -413,6 +417,33 @@ export class wrappers {
         Logger.log('startupDependencyCheck', `tagstr ERROR: ${getErrorMessage(err)}`, false, 'error')
       }
 
+      /// migrate BBT-prefixed pref keys to new names
+      try {
+        // matchstrategy values
+        const matchVal = getPref('matchstrategy') as string
+        if (matchVal === 'bbtcitekey' || matchVal === 'bbtcitekeyyaml') {
+          setPref('matchstrategy', 'citekeyyaml')
+        } else if (matchVal === 'bbtcitekeyregexp') {
+          setPref('matchstrategy', 'citekeyregexp')
+        }
+
+        // pref key: bbtyamlkeyword -> yamlkeyword
+        // @ts-ignore old pref key
+        const yamlVal = getPref('bbtyamlkeyword')
+        if (yamlVal && typeof yamlVal === 'string' && yamlVal.length > 0) {
+          setPref('yamlkeyword', yamlVal)
+        }
+
+        // pref key: bbtregexp -> citekeypattern
+        // @ts-ignore old pref key
+        const regexpVal = getPref('bbtregexp')
+        if (regexpVal && typeof regexpVal === 'string' && regexpVal.length > 0) {
+          setPref('citekeypattern', regexpVal)
+        }
+      } catch (err) {
+        Logger.log('startupVersionCheck', `pref migration ERROR: ${getErrorMessage(err)}`, false, 'error')
+      }
+
       if (addon.data.env === 'production') {
         setPref('configuration', version)
         Logger.log(
@@ -458,8 +489,6 @@ export class wrappers {
     }
 
     getParam.obsidianresolve()
-
-    // TODO - check for BBT if BBT citekeys are used
 
     return success
   }

@@ -14,8 +14,8 @@ declare namespace _ZoteroTypes {
       "filefilterstrategy": string;
       "filepattern": string;
       "matchstrategy": string;
-      "bbtyamlkeyword": string;
-      "bbtregexp": string;
+      "yamlkeyword": string;
+      "citekeypattern": string;
       "zotkeyregexp": string;
       "mdeditor": string;
       "obsidianvaultname": string;

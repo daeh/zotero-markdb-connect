@@ -143,9 +143,9 @@ export class getParam {
   }
 
   @trace
-  static bbtyamlkeyword() {
+  static yamlkeyword() {
     ///TYPE: string
-    const name = 'bbtyamlkeyword'
+    const name = 'yamlkeyword'
     const valueDefault = ''
     let verified = false
     let valid = false
@@ -186,9 +186,9 @@ export class getParam {
   }
 
   @trace
-  static bbtregexp() {
+  static citekeypattern() {
     ///TYPE: regex
-    const name = 'bbtregexp'
+    const name = 'citekeypattern'
     const valueDefault = ''
     let valid = false
     let msg = ''

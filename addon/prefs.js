@@ -11,9 +11,9 @@ pref('sourcedir', '')
 pref('filefilterstrategy', 'default') // ['default', 'customfileregexp'][0]
 pref('filepattern', '^@.+\\.md$')
 
-pref('matchstrategy', 'bbtcitekeyyaml') // ['bbtcitekeyyaml', 'bbtcitekeyregexp', 'zotitemkey'][0]
-pref('bbtyamlkeyword', '')
-pref('bbtregexp', '')
+pref('matchstrategy', 'citekeyyaml') // ['citekeyyaml', 'citekeyregexp', 'zotitemkey'][0]
+pref('yamlkeyword', '')
+pref('citekeypattern', '')
 pref('zotkeyregexp', '')
 
 pref('mdeditor', 'obsidian') // ['obsidian', 'logseq', 'system'][0]

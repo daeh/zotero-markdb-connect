@@ -2,7 +2,7 @@ import type { DebugMode } from '../mdbcTypes'
 
 export const paramVals = {
   filefilterstrategy: ['default', 'customfileregexp'],
-  matchstrategy: ['bbtcitekeyyaml', 'bbtcitekeyregexp', 'zotitemkey'],
+  matchstrategy: ['citekeyyaml', 'citekeyregexp', 'zotitemkey'],
   mdeditor: ['system', 'obsidian', 'logseq'],
   // obsidianresolvewithfile: [false, true],
   obsidianresolvespec: ['path', 'file'],
