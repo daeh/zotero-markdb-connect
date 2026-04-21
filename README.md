@@ -208,13 +208,34 @@ tags:
 
 ## Suppressing the Zotero security notification
 
-Recent builds of Zotero have introduced a security notification for external links. At present, Zotero does not remember the user's link preferences, so this alert is shown every time an application-specific URI is launched. You can suppress this warning by setting `security.external_protocol_requires_permission` to `false` in Zotero's advanced configuration.
+Recent builds of Zotero show a security notification every time an application-specific URI (such as `obsidian://…`) is launched, because Zotero does not remember the user's link preferences. The notification can be suppressed from Zotero's advanced configuration, but the procedure differs between Zotero 9 and earlier versions because the underlying Gecko preference changed.
 
 ![Zotero Security Notification](./docs/assets/readme/ExternalLinkNotificationScreenshot.png)
 
 <details>
 
-<summary>Instructions for modifying Zotero's advanced config</summary>
+<summary>Zotero 9</summary>
+
+The dialog can be bypassed on a per-scheme basis by creating a `network.protocol-handler.external.<scheme>` preference set to `true`. The setting must be added manually (it does not exist by default).
+
+1. Open Zotero Settings
+2. Click the "Advanced" tab
+3. Click the "Config Editor" button
+4. Click the "Accept Risk and Continue" button
+5. In the search field, enter the config you want to create, e.g.
+    - `network.protocol-handler.external.obsidian`
+    -  `network.protocol-handler.external.logseq`
+6. If no matching entry appears, click the "+" (New) button on the right of the novel config.
+    - Make sure the type is boolean and the value is true. By default, the setting should be set to "Boolean" and should be assigned `true` when created. 
+    - ![](docs/assets/readme/ExternalLinkConfigScreenshot.png)
+
+If prompts still appear for links triggered from outside Zotero, you can additionally set `network.protocol-handler.prompt-from-external` to `false` using the same procedure.
+
+</details>
+
+<details>
+
+<summary>Zotero 7 and 8</summary>
 
 1. Open Zotero Settings
 2. Click the "Advanced" tab
