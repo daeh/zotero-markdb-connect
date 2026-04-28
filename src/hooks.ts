@@ -1,5 +1,3 @@
-// import { config } from '../package.json'
-
 import { DataManager } from './dataGlobals'
 import { Logger } from './modules/mdbcLogger'
 import { ScanMarkdownFiles } from './modules/mdbcScan'
@@ -69,6 +67,9 @@ async function onMainWindowLoad(win: _ZoteroTypes.MainWindow): Promise<void> {
     progress: 100,
     text: `[100%] ${getString('startup-finish')}`,
   })
+
+  Logger.log('trace', 'onMainWindowLoad:complete', false, 'trace')
+  Logger.log('startup', 'onMainWindowLoad:complete', true, 'info')
 
   if (Logger.mode() !== 'minimal' || addon.data.env === 'development') {
     popupWin.addLines(`DebugMode: ${Logger.mode()}`, Notifier.notificationTypes.debug)
@@ -159,8 +160,8 @@ function DataZotIds() {
 function DataStore() {
   return DataManager.dump()
 }
-function Logs() {
-  return Logger.dump()
+async function Logs() {
+  return await Logger.dump()
 }
 
 async function onMainWindowUnload(win: Window): Promise<void> {

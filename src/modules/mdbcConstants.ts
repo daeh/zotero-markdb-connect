@@ -6,6 +6,9 @@ export const paramVals = {
   mdeditor: ['system', 'obsidian', 'logseq'],
   // obsidianresolvewithfile: [false, true],
   obsidianresolvespec: ['path', 'file'],
+  // 'active' is a plugin-internal sentinel meaning "omit paneType from the URI",
+  // not an Obsidian-recognized value. 'tab' and 'window' pass through verbatim.
+  obsidianpanetype: ['tab', 'active', 'window'],
   grouplibraries: ['user', 'group'],
   removetags: ['keepsynced', 'addonly'],
   debugmode: ['minimal' satisfies DebugMode, 'maximal' satisfies DebugMode],

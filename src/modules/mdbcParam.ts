@@ -302,6 +302,30 @@ export class getParam {
   }
 
   @trace
+  static obsidianpanetype() {
+    ///TYPE: enum
+    const name: ParamKey = 'obsidianpanetype'
+    const valueDefault = paramVals[name][0]
+    const valid = true
+
+    const valueRaw = getPref(name)
+
+    const valueVerified = paramVals[name].find((validName) => validName === valueRaw)
+    const value: ParamValue<'obsidianpanetype'> = valueVerified ? valueVerified : valueDefault
+    const param = { name, value, valid }
+
+    if (valueVerified) {
+    } else {
+      Logger.log('getParam', `ERROR: ${name}: invalid value :: ${valueRaw}`, false, 'error')
+      Logger.log('getParam', `${name}: set to default :: ${valueDefault}`, false, 'error')
+      setPref(name, valueDefault)
+    }
+
+    Logger.log(name, param, false, 'config')
+    return param
+  }
+
+  @trace
   static obsidianvaultname() {
     ///TYPE: string
     const name = 'obsidianvaultname'

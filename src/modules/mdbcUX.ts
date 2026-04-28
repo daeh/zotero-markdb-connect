@@ -88,7 +88,7 @@ export class systemInterface {
 
   @trace
   static async dumpDebuggingLog() {
-    const data = JSON.stringify(Logger.dump(), null, 1)
+    const data = JSON.stringify(await Logger.dump(), null, 1)
     const filename = `${config.addonName.replace('-', '')}-logs.json`
 
     const filepathstr = await new ztoolkit.FilePicker(
@@ -203,7 +203,13 @@ export class systemInterface {
   static openObsidianURI(entry_res: Entry): void {
     try {
       const uri_spec = getParam.obsidianresolve().value
+      const paneType = getParam.obsidianpanetype().value
       const vaultnameParam = getParam.obsidianvaultname()
+      // TODO(vault-encoding): Obsidian's URI docs require %20-style encoding, and
+      // https://github.com/Taitava/obsidian-shellcommands/discussions/412 documents
+      // vault names with spaces failing. Not wrapped in encodeURIComponent here to
+      // avoid double-encoding users who entered encoded values as a workaround.
+      // Revisit with a one-shot migration if a bug is reported.
       const vaultKey = vaultnameParam.valid ? `vault=${vaultnameParam.value}&` : ''
 
       const fileKey =
@@ -211,7 +217,9 @@ export class systemInterface {
           ? `file=${encodeURIComponent(entry_res.name)}`
           : `path=${encodeURIComponent(entry_res.path)}`
 
-      const uri = `obsidian://open?${vaultKey}${fileKey}`
+      const paneKey = paneType === 'active' ? '' : `&paneType=${paneType}`
+
+      const uri = `obsidian://open?${vaultKey}${fileKey}${paneKey}`
       Zotero.launchURL(uri)
 
       Logger.log('openObsidianURI', `Launching ${entry_res.path} :: ${uri}`, false, 'info')

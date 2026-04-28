@@ -1,4 +1,4 @@
-import { config } from '../../package.json'
+import { config, version } from '../../package.json'
 import { getPref } from '../utils/prefs'
 
 import type { DebugMode, LogType, messageData } from '../mdbcTypes'
@@ -9,14 +9,47 @@ class LogsStore {
     init: Date.now(),
     last: Date.now(),
   }
+  static info: Record<string, string> = {}
+  static config: Record<string, any> = {}
   static logs: Record<string, any> = {}
   static data: Record<string, any> = {}
   static messages: messageData[] = []
 }
 
 export class Logger {
-  static dump() {
-    return { logs: LogsStore.logs, data: LogsStore.data }
+  private static async collectInfo(): Promise<Record<string, any>> {
+    const info: Record<string, any> = {
+      MDBC: version,
+      Zotero: Zotero.version,
+      clientName: Zotero.clientName,
+      platform: Zotero.platform,
+      platformMajorVersion: Zotero.platformMajorVersion,
+      locale: Zotero.locale,
+      env: addon.data.env,
+      timestamp: new Date().toString(),
+    }
+    try {
+      info.osVersion = await Zotero.getOSVersion()
+    } catch (err) {
+      info.osVersion = `ERROR :: ${getErrorMessage(err)}`
+    }
+    try {
+      info.extensions = await Zotero.getInstalledExtensions()
+    } catch (err) {
+      info.extensions = `ERROR :: ${getErrorMessage(err)}`
+    }
+    LogsStore.info = info
+    return info
+  }
+
+  static async dump() {
+    await this.collectInfo()
+    return {
+      info: LogsStore.info,
+      config: LogsStore.config,
+      logs: LogsStore.logs,
+      data: LogsStore.data,
+    }
   }
 
   static getLogs() {
@@ -28,6 +61,8 @@ export class Logger {
   }
 
   static clear(): void {
+    LogsStore.info = {}
+    LogsStore.config = {}
     LogsStore.logs = {}
     LogsStore.messages = []
     LogsStore.data = {}
@@ -130,6 +165,7 @@ export class Logger {
           case 'trace':
             break
           case 'config':
+            LogsStore.config[key] = value
             break
           default:
             break
@@ -162,10 +198,7 @@ export class Logger {
             toLogsStore = true
             break
           case 'config':
-            if (!(type in LogsStore.logs)) {
-              LogsStore.logs[type] = {} as Record<string, any>
-            }
-            LogsStore.logs[type][key] = value
+            LogsStore.config[key] = value
             break
           default:
             break

@@ -223,11 +223,11 @@ The dialog can be bypassed on a per-scheme basis by creating a `network.protocol
 3. Click the "Config Editor" button
 4. Click the "Accept Risk and Continue" button
 5. In the search field, enter the config you want to create, e.g.
-    - `network.protocol-handler.external.obsidian`
-    -  `network.protocol-handler.external.logseq`
+   - `network.protocol-handler.external.obsidian`
+   - `network.protocol-handler.external.logseq`
 6. If no matching entry appears, click the "+" (New) button on the right of the novel config.
-    - Make sure the type is boolean and the value is true. By default, the setting should be set to "Boolean" and should be assigned `true` when created. 
-    - ![](docs/assets/readme/ExternalLinkConfigScreenshot.png)
+   - Make sure the type is boolean and the value is true. By default, the setting should be set to "Boolean" and should be assigned `true` when created.
+   - ![](docs/assets/readme/ExternalLinkConfigScreenshot.png)
 
 If prompts still appear for links triggered from outside Zotero, you can additionally set `network.protocol-handler.prompt-from-external` to `false` using the same procedure.
 

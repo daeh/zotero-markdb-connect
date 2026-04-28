@@ -20,6 +20,7 @@ declare namespace _ZoteroTypes {
       "mdeditor": string;
       "obsidianvaultname": string;
       "obsidianresolvespec": string;
+      "obsidianpanetype": string;
       "logseqgraph": string;
       "logseqprefix": string;
       "grouplibraries": string;

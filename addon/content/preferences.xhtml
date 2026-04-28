@@ -321,6 +321,35 @@
               </hbox>
             </hbox>
           </groupbox>
+
+          <separator />
+
+          <groupbox>
+            <description class="mdbc-pref-explication-minor mdbc-pref-description-indent"
+              >Which pane Obsidian uses when opening a note. "Pop-out window" requires Obsidian 1.11 or newer (desktop only).</description
+            >
+            <hbox>
+              <hbox align="center">
+                <label value="Open note in" />
+                <menulist
+                  id="zotero-prefpane-__addonRef__-obsidianpanetype"
+                  preference="obsidianpanetype"
+                  native="true">
+                  <menupopup>
+                    <menuitem
+                      label="Open in new tab"
+                      value="tab" />
+                    <menuitem
+                      label="Open in last active tab"
+                      value="active" />
+                    <menuitem
+                      label="Open in pop-out window"
+                      value="window" />
+                  </menupopup>
+                </menulist>
+              </hbox>
+            </hbox>
+          </groupbox>
         </html:div>
       </groupbox>
 

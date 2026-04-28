@@ -1024,7 +1024,7 @@ export class ScanMarkdownFiles {
     const loggedMessages = Logger.getMessages()
 
     if (displayReport) {
-      if (!DataManager.isClean() || DataManager.numberRecords() === 0) {
+      if (!DataManager.isClean() || DataManager.numberRecords() === 0 || addon.data.env === 'development') {
         await this.displayReportDialog(summaryMessages, loggedMessages)
       }
     } else if (saveLogs) {
