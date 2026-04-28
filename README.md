@@ -35,9 +35,10 @@ Opens an existing markdown note in [Obsidian](https://obsidian.md), [logseq](htt
 - Restart Zotero
 
 > [!NOTE]
-> The last release for Zotero 6 was [`v0.0.27`](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.0.27).
->
 > The last release for Zotero 7 and 8 was [`v0.1.8`](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.1.8).
+> 
+> The last release for Zotero 6 was [`v0.0.27`](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.0.27).
+
 
 ## Setup
 
