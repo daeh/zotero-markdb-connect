@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ES2023",
+    "lib": ["ES2023", "ESNext.Temporal"],
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "verbatimModuleSyntax": true,
+    "erasableSyntaxOnly": true,
+    "rewriteRelativeImportExtensions": true,
+    "noEmit": true,
+    "composite": false,
+    "incremental": false,
+    "skipLibCheck": true,
+    "types": ["node"]
+  },
+  "include": ["./**/*.test.ts", "../src/utils/time.ts", "../src/utils/noteName.ts", "../src/utils/json.ts"]
+}

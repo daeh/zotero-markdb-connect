@@ -1,10 +1,9 @@
 /* eslint-disable no-undef */
 
 /**
- * Most of this code is from Zotero team's official Make It Red example[1]
- * or the Zotero 7 documentation[2].
- * [1] https://github.com/zotero/make-it-red
- * [2] https://www.zotero.org/support/dev/zotero_7_for_developers
+ * Adapted from Zotero's Make It Red example and Zotero 7 developer documentation:
+ * https://github.com/zotero/make-it-red
+ * https://www.zotero.org/support/dev/zotero_7_for_developers
  */
 
 var chromeHandle
@@ -14,7 +13,7 @@ function install(data, reason) {}
 async function startup({ id, version, resourceURI, rootURI }, reason) {
   await Zotero.initializationPromise
 
-  // String 'rootURI' introduced in Zotero 7
+  // Zotero 7 introduced rootURI; earlier versions provide resourceURI.
   if (!rootURI) {
     rootURI = resourceURI.spec
   }
@@ -25,27 +24,23 @@ async function startup({ id, version, resourceURI, rootURI }, reason) {
   var manifestURI = Services.io.newURI(rootURI + 'manifest.json')
   chromeHandle = aomStartup.registerChrome(manifestURI, [['content', '__addonRef__', rootURI + 'content/']])
 
-  /**
-   * Global variables for plugin code.
-   * The `_globalThis` is the global root variable of the plugin sandbox environment
-   * and all child variables assigned to it is globally accessible.
-   * See `src/index.ts` for details.
-   */
+  // `_globalThis` is the plugin sandbox's global root. Its properties are
+  // available throughout plugin code; see `src/index.ts`.
   const ctx = {
     rootURI,
   }
   ctx._globalThis = ctx
 
   Services.scriptloader.loadSubScript(`${rootURI}/content/scripts/__addonRef__.js`, ctx)
-  Zotero.__addonInstance__.hooks.onStartup()
+  await Zotero.__addonInstance__.hooks.onStartup()
 }
 
 async function onMainWindowLoad({ window }, reason) {
-  Zotero.__addonInstance__?.hooks.onMainWindowLoad(window)
+  await Zotero.__addonInstance__?.hooks.onMainWindowLoad(window)
 }
 
 async function onMainWindowUnload({ window }, reason) {
-  Zotero.__addonInstance__?.hooks.onMainWindowUnload(window)
+  await Zotero.__addonInstance__?.hooks.onMainWindowUnload(window)
 }
 
 function shutdown({ id, version, resourceURI, rootURI }, reason) {

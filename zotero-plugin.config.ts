@@ -1,8 +1,40 @@
-import { copyFileSync } from 'fs'
+import { createHash } from 'node:crypto'
+import { copyFile, cp, mkdir, readFile } from 'node:fs/promises'
+import { resolve } from 'node:path'
 
 import { defineConfig } from 'zotero-plugin-scaffold'
 
 import pkg from './package.json'
+
+const CHAI_SHA256 = 'bdc229d660afad0313fc10d6afb5a339956a18c4c6e819d3eb5d8b94f314c202'
+const MOCHA_SHA256 = '8f46c07ab4422da71bdb27e8f54d0a9ba59b736face2c9f5534c414623c55ef6'
+
+const chaiSource = resolve('test/vendor/chai.js')
+const mochaSource = resolve('node_modules/mocha/mocha.js')
+const scaffoldCache = resolve('.scaffold/cache')
+const scaffoldTestVault = resolve('.scaffold/test/data/fixture-vault')
+const testFixtureVault = resolve('test/fixtures/vault')
+
+async function verifySha256(filePath: string, expected: string): Promise<void> {
+  const actual = createHash('sha256')
+    .update(await readFile(filePath))
+    .digest('hex')
+  if (actual !== expected) {
+    throw new Error(`SHA-256 mismatch for ${filePath}: expected ${expected}, got ${actual}`)
+  }
+}
+
+async function prepareZoteroTestHarness(): Promise<void> {
+  await Promise.all([verifySha256(chaiSource, CHAI_SHA256), verifySha256(mochaSource, MOCHA_SHA256)])
+  await Promise.all([
+    mkdir(scaffoldCache, { recursive: true }),
+    cp(testFixtureVault, scaffoldTestVault, { recursive: true }),
+  ])
+  await Promise.all([
+    copyFile(chaiSource, resolve(scaffoldCache, 'chai.js')),
+    copyFile(mochaSource, resolve(scaffoldCache, 'mocha.js')),
+  ])
+}
 
 export default defineConfig({
   source: ['src', 'addon'],
@@ -10,9 +42,8 @@ export default defineConfig({
   name: pkg.config.addonName,
   id: pkg.config.addonID,
   namespace: pkg.config.addonRef,
-  // updateURL: `https://github.com/{{owner}}/{{repo}}/releases/download/release/${
-  //   pkg.version.includes('-') ? 'update-beta.json' : 'update.json'
-  // }`,
+  // Keep the XPI basename at markdb-connect.xpi to match update manifest links.
+  xpiName: pkg.name,
   updateURL: `https://raw.githubusercontent.com/{{owner}}/{{repo}}/main/${
     pkg.version.includes('-') ? 'update-beta.json' : 'update.json'
   }`,
@@ -38,35 +69,27 @@ export default defineConfig({
           __env__: `"${process.env.NODE_ENV}"`,
         },
         bundle: true,
-        target: 'firefox115',
+        format: 'iife',
+        platform: 'browser',
+        target: 'firefox140',
         outfile: `.scaffold/build/addon/content/scripts/${pkg.config.addonRef}.js`,
       },
     ],
-    // If you want to checkout update.json into the repository, uncomment the following lines:
+    // Leave generated manifests in .scaffold/build; root manifests have legacy ranges and two add-on blocks.
     makeUpdateJson: {
       hash: false,
     },
+  },
+
+  test: {
+    waitForPlugin: `() => Zotero.${pkg.config.addonInstance}.data.initialized`,
     hooks: {
-      'build:makeUpdateJSON': (_ctx) => {
-        try {
-          copyFileSync('.scaffold/build/update.json', 'update_gitignore.json')
-        } catch (err) {
-          console.log('Some Error: ', err)
-        }
-        try {
-          copyFileSync('.scaffold/build/update-beta.json', 'update-beta_gitignore.json')
-        } catch (err) {
-          console.log('Some Error: ', err)
-        }
+      'test:init': async (ctx) => {
+        await prepareZoteroTestHarness()
+        ctx.test.prefs[`${pkg.config.prefsPrefix}.sourcedir`] = scaffoldTestVault
+        // Verify startup repairs an invalid persisted debug mode.
+        ctx.test.prefs[`${pkg.config.prefsPrefix}.debugmode`] = 'invalid-test-value'
       },
     },
   },
-  // release: {
-  //   bumpp: {
-  //     execute: "npm run build",
-  //   },
-  // },
-
-  // If you need to see a more detailed build log, uncomment the following line:
-  // logLevel: "trace",
 })

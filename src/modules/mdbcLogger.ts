@@ -1,24 +1,45 @@
 import { config, version } from '../../package.json'
-import { getPref } from '../utils/prefs'
+import {
+  assembleDump,
+  type JsonObject,
+  type JsonValue,
+  type LoggerDump,
+  safeJsonClone,
+  safeJsonObjectClone,
+} from '../utils/json'
+import { getPref, setPref } from '../utils/prefs'
+import { elapsedMs, formatTimestamp } from '../utils/time'
+
+import { paramVals } from './mdbcConstants'
 
 import type { DebugMode, LogType, messageData } from '../mdbcTypes'
 
+const getInitialDebugMode = (): DebugMode => {
+  const valueRaw = getPref('debugmode')
+  const valueVerified = paramVals.debugmode.find((validMode) => validMode === valueRaw)
+  if (valueVerified) return valueVerified
+
+  const valueDefault = paramVals.debugmode[0]
+  setPref('debugmode', valueDefault)
+  return valueDefault
+}
+
 class LogsStore {
-  static debug: DebugMode = getPref('debugmode') as DebugMode
+  static debug: DebugMode = getInitialDebugMode()
   static time = {
-    init: Date.now(),
-    last: Date.now(),
+    init: Temporal.Now.instant(),
+    last: Temporal.Now.instant(),
   }
-  static info: Record<string, string> = {}
-  static config: Record<string, any> = {}
-  static logs: Record<string, any> = {}
-  static data: Record<string, any> = {}
+  static info: JsonObject = {}
+  static config: JsonObject = {}
+  static logs: JsonObject = {}
+  static data: JsonObject = {}
   static messages: messageData[] = []
 }
 
 export class Logger {
-  private static async collectInfo(): Promise<Record<string, any>> {
-    const info: Record<string, any> = {
+  private static async collectInfo(): Promise<JsonObject> {
+    const info: JsonObject = {
       MDBC: version,
       Zotero: Zotero.version,
       clientName: Zotero.clientName,
@@ -26,7 +47,7 @@ export class Logger {
       platformMajorVersion: Zotero.platformMajorVersion,
       locale: Zotero.locale,
       env: addon.data.env,
-      timestamp: new Date().toString(),
+      timestamp: formatTimestamp(Temporal.Now.zonedDateTimeISO()),
     }
     try {
       info.osVersion = await Zotero.getOSVersion()
@@ -38,21 +59,21 @@ export class Logger {
     } catch (err) {
       info.extensions = `ERROR :: ${getErrorMessage(err)}`
     }
-    LogsStore.info = info
-    return info
+    LogsStore.info = safeJsonObjectClone(info)
+    return LogsStore.info
   }
 
-  static async dump() {
+  static async dump(): Promise<LoggerDump> {
     await this.collectInfo()
-    return {
+    return assembleDump({
       info: LogsStore.info,
       config: LogsStore.config,
       logs: LogsStore.logs,
       data: LogsStore.data,
-    }
+    })
   }
 
-  static getLogs() {
+  static getLogs(): JsonObject {
     return LogsStore.logs
   }
 
@@ -80,11 +101,10 @@ export class Logger {
     LogsStore.debug = mode
   }
 
-  private static updateTime() {
+  private static updateTime(): number {
     const init = LogsStore.time.init
-    const current = Date.now()
-    // const last = LogsStore.time.last
-    const delta = current - init
+    const current = Temporal.Now.instant()
+    const delta = elapsedMs(init, current)
     LogsStore.time.last = current
     return delta
   }
@@ -93,52 +113,43 @@ export class Logger {
     LogsStore.messages.push(messageData)
   }
 
-  static addData<T>(key: string, valueIn: T, overwrite = true) {
+  static addData(key: string, valueIn: unknown, overwrite = true) {
     if (LogsStore.debug === 'minimal') {
       LogsStore.data[key] = 'not stored in minimal debugging mode'
     } else {
-      const value: T = JSON.parse(JSON.stringify(valueIn))
-      if (!(key in LogsStore.data) || LogsStore.data[key] === undefined) {
+      const value = safeJsonClone(valueIn)
+      const existing = LogsStore.data[key]
+      if (existing === undefined || overwrite) {
         LogsStore.data[key] = value
+      } else if (Array.isArray(existing)) {
+        existing.push(value)
       } else {
-        //// if property already exists ////
-        if (overwrite) {
-          delete LogsStore.data[key]
-          LogsStore.data[key] = value
-        } else if (Array.isArray(LogsStore.data[key])) {
-          LogsStore.data[key].push(value)
-        } else {
-          LogsStore.data[key] = [LogsStore.data[key], value]
-        }
+        LogsStore.data[key] = [existing, value]
       }
     }
   }
 
-  static getData(key: string) {
+  static getData(key: string): JsonValue | undefined {
     if (key in LogsStore.data) {
       return LogsStore.data[key]
     }
+    return undefined
   }
 
-  static addLog(key: string, value: any, overwrite = false) {
+  static addLog(key: string, value: unknown, overwrite = false) {
     const timedelta = this.updateTime()
-    const timedvalue = { msg: value, td: timedelta }
-    if (!(key in LogsStore.logs) || LogsStore.logs[key] === undefined) {
+    const timedvalue: JsonValue = { msg: safeJsonClone(value), td: timedelta }
+    const existing = LogsStore.logs[key]
+    if (existing === undefined || overwrite) {
       LogsStore.logs[key] = timedvalue
+    } else if (Array.isArray(existing)) {
+      existing.push(timedvalue)
     } else {
-      //// if property already exists ////
-      if (overwrite) {
-        delete LogsStore.logs[key]
-        LogsStore.logs[key] = timedvalue
-      } else if (Array.isArray(LogsStore.logs[key])) {
-        LogsStore.logs[key].push(timedvalue)
-      } else {
-        LogsStore.logs[key] = [LogsStore.logs[key], timedvalue]
-      }
+      LogsStore.logs[key] = [existing, timedvalue]
     }
   }
 
-  static log(key: string, value: any, overwrite = false, type: LogType = 'info'): void {
+  static log(key: string, value: unknown, overwrite = false, type: LogType = 'info'): void {
     let success = false
     try {
       let toZoteroDebugConsole = false
@@ -165,7 +176,7 @@ export class Logger {
           case 'trace':
             break
           case 'config':
-            LogsStore.config[key] = value
+            LogsStore.config[key] = safeJsonClone(value)
             break
           default:
             break
@@ -198,14 +209,14 @@ export class Logger {
             toLogsStore = true
             break
           case 'config':
-            LogsStore.config[key] = value
+            LogsStore.config[key] = safeJsonClone(value)
             break
           default:
             break
         }
       }
 
-      if (toZoteroDebugConsole) Zotero.debug(`{${config.addonInstance}}[log][${type}] ${key} :: ${value}`)
+      if (toZoteroDebugConsole) Zotero.debug(`{${config.addonInstance}}[log][${type}] ${key} :: ${String(value)}`)
       if (toZoteroErrorConsole) ztoolkit.log(`{${config.addonInstance}}[log][${type}] ${key}`, value)
       if (toLogsStore) this.addLog(key, value, overwrite)
 
@@ -216,7 +227,8 @@ export class Logger {
     }
     if (!success) {
       try {
-        LogsStore.logs[key] = [LogsStore.logs[key], value]
+        const existing = LogsStore.logs[key]
+        LogsStore.logs[key] = [existing === undefined ? null : existing, safeJsonClone(value)]
       } catch (err) {
         Zotero.debug(`{${config.addonInstance}}[log][ERROR] addDebugLog-fallback Error: ${getErrorMessage(err)}`)
         ztoolkit.log(`{${config.addonInstance}}[log][ERROR] addDebugLog-fallback Error`, err)
@@ -225,10 +237,24 @@ export class Logger {
   }
 }
 
-export function trace(target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor) {
-  const original = descriptor.value
-  const identifier = `${target.name}.${String(propertyKey)}`
-  descriptor.value = function (...args: any) {
+type DecoratedMethod = (this: unknown, ...args: unknown[]) => unknown
+
+function isDecoratedMethod(value: unknown): value is DecoratedMethod {
+  return typeof value === 'function'
+}
+
+export function trace(
+  target: object,
+  propertyKey: string | symbol,
+  descriptor: PropertyDescriptor,
+): PropertyDescriptor {
+  const original: unknown = descriptor.value
+  if (!isDecoratedMethod(original)) {
+    throw new TypeError(`Cannot trace non-callable property ${String(propertyKey)}`)
+  }
+  const targetName = 'name' in target && typeof target.name === 'string' ? target.name : undefined
+  const identifier = `${targetName}.${String(propertyKey)}`
+  descriptor.value = function (this: unknown, ...args: unknown[]): unknown {
     try {
       Zotero.debug(`{${config.addonInstance}}[call] : ${identifier}`)
       if (LogsStore.debug === 'maximal') {
@@ -238,9 +264,9 @@ export function trace(target: any, propertyKey: string | symbol, descriptor: Pro
     } catch (err) {
       ztoolkit.log(`{${config.addonInstance}}[call][ERROR] : SOME ERROR`)
       Zotero.debug(
-        `{${config.addonInstance}}[call][ERROR] : ${target.name}.${String(propertyKey)} :: ${getErrorMessage(err)}`,
+        `{${config.addonInstance}}[call][ERROR] : ${targetName}.${String(propertyKey)} :: ${getErrorMessage(err)}`,
       )
-      ztoolkit.log(`{${config.addonInstance}}[call][ERROR] : ${target.name}.${String(propertyKey)}`, err)
+      ztoolkit.log(`{${config.addonInstance}}[call][ERROR] : ${targetName}.${String(propertyKey)}`, err)
       Logger.log('trace', `ERROR : ${identifier} :: ${getErrorMessage(err)}`, false, 'error')
       throw err
     }

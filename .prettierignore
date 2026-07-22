@@ -1,5 +1,4 @@
 **/.git/
-**/.github/
 **/.vscode/
 **/.idea/
 **/build/
@@ -13,3 +12,19 @@ yarn.lock
 pnpm-lock.yaml
 **/*_lintignore*
 **/*-lintignore*
+
+# Local scratch directories
+**/.scaffold/
+_agents/
+_memories/
+_development/
+
+# SHA-256-pinned third-party bundle
+test/vendor/chai.js
+
+# Scaffold-generated typings
+typings/i10n.d.ts
+typings/prefs.d.ts
+
+# Hand-formatted documentation
+README.md

@@ -2,9 +2,13 @@ import { config } from '../../package.json'
 
 export { initLocale, getString, getLocaleID }
 
-/**
- * Initialize locale data
- */
+interface GetStringOptions {
+  branch?: string
+  args?: L10nArgs
+}
+
+type GetStringInputs = [localString: string] | [localString: string, branchOrOptions: string | GetStringOptions]
+
 function initLocale() {
   const l10n = new (typeof Localization === 'undefined' ? ztoolkit.getGlobal('Localization') : Localization)(
     [`${config.addonRef}-addon.ftl`],
@@ -16,35 +20,14 @@ function initLocale() {
 }
 
 /**
- * Get locale string, see https://firefox-source-docs.mozilla.org/l10n/fluent/tutorial.html#fluent-translation-list-ftl
- * @param localString ftl key
- * @param options.branch branch name
- * @param options.args args
- * @example
- * ```ftl
- * # addon.ftl
- * addon-static-example = This is default branch!
- *     .branch-example = This is a branch under addon-static-example!
- * addon-dynamic-example =
-    { $count ->
-        [one] I have { $count } apple
-       *[other] I have { $count } apples
-    }
- * ```
- * ```js
- * getString("addon-static-example"); // This is default branch!
- * getString("addon-static-example", { branch: "branch-example" }); // This is a branch under addon-static-example!
- * getString("addon-dynamic-example", { args: { count: 1 } }); // I have 1 apple
- * getString("addon-dynamic-example", { args: { count: 2 } }); // I have 2 apples
- * ```
+ * Format an add-on Fluent message or attribute.
+ * Returns the prefixed message ID when no value is found.
+ * @see https://firefox-source-docs.mozilla.org/l10n/fluent/tutorial.html#fluent-translation-list-ftl
  */
 function getString(localString: string): string
 function getString(localString: string, branch: string): string
-function getString(
-  localeString: string,
-  options: { branch?: string | undefined; args?: Record<string, unknown> },
-): string
-function getString(...inputs: any[]) {
+function getString(localeString: string, options: GetStringOptions): string
+function getString(...inputs: GetStringInputs): string {
   if (inputs.length === 1) {
     return _getString(inputs[0])
   } else if (inputs.length === 2) {
@@ -58,13 +41,12 @@ function getString(...inputs: any[]) {
   }
 }
 
-function _getString(
-  localeString: string,
-  options: { branch?: string | undefined; args?: Record<string, unknown> } = {},
-): string {
+function _getString(localeString: string, options: GetStringOptions = {}): string {
   const localStringWithPrefix = `${config.addonRef}-${localeString}`
   const { branch, args } = options
-  const pattern = addon.data.locale?.current.formatMessagesSync([{ id: localStringWithPrefix, args }])[0]
+  const messageKey: L10nIdArgs =
+    args === undefined ? { id: localStringWithPrefix } : { id: localStringWithPrefix, args }
+  const pattern = addon.data.locale?.current.formatMessagesSync([messageKey])?.[0]
   if (!pattern) {
     return localStringWithPrefix
   }
@@ -74,7 +56,8 @@ function _getString(
         return attr.value
       }
     }
-    return pattern.attributes[branch] || localStringWithPrefix
+    const legacyBranchValue: unknown = Reflect.get(pattern.attributes, branch)
+    return typeof legacyBranchValue === 'string' ? legacyBranchValue : localStringWithPrefix
   } else {
     return pattern.value || localStringWithPrefix
   }

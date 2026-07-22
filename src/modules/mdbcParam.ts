@@ -9,7 +9,6 @@ import type { ParamKey, ParamValue } from './mdbcConstants'
 
 export class getParam {
   static sourcedir() {
-    ///TYPE: path
     const name = 'sourcedir'
     const valueDefault = ''
     let valid = false
@@ -46,7 +45,6 @@ export class getParam {
         msg.push(`sourcedirpathObj.isDirectory(): ${zfileSourcedir.isDirectory()}.`)
       }
 
-      // const value = valid ? sourcedirpath : valueDefault
       param.valid = valid
       param.value = valid ? sourcedirpath : valueDefault
     } catch (err) {
@@ -66,7 +64,6 @@ export class getParam {
 
   @trace
   static filefilterstrategy() {
-    ///TYPE: enum
     const name: ParamKey = 'filefilterstrategy'
     const valueDefault = paramVals[name][0]
     const valid = true
@@ -90,7 +87,6 @@ export class getParam {
 
   @trace
   static filepattern() {
-    ///TYPE: regex
     const name = 'filepattern'
     const valueDefault = '^@(\\S+).*\\.md$'
     const valid = true
@@ -120,7 +116,6 @@ export class getParam {
 
   @trace
   static matchstrategy() {
-    ///TYPE: enum
     const name: ParamKey = 'matchstrategy'
     const valueDefault = paramVals[name][0]
     const valid = true
@@ -144,7 +139,6 @@ export class getParam {
 
   @trace
   static yamlkeyword() {
-    ///TYPE: string
     const name = 'yamlkeyword'
     const valueDefault = ''
     let verified = false
@@ -155,7 +149,6 @@ export class getParam {
     const valueRaw = getPref(name)
     msg.push(`pref value: >>${valueRaw}<<.`)
 
-    /// NB checkMetadataFormat() will show a notification
     if (valueRaw && typeof valueRaw === 'string' && valueRaw.length > 0 && prefHelpers.checkMetadataFormat(valueRaw)) {
       verified = true
       valid = true
@@ -187,7 +180,6 @@ export class getParam {
 
   @trace
   static citekeypattern() {
-    ///TYPE: regex
     const name = 'citekeypattern'
     const valueDefault = ''
     let valid = false
@@ -221,7 +213,6 @@ export class getParam {
 
   @trace
   static zotkeyregexp() {
-    ///TYPE: regex
     const name = 'zotkeyregexp'
     const valueDefault = ''
     let valid = false
@@ -255,7 +246,6 @@ export class getParam {
 
   @trace
   static mdeditor() {
-    ///TYPE: enum
     const name: ParamKey = 'mdeditor'
     const valueDefault = paramVals[name][0]
     const valid = true
@@ -279,7 +269,6 @@ export class getParam {
 
   @trace
   static obsidianresolve() {
-    ///TYPE: enum
     const name: ParamKey = 'obsidianresolvespec'
     const valueDefault = paramVals[name][0]
     const valid = true
@@ -303,7 +292,6 @@ export class getParam {
 
   @trace
   static obsidianpanetype() {
-    ///TYPE: enum
     const name: ParamKey = 'obsidianpanetype'
     const valueDefault = paramVals[name][0]
     const valid = true
@@ -327,7 +315,6 @@ export class getParam {
 
   @trace
   static obsidianvaultname() {
-    ///TYPE: string
     const name = 'obsidianvaultname'
     const valueDefault = ''
     let value = valueDefault
@@ -338,7 +325,6 @@ export class getParam {
     const valueRaw = getPref(name)
     msg.push(`pref value: >>${valueRaw}<<.`)
 
-    /// NB checkMetadataFormat() will show a notification
     if (valueRaw && typeof valueRaw === 'string' && valueRaw.length > 0 && prefHelpers.checkMetadataFormat(valueRaw)) {
       verified = true
       valid = true
@@ -369,7 +355,6 @@ export class getParam {
 
   @trace
   static logseqgraph() {
-    ///TYPE: string
     const name = 'logseqgraph'
     const valueDefault = ''
     let value = valueDefault
@@ -380,7 +365,6 @@ export class getParam {
     const valueRaw = getPref(name)
     msg.push(`pref value: >>${valueRaw}<<.`)
 
-    /// NB checkMetadataFormat() will show a notification
     if (valueRaw && typeof valueRaw === 'string' && valueRaw.length > 0 && prefHelpers.checkMetadataFormat(valueRaw)) {
       verified = true
       valid = true
@@ -411,7 +395,6 @@ export class getParam {
 
   @trace
   static logseqprefix() {
-    ///TYPE: string
     const name = 'logseqprefix'
     const valueDefault = ''
     let value = valueDefault
@@ -422,7 +405,6 @@ export class getParam {
     const valueRaw = getPref(name)
     msg.push(`pref value: >>${valueRaw}<<.`)
 
-    /// NB checkMetadataFormat() will show a notification
     if (valueRaw && typeof valueRaw === 'string' && valueRaw.length > 0 && prefHelpers.checkMetadataFormat(valueRaw)) {
       verified = true
       valid = true
@@ -453,7 +435,6 @@ export class getParam {
 
   @trace
   static grouplibraries() {
-    ///TYPE: enum
     const name: ParamKey = 'grouplibraries'
     const valueDefault = paramVals[name][0]
     const valid = true
@@ -477,7 +458,6 @@ export class getParam {
 
   @trace
   static removetags() {
-    ///TYPE: enum
     const name: ParamKey = 'removetags'
     const valueDefault = paramVals[name][0]
     const valid = true
@@ -501,7 +481,6 @@ export class getParam {
 
   @trace
   static tagstr() {
-    ///TYPE: string
     const name = 'tagstr'
     const valueDefault = 'ObsCite'
     let value = valueDefault
@@ -512,8 +491,7 @@ export class getParam {
     const valueRaw = getPref(name)
     msg.push(`pref value: >>${valueRaw}<<.`)
 
-    /// NB checkMetadataFormat() will show a notification
-    if (valueRaw && typeof valueRaw === 'string' && valueRaw.length > 0 && prefHelpers.checkMetadataFormat(valueRaw)) {
+    if (valueRaw && typeof valueRaw === 'string' && valueRaw.length > 0 && prefHelpers.checkTagStr(valueRaw)) {
       verified = true
       valid = true
       value = valueRaw
@@ -543,7 +521,6 @@ export class getParam {
 
   @trace
   static debugmode() {
-    ///TYPE: enum
     const name: ParamKey = 'debugmode'
     const valueDefault = paramVals[name][0]
     const valid = true

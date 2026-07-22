@@ -1,9 +1,3 @@
-<!--https://www.oreilly.com/library/view/creating-applications-with/9780596000523/07_chapter-03.html-->
-<!-- Three tags available in XUL handle basic text display in the UI, and each has its own context for use. They include a <caption>, a <label>, and a <description> element. -->
-<!-- The caption is designed specifically for the text that appears inline in the border of a group box. You can control where the caption appears by putting the caption element above or below the other content in the group box: -->
-<!-- label is more flexible than caption because it isn't tied to a particular widget and can even be used as a standalone. -->
-<!-- For longer text, the <description> element is best. You can embed text in the description element and have it wrap to the maximum size of the containing element: -->
-
 <linkset>
   <html:link
     rel="localization"
@@ -17,10 +11,6 @@
   id="zotero-prefpane-__addonRef__"
   onload="Zotero.__addonInstance__.hooks.onPrefsEvent('load', { window })">
   <groupbox>
-    <!--<label class="mdbc-pref-text-center"><html:h1 data-l10n-id="pref-title"> </html:h1></label>-->
-    <!--<caption-->
-    <!--  class="mdbc-pref-hone"-->
-    <!--  data-l10n-id="pref-title" />-->
     <label
       class="mdbc-pref-text-center mdbc-pref-label-hone"
       data-l10n-id="pref-title" />
@@ -30,9 +20,6 @@
     <caption
       class="mdbc-pref-section-title"
       data-l10n-id="pref-locate-mdfiles" />
-    <!--<caption class="mdbc-pref-section-title">-->
-    <!--  <html:span data-l10n-id="pref-locate-mdfiles"> </html:span>-->
-    <!--</caption>-->
 
     <separator />
 
@@ -80,8 +67,6 @@
         >
       </html:div>
 
-      <!--<separator />-->
-
       <radio
         id="zotero-prefpane-__addonRef__-filefilterstrategy-custom"
         value="customfileregexp"
@@ -110,13 +95,11 @@
             ><html:code>/i</html:code></html:span
           >
         </hbox>
-        <!--<description class="mdbc-pref-explication-minor">The default file filter looks for Markdown files beginning with '<html:code>@</html:code>' : <html:code>/^@.+\.md$/i</html:code> </description>-->
         <description class="mdbc-pref-description-indent">If the citation key is present in the filename pattern, you can include one capturing group to match it.</description>
         <description class="mdbc-pref-description-indent"
           >E.g. the default RegExp filters for MarkDown files that begin with <html:code>@</html:code> and attempts to use the subsequent non-whitespace characters as the citation key:</description
         >
         <description class="mdbc-pref-description-indent"><html:code class="mdbc-pref-code-indent">/^@(\S+).*\.md$/i</html:code></description>
-        <!--<description class="mdbc-pref-description-indent">E.g. to simply filter for MarkDown files beginning with <html:code>@</html:code>: <html:code>/^@.+\.md$/i</html:code></description>-->
       </html:div>
     </radiogroup>
   </groupbox>
@@ -148,8 +131,6 @@
           id="zotero-prefpane-__addonRef__-matchstrategy-citekeyyaml-options">
           <label>__addonName__ will search for a citation key in the YAML metadata.</label>
 
-          <!--<separator />-->
-
           <description>Specify the markdown YAML metadata keyword (optional if citation key is in title, required otherwise).</description>
           <hbox class="mdbc-pref-hbox-indent">
             <html:span class="mdbc-pref-options-span-first">YAML keyword: </html:span
@@ -168,8 +149,6 @@
         </html:div>
       </groupbox>
 
-      <!--<separator />-->
-
       <groupbox>
         <radio
           id="zotero-prefpane-__addonRef__-matchstrategy-citekeyregexp"
@@ -186,8 +165,6 @@
           class="mdbc-pref-options-div"
           id="zotero-prefpane-__addonRef__-matchstrategy-citekeyregexp-options">
           <label>__addonName__ will search for a citation key using a custom RegExp.</label>
-
-          <!--<separator />-->
 
           <description>RegExp to match citation key in file content (optional if citation key is in title, required otherwise)</description>
           <hbox class="mdbc-pref-hbox-indent">
@@ -211,8 +188,6 @@
         </html:div>
       </groupbox>
 
-      <!--<separator />-->
-
       <groupbox>
         <radio
           id="zotero-prefpane-__addonRef__-matchstrategy-zotid"
@@ -229,8 +204,6 @@
           class="mdbc-pref-options-div"
           id="zotero-prefpane-__addonRef__-matchstrategy-zotid-options">
           <label>__addonName__ will search for a Zotero-Item-Key in the note's contents.</label>
-
-          <!--<separator />-->
 
           <description>Required: Specify a RegExp to match the Zotero-Item-Key from the markdown contents.</description>
           <hbox class="mdbc-pref-hbox-indent">
@@ -256,7 +229,6 @@
 
   <separator />
 
-  <!-- LAUNCHING MD FILES SETTINGS -->
   <groupbox class="mdbc-pref-section-box">
     <caption class="mdbc-pref-section-title">
       Open Markdown Files using:
@@ -265,7 +237,6 @@
     <radiogroup
       id="zotero-prefpane-__addonRef__-mdeditor"
       preference="mdeditor">
-      <!-- obsidian file resolution -->
       <groupbox>
         <radio
           id="zotero-prefpane-__addonRef__-mdeditor-obsidian"
@@ -353,9 +324,6 @@
         </html:div>
       </groupbox>
 
-      <!--<separator />-->
-
-      <!-- use logseq -->
       <groupbox>
         <radio
           id="zotero-prefpane-__addonRef__-mdeditor-logseq"
@@ -407,9 +375,6 @@
         </html:div>
       </groupbox>
 
-      <!--<separator />-->
-
-      <!-- use system default -->
       <groupbox>
         <radio
           id="zotero-prefpane-__addonRef__-mdeditor-system"
@@ -433,13 +398,11 @@
 
   <separator />
 
-  <!-- ADVANCED SETTINGS -->
   <groupbox class="mdbc-pref-section-box">
     <caption class="mdbc-pref-section-title">
       Advanced Settings
     </caption>
 
-    <!-- keyboard shortcut to open linked note -->
     <label class="mdbc-pref-subsection-title">Keyboard Shortcut to Open Linked Note</label>
     <html:div class="mdbc-pref-options-div">
       <groupbox>
@@ -457,9 +420,6 @@
       </groupbox>
     </html:div>
 
-    <!--<separator />-->
-
-    <!-- tag name -->
     <label class="mdbc-pref-subsection-title">Specify a Custom Tag Name?</label>
     <html:div class="mdbc-pref-options-div">
       <groupbox>
@@ -476,9 +436,6 @@
       </groupbox>
     </html:div>
 
-    <!--<separator />-->
-
-    <!-- include group libraries -->
     <label class="mdbc-pref-subsection-title">Include Group Libraries?</label>
     <html:div class="mdbc-pref-options-div">
       <groupbox>
@@ -497,9 +454,6 @@
       </groupbox>
     </html:div>
 
-    <!--<separator />-->
-
-    <!-- remove tag from Zotero items without notes -->
     <label class="mdbc-pref-subsection-title">Remove tags from unmatched Zotero items?</label>
     <html:div class="mdbc-pref-options-div">
       <groupbox>
@@ -517,19 +471,15 @@
         <description>Certain special use cases may prefer to not remove tags from Zotero items.</description>
       </groupbox>
     </html:div>
-
-    <!--<separator />-->
   </groupbox>
 
   <separator />
 
-  <!-- TROUBLESHOOTING -->
   <groupbox class="mdbc-pref-section-box">
     <caption class="mdbc-pref-section-title">
       Troubleshooting
     </caption>
 
-    <!-- generate debugging log -->
     <label class="mdbc-pref-subsection-title">Save Debugging Log</label>
     <html:div class="mdbc-pref-options-div">
       <groupbox>
@@ -541,9 +491,6 @@
       </groupbox>
     </html:div>
 
-    <!--<separator />-->
-
-    <!-- open github issues -->
     <label class="mdbc-pref-subsection-title">Git Help</label>
     <html:div class="mdbc-pref-options-div">
       <groupbox>
@@ -558,7 +505,6 @@
       </groupbox>
     </html:div>
 
-    <!-- debug log level -->
     <label class="mdbc-pref-subsection-title">Debug Log Level</label>
     <html:div class="mdbc-pref-options-div">
       <groupbox>
@@ -588,8 +534,6 @@
       </groupbox>
     </html:div>
   </groupbox>
-
-  <!--<separator />-->
 </vbox>
 
 <vbox>

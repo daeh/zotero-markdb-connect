@@ -3,33 +3,28 @@
   "compilerOptions": {
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "target": "ES2018",
-    "lib": [
-      "ESNext",
-      "DOM",
-      "DOM.Iterable",
-      "ES2021.WeakRef"
-      // "webworker",
-    ],
+    "target": "ES2023",
+    "lib": ["ES2023", "ES2025.RegExp", "ESNext.Temporal", "DOM", "DOM.Iterable"],
+    // Legacy decorators require assignment semantics for class fields.
+    "useDefineForClassFields": false,
     "types": ["zotero-types"],
-    "outDir": "build/dist/",
 
-    /*  */
     "experimentalDecorators": true,
     "resolveJsonModule": true,
+    // Prevent no-emit type checks from writing tsconfig.tsbuildinfo.
+    "composite": false,
+    "incremental": false,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    // Bundled Zotero, DOM, React, and EPUB declarations conflict.
     "skipLibCheck": true,
     "noEmit": true,
-    // "strict": true,
+    "strict": true,
 
-    /*  */
-    // "isolatedModules": true, // for bundlers like vite. Setting the isolatedModules flag tells TypeScript to warn you if you write certain code that can’t be correctly interpreted by a single-file transpilation process.
-    // "esModuleInterop": true,
-
-    // "allowImportingTsExtensions": true,
-    // "allowSyntheticDefaultImports": false,
-
-    /* Linting */
+    "noUncheckedSideEffectImports": true,
     "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
     "forceConsistentCasingInFileNames": true
   },
   "include": ["src", "typings", "package.json", "node_modules/zotero-types"],

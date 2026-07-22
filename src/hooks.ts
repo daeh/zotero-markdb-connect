@@ -1,5 +1,5 @@
 import { DataManager } from './dataGlobals'
-import { Logger } from './modules/mdbcLogger'
+import { getErrorMessage, Logger } from './modules/mdbcLogger'
 import { ScanMarkdownFiles } from './modules/mdbcScan'
 import { wrappers } from './modules/mdbcStartupHelpers'
 import { KeyboardShortcuts, Notifier, prefHelpers, Registrar, systemInterface, UIHelpers } from './modules/mdbcUX'
@@ -7,24 +7,29 @@ import { registerPrefsScripts } from './modules/preferenceScript'
 import { getString, initLocale } from './utils/locale'
 import { createZToolkit } from './utils/ztoolkit'
 
+type PrefsEvent =
+  | [type: 'load', data: { window: Window }]
+  | [type: 'chooseVaultFolder' | 'syncMarkDBSaveDebug', data?: undefined]
+  | [type: 'checkMetadataFormat' | 'checkRegExpValid' | 'checkTagStr', data: { value: string }]
+
 async function onStartup() {
   await Promise.all([Zotero.initializationPromise, Zotero.unlockPromise, Zotero.uiReadyPromise])
 
   initLocale()
 
-  await wrappers.startupVersionCheck()
+  wrappers.startupVersionCheck()
 
   Registrar.registerPrefs()
 
   await Promise.all(Zotero.getMainWindows().map((win) => onMainWindowLoad(win)))
+
+  addon.data.initialized = true
 }
 
 async function onMainWindowLoad(win: _ZoteroTypes.MainWindow): Promise<void> {
-  // Create ztoolkit for every window
   addon.data.ztoolkit = createZToolkit()
 
-  // needed so MenuManager can resolve our l10n IDs
-  // @ts-ignore MozXULElement is a Gecko global, not in lib.dom
+  // MenuManager requires the localization IDs before registration.
   win.MozXULElement.insertFTLIfNeeded(`${addon.data.config.addonRef}-addon.ftl`)
 
   const popupWin = new ztoolkit.ProgressWindow(addon.data.config.addonName, {
@@ -39,14 +44,11 @@ async function onMainWindowLoad(win: _ZoteroTypes.MainWindow): Promise<void> {
     })
     .show()
 
-  // KeyExampleFactory.registerShortcuts();
-
   popupWin.changeLine({
     progress: 30,
     text: `[30%]  ${getString('startup-syncing')}`,
   })
 
-  // TODO Only run Sync if config check passes.
   await ScanMarkdownFiles.syncWrapper(false, false)
 
   popupWin.changeLine({
@@ -82,22 +84,19 @@ async function onMainWindowLoad(win: _ZoteroTypes.MainWindow): Promise<void> {
   popupWin.startCloseTimer(3000)
 }
 
-function syncMarkDB() {
-  //// called from tools menu ////
+async function syncMarkDB(): Promise<void> {
   const displayReport = false
   const saveLogsToggle = false
 
-  ScanMarkdownFiles.syncWrapper(displayReport, saveLogsToggle)
-    .then(() => {
-      Logger.log('syncMarkDB', 'finished', true, 'info')
-    })
-    .catch((err) => {
-      Logger.log('syncMarkDB', `ERROR :: ${err}`, true, 'error')
-    })
+  try {
+    await ScanMarkdownFiles.syncWrapper(displayReport, saveLogsToggle)
+    Logger.log('syncMarkDB', 'finished', true, 'info')
+  } catch (err) {
+    Logger.log('syncMarkDB', `ERROR :: ${getErrorMessage(err)}`, true, 'error')
+  }
 }
 
 function syncMarkDBReport() {
-  //// called from tools menu ////
   const displayReport = true
   const saveLogsToggle = false
 
@@ -111,7 +110,6 @@ function syncMarkDBReport() {
 }
 
 function syncMarkDBSaveDebug() {
-  //// called from prefs ////
   const displayReport = false
   const saveLogsToggle = true
 
@@ -121,11 +119,6 @@ function syncMarkDBSaveDebug() {
     })
     .catch((err) => {
       Logger.log('syncMarkDBSaveDebug', `ERROR :: ${err}`, true, 'error')
-      // const loggedMessages = Logger.getMessages()
-      // await
-      // ScanMarkdownFiles.displayReportDialog([], loggedMessages)
-      // await
-      // systemInterface.dumpDebuggingLog()
     })
 }
 
@@ -164,7 +157,7 @@ async function Logs() {
   return await Logger.dump()
 }
 
-async function onMainWindowUnload(win: Window): Promise<void> {
+function onMainWindowUnload(win: Window): void {
   ztoolkit.unregisterAll()
   addon.data.dialog?.window?.close()
 }
@@ -172,35 +165,28 @@ async function onMainWindowUnload(win: Window): Promise<void> {
 function onShutdown(): void {
   ztoolkit.unregisterAll()
   addon.data.dialog?.window?.close()
-  // Remove addon object
+  addon.data.initialized = false
   addon.data.alive = false
-  // @ts-ignore - Plugin instance is not typed
+  // @ts-expect-error -- Zotero's type omits dynamic addon instance properties
   delete Zotero[addon.data.config.addonInstance]
 }
 
-/**
- * This function is just an example of dispatcher for Preference UI events.
- * Any operations should be placed in a function to keep this function clear.
- * @param type event type
- * @param data event data
- */
-async function onPrefsEvent(type: string, data: Record<string, any>) {
+async function onPrefsEvent(...[type, data]: PrefsEvent): Promise<void> {
   switch (type) {
     case 'load':
-      // await registerPrefsScripts(data.window as Window)
       registerPrefsScripts(data.window)
       break
     case 'chooseVaultFolder':
       await prefHelpers.chooseVaultFolder()
       break
     case 'checkMetadataFormat':
-      prefHelpers.checkMetadataFormat(data.value as string)
+      prefHelpers.checkMetadataFormat(data.value)
       break
     case 'checkRegExpValid':
-      prefHelpers.isValidRegExp(data.value as string)
+      prefHelpers.isValidRegExp(data.value)
       break
     case 'checkTagStr':
-      prefHelpers.checkTagStr(data.value as string)
+      prefHelpers.checkTagStr(data.value)
       break
     case 'syncMarkDBSaveDebug':
       syncMarkDBSaveDebug()
@@ -210,20 +196,10 @@ async function onPrefsEvent(type: string, data: Record<string, any>) {
   }
 }
 
-// Add your hooks here. For element click, etc.
-// Keep in mind hooks only do dispatch. Don't add code that does real jobs in hooks.
-// Otherwise the code would be hard to read and maintain.
-
 function openSelectedItemNote() {
   KeyboardShortcuts.openSelectedItemNote()
 }
 
-/*
- * E.g.:
- * Zotero.MDBC.hooks.DataStore()
- * Zotero.MDBC.hooks.Logs()
- * Zotero.MDBC.hooks.openSelectedItemNote()
- */
 export default {
   onStartup,
   onShutdown,

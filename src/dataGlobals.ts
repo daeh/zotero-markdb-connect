@@ -22,7 +22,7 @@ export class DataManager {
   }
 
   static checkForKey(key: string): boolean {
-    return Object.keys(DataStore.data).includes(key)
+    return Object.hasOwn(DataStore.data, key)
   }
 
   static checkForZotId(itemId: number): boolean {
@@ -30,13 +30,15 @@ export class DataManager {
   }
 
   static getEntryList(itemId: number): Entry[] {
-    return DataStore.data[itemId.toString()]
+    return DataStore.data[itemId.toString()] ?? []
   }
   static addEntry(zotid: number, entry_res: Entry): void {
-    if (Object.keys(DataStore.data).includes(zotid.toString())) {
-      DataStore.data[zotid.toString()].push(entry_res)
+    const key = zotid.toString()
+    const existing = DataStore.data[key]
+    if (existing !== undefined) {
+      existing.push(entry_res)
     } else {
-      DataStore.data[zotid.toString()] = [entry_res]
+      DataStore.data[key] = [entry_res]
       DataStore.zotIds.push(zotid)
     }
   }

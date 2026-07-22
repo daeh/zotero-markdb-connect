@@ -4,16 +4,10 @@
     "strict": true,
     "sourceMap": false,
     "removeComments": true,
-    // "noUnusedLocals": false,
-    // "noUnusedParameters": false,
-    // "noImplicitAny": false,
-    // "noFallthroughCasesInSwitch": false
     "allowUnreachableCode": false,
     "noUnusedLocals": true,
     "noUnusedParameters": false,
-    "importHelpers": true,
     "disableSizeLimit": true,
-    // "noImplicitAny": false,
     "preserveConstEnums": true
   }
 }

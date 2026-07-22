@@ -24,29 +24,53 @@
   "scripts": {
     "start": "zotero-plugin serve",
     "build": "zotero-plugin build && tsc --noEmit",
-    "lint": "export ESLINT_USE_FLAT_CONFIG=true && export NODE_ENV=production && prettier --config prettier.config.mjs --write . && eslint --config eslint.config.mjs --fix .",
-    "lint:repo": "export ESLINT_USE_FLAT_CONFIG=true && export NODE_ENV=repo && prettier --config prettier.config.mjs --write . && eslint --config eslint.config.mjs --fix .",
-    "update-deps": "npm outdated --depth=0; npm update --save; npm update --save-dev; npm outdated --depth=0",
+    "typecheck": "npm run typecheck:app && npm run typecheck:test && npm run typecheck:zotero && npm run typecheck:repo",
+    "typecheck:app": "tsc --noEmit",
+    "typecheck:test": "tsc --noEmit -p tests/tsconfig.json",
+    "typecheck:zotero": "tsc --noEmit -p test/tsconfig.json",
+    "typecheck:repo": "tsc --noEmit -p tsconfig.repo.json",
+    "lint": "npm run format && eslint --fix .",
+    "lint:check": "eslint . --max-warnings 0",
+    "format": "prettier --config prettier.config.mjs --write .",
+    "format:check": "prettier --config prettier.config.mjs --check .",
+    "update-deps": "set -e; npm outdated --depth=0 || true; npm update --save; npm outdated --depth=0 || true",
     "release": "zotero-plugin release",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test 'tests/**/*.test.ts'",
+    "test:unit": "node --test 'tests/**/*.test.ts'",
+    "test:zotero": "zotero-plugin test --no-watch",
+    "test:zotero:watch": "zotero-plugin test"
+  },
+  "engines": {
+    "node": ">=26.0.0"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "npm",
+      "version": ">=12.0.0",
+      "onFail": "warn"
+    }
   },
   "dependencies": {
-    "tslib": "^2.8.1",
-    "zotero-plugin-toolkit": "^5.1.2"
+    "zotero-plugin-toolkit": "^5.2.0"
   },
   "devDependencies": {
-    "@stylistic/eslint-plugin": "^5.10.0",
-    "@types/node": "^25.6.0",
+    "@types/chai": "4.3.20",
+    "@types/mocha": "10.0.10",
+    "@types/node": "^26.1.1",
     "@zotero-plugin/eslint-config": "^0.6.9",
-    "eslint": "^10.2.1",
+    "eslint": "~10.7.0",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-import-resolver-typescript": "^4.4.4",
-    "eslint-plugin-import-x": "^4.16.2",
-    "eslint-plugin-prettier": "^5.5.5",
-    "prettier": "^3.8.3",
-    "typescript": "^6.0.3",
-    "typescript-eslint": "^8.59.1",
-    "zotero-plugin-scaffold": "^0.8.6",
+    "eslint-import-resolver-typescript": "^4.4.5",
+    "eslint-plugin-import-x": "^4.17.1",
+    "globals": "^17.7.0",
+    "mocha": "11.7.6",
+    "prettier": "3.9.6",
+    "typescript": "6.0.3",
+    "typescript-eslint": "^8.65.0",
+    "zotero-plugin-scaffold": "^0.8.7",
     "zotero-types": "^4.1.2"
+  },
+  "overrides": {
+    "adm-zip": "0.6.0"
   }
 }
