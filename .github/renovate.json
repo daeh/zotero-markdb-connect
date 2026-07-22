@@ -1,28 +1,24 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended",
-    ":semanticPrefixChore",
-    ":prHourlyLimitNone",
-    ":prConcurrentLimitNone",
-    ":enableVulnerabilityAlerts",
-    ":dependencyDashboard",
-    "group:allNonMajor",
-    "schedule:weekly"
-  ],
+  "extends": ["config:best-practices", ":semanticPrefixChore", ":prHourlyLimitNone", ":prConcurrentLimitNone", "group:allNonMajor", "schedule:weekly"],
   "labels": ["dependencies"],
   "packageRules": [
     {
-      "matchPackageNames": [
-        "zotero-plugin-toolkit",
-        "zotero-types",
-        "zotero-plugin-scaffold"
-      ],
-      "schedule": ["at any time"],
+      "description": "Stable (>=1.0.0) zotero packages: automerge patch + minor.",
+      "matchPackageNames": ["zotero-plugin-toolkit", "zotero-types"],
+      "matchUpdateTypes": ["minor", "patch"],
       "automerge": true
+    },
+    {
+      "description": "zotero-plugin-scaffold is 0.x, where a minor can be breaking: automerge patch only.",
+      "matchPackageNames": ["zotero-plugin-scaffold"],
+      "matchUpdateTypes": ["patch"],
+      "automerge": true
+    },
+    {
+      "description": "Cap TypeScript below 6.1 until typescript-eslint supports it.",
+      "matchPackageNames": ["typescript"],
+      "allowedVersions": "<6.1.0"
     }
-  ],
-  "git-submodules": {
-    "enabled": true
-  }
+  ]
 }

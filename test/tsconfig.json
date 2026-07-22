@@ -1,0 +1,7 @@
+{
+  "extends": "../tsconfig.base",
+  "compilerOptions": {
+    "types": ["zotero-types", "mocha", "chai"]
+  },
+  "include": ["./**/*.ts", "../src", "../typings", "../package.json"]
+}

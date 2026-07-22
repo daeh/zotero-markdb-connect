@@ -6,22 +6,25 @@ import Addon from './addon'
 
 const basicTool = new BasicTool()
 
-// @ts-ignore - Plugin instance is not typed
+// @ts-expect-error -- Zotero's type omits dynamic addon instance properties
 if (!basicTool.getGlobal('Zotero')[config.addonInstance]) {
   _globalThis.addon = new Addon()
   defineGlobal('ztoolkit', () => {
     return _globalThis.addon.data.ztoolkit
   })
-  // @ts-ignore - Plugin instance is not typed
+  // @ts-expect-error -- Zotero's type omits dynamic addon instance properties
   Zotero[config.addonInstance] = addon
 }
 
 function defineGlobal(name: Parameters<BasicTool['getGlobal']>[0]): void
-function defineGlobal(name: string, getter: () => any): void
-function defineGlobal(name: string, getter?: () => any) {
+function defineGlobal<K extends keyof typeof _globalThis>(name: K, getter: () => (typeof _globalThis)[K]): void
+function defineGlobal(name: string, getter?: () => unknown): void {
   Object.defineProperty(_globalThis, name, {
-    get() {
-      return getter ? getter() : basicTool.getGlobal(name)
+    get(): unknown {
+      if (getter) return getter()
+
+      const globalValue: unknown = basicTool.getGlobal(name)
+      return globalValue
     },
   })
 }

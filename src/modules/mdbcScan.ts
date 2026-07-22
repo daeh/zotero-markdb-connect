@@ -1,6 +1,7 @@
 import { config, version } from '../../package.json'
 import { DataManager } from '../dataGlobals'
 import { getString } from '../utils/locale'
+import { stripAndDecodeNotePrefix } from '../utils/noteName'
 import { getPref, setPref } from '../utils/prefs'
 
 import { getErrorMessage, Logger, trace } from './mdbcLogger'
@@ -8,16 +9,26 @@ import { getParam } from './mdbcParam'
 import { wrappers } from './mdbcStartupHelpers'
 import { Notifier, systemInterface } from './mdbcUX'
 
-import type { Entry, messageData, notificationData } from '../mdbcTypes'
+import type { Entry, messageData, notificationData, NotificationMessage } from '../mdbcTypes'
+import type { DialogData } from 'zotero-plugin-toolkit'
 
-// Components.utils.import('resource://gre/modules/FileUtils.jsm')
-// declare const FileUtils: any
+interface DirEntry {
+  name: string
+  path: string
+}
 
-const listDirContents = async (dirpath: string): Promise<OS.File.Entry[]> => {
-  const items: OS.File.Entry[] = []
+interface ReportDialogData extends DialogData {
+  _lastButtonId?: string
+  checkboxValue?: boolean
+  inputValue?: string
+  loadCallback: () => void
+  unloadCallback: () => void
+}
+
+const listDirContents = async (dirpath: string): Promise<DirEntry[]> => {
+  const items: DirEntry[] = []
   try {
-    /* Zotero.File.iterateDirectory calls new OS.File.DirectoryIterator(dirpath) */
-    await Zotero.File.iterateDirectory(dirpath, (item: OS.File.Entry) => {
+    await Zotero.File.iterateDirectory(dirpath, (item: DirEntry) => {
       if (!item.name.startsWith('.')) {
         items.push(item)
       }
@@ -28,10 +39,10 @@ const listDirContents = async (dirpath: string): Promise<OS.File.Entry[]> => {
   return items
 }
 
-const listFilesRecursively = async function* (dirpath: string): AsyncGenerator<OS.File.Entry> {
-  // Does not follow symbolic links //
+const listFilesRecursively = async function* (dirpath: string): AsyncGenerator<DirEntry> {
+  // Skip symbolic links.
 
-  const entries: OS.File.Entry[] = await listDirContents(dirpath)
+  const entries: DirEntry[] = await listDirContents(dirpath)
   for (const entry of entries) {
     try {
       const zfile: nsIFile = Zotero.File.pathToFile(entry.path)
@@ -49,30 +60,9 @@ const listFilesRecursively = async function* (dirpath: string): AsyncGenerator<O
   }
 }
 
-// const collectFilesRecursive = async (dirPath: string, parents: string[] = [], files: OS.File.Entry[] = []) => {
-//   await Zotero.File.iterateDirectory(dirPath, async (entry: OS.File.Entry) => {
-//     const zfile = Zotero.File.pathToFile(entry.path)
-//     if (
-//       !entry.name.startsWith('.') &&
-//       zfile.exists() &&
-//       zfile.isReadable() &&
-//       !zfile.isHidden() &&
-//       !zfile.isSpecial() &&
-//       !zfile.isSymlink()
-//     ) {
-//       if (zfile.isDirectory()) {
-//         await collectFilesRecursive(entry.path, [...parents, entry.name], files)
-//       } else if (zfile.isFile()) {
-//         files.push(entry)
-//       }
-//     }
-//   })
-//   return files
-// }
-
 class Utils {
-  static async getFilesRecursively(dirpath: string): Promise<OS.File.Entry[]> {
-    const files: OS.File.Entry[] = []
+  static async getFilesRecursively(dirpath: string): Promise<DirEntry[]> {
+    const files: DirEntry[] = []
     try {
       const zfileBaseDir: nsIFile = Zotero.File.pathToFile(dirpath)
 
@@ -92,44 +82,15 @@ class Utils {
     return files
   }
 
-  // static async getFilesRecursively(dirpath: string): Promise<OS.File.Entry[]> {
-  //   let files: OS.File.Entry[] = []
-  //   try {
-  //     const zfileBaseDir: nsIFile = Zotero.File.pathToFile(dirpath)
-  //
-  //     if (!zfileBaseDir.exists() || !zfileBaseDir.isDirectory()) {
-  //       Logger.log('getFilesRecursively', `ERROR ${zfileBaseDir.path} does not exist or is not a folder`, false, 'warn')
-  //       throw new Error(`${zfileBaseDir.path} does not exist or is file`)
-  //     }
-  //     zfileBaseDir.normalize()
-  //
-  //     await collectFilesRecursive(zfileBaseDir.path, [], files)
-  //   } catch (err) {
-  //     Logger.log('getFilesRecursively', `ERROR: ${getErrorMessage(err)}`, false, 'warn')
-  //   }
-  //
-  //   return files
-  // }
-
   static async findTaggedItems(tagstr: string): Promise<Zotero.Item[]> {
-    const s = new Zotero.Search()
-    if (getParam.grouplibraries().value === 'user') {
-      // @ts-ignore
-      s.libraryID = Zotero.Libraries.userLibraryID
-    }
+    const s =
+      getParam.grouplibraries().value === 'user'
+        ? new Zotero.Search({ libraryID: Zotero.Libraries.userLibraryID })
+        : new Zotero.Search()
     s.addCondition('deleted', 'false', '')
     s.addCondition('tag', 'is', tagstr)
     const itemIds = await s.search()
     return await Zotero.Items.getAsync(itemIds)
-  }
-
-  static async removeAllTags(tagstr: string): Promise<void> {
-    const items_tagged = await this.findTaggedItems(tagstr)
-    //// remove tags ////
-    for (const item of items_tagged) {
-      item.removeTag(tagstr)
-      await item.saveTx()
-    }
   }
 }
 
@@ -153,23 +114,20 @@ export class ScanMarkdownFiles {
     const citekeypatternParam =
       matchstrategy === 'citekeyregexp' ? getParam.citekeypattern() : { name: '', value: new RegExp(''), valid: false }
 
-    /// pattern to match MD files
     const filefilterstrategy = getParam.filefilterstrategy().value
 
-    /// pattern to match citekey in MD file name
     let re_file = /^@.+\.md$/i
     let re_title = /^@(\S+).*\.md$/i
     if (filefilterstrategy === 'customfileregexp') {
       re_file = re_title = getParam.filepattern().value
     }
 
-    /// pattern to trim extension from filename
     const re_suffix = /\.md$/i
 
     let logseq_prefix_valid = false
     let logseq_prefix_file = ''
     if (protocol === 'logseq') {
-      /* logseq filename prefix, should be URL encoded */
+      // Logseq filename prefixes are URL-encoded.
       const logseqprefixParam = getParam.logseqprefix()
       logseq_prefix_valid = logseqprefixParam.valid
       logseq_prefix_file = logseqprefixParam.value
@@ -184,20 +142,13 @@ export class ScanMarkdownFiles {
         const filenamebase = filename.replace(re_suffix, '')
         const filepath = entry.path
 
-        // TODO make separate fields for name (filename, filenamebase, displayname)
-        /* use display name in context menu
-        for obsidian, display name is the filenamebase
-        for logseq, display name is the filenamebase with prefix removed and URL decoded
-        for URI, always use filenamebase
-         */
         let noteName = filenamebase
         if (protocol === 'logseq' && logseq_prefix_valid) {
-          if (logseq_prefix_valid) {
-            if (noteName.startsWith(logseq_prefix_file)) {
-              noteName = noteName.replace(new RegExp(`^${logseq_prefix_file}`), '')
-            }
+          const stripped = stripAndDecodeNotePrefix(noteName, logseq_prefix_file)
+          if (stripped.malformedEncoding) {
+            Logger.log('resolveItems', `Malformed URL-encoding in note name: ${noteName}`, false, 'warn')
           }
-          noteName = decodeURIComponent(noteName)
+          noteName = stripped.value
         }
 
         const entry_res: Entry = {
@@ -210,43 +161,41 @@ export class ScanMarkdownFiles {
           path: filepath,
         }
 
-        /// get citekey from filename
         try {
-          const reTitle_match_res = filename.match(re_title)
-          if (reTitle_match_res && reTitle_match_res.length > 1) {
-            entry_res.citekey_title = reTitle_match_res[1].trim()
+          const citekeyTitle = filename.match(re_title)?.[1]
+          if (citekeyTitle !== undefined) {
+            entry_res.citekey_title = citekeyTitle.trim()
           }
         } catch (err) {
           Logger.log('scanVault', `ERROR: get citekey from filename :: ${getErrorMessage(err)}`, false, 'warn')
         }
 
-        /// get citekey from metadata
         try {
           if (matchstrategy === 'citekeyyaml') {
             if (yamlkeywordParam.valid) {
-              /// pattern to match citekey in MD file metadata
-              const re_metadata = new RegExp(`^${yamlkeywordParam.value}: *(?:['"])?(\\S+?)(?:['"]|\\s|$)`, 'm')
-              const contentsRaw = await Zotero.File.getContentsAsync(filepath) // as string
+              const re_metadata = new RegExp(
+                `^${RegExp.escape(yamlkeywordParam.value)}: *(?:['"])?(\\S+?)(?:['"]|\\s|$)`,
+                'm',
+              )
+              const contentsRaw = await Zotero.File.getContentsAsync(filepath)
               const contents = contentsRaw && typeof contentsRaw === 'string' ? contentsRaw : ''
-              /// get metadata
               const contentSections = contents.split('\n---')
               const metadata = contentSections[0]
-              if (contentSections.length > 1 && metadata.startsWith('---')) {
-                const reBody_match_res = metadata.match(re_metadata)
-                if (reBody_match_res && reBody_match_res.length > 1) {
-                  entry_res.citekey_metadata = reBody_match_res[1].trim()
+              if (contentSections.length > 1 && metadata?.startsWith('---')) {
+                const citekeyMetadata = metadata.match(re_metadata)?.[1]
+                if (citekeyMetadata !== undefined) {
+                  entry_res.citekey_metadata = citekeyMetadata.trim()
                 }
               }
             }
           } else if (matchstrategy === 'citekeyregexp') {
             if (citekeypatternParam.valid) {
-              /// pattern to match citekey in MD file contents
               const re_body = citekeypatternParam.value
-              const contentsRaw = await Zotero.File.getContentsAsync(filepath) // as string
+              const contentsRaw = await Zotero.File.getContentsAsync(filepath)
               const contents = contentsRaw && typeof contentsRaw === 'string' ? contentsRaw : ''
-              const reBody_match_res = contents.match(re_body)
-              if (reBody_match_res && reBody_match_res.length > 1) {
-                entry_res.citekey_metadata = reBody_match_res[1].trim()
+              const citekeyMetadata = contents.match(re_body)?.[1]
+              if (citekeyMetadata !== undefined) {
+                entry_res.citekey_metadata = citekeyMetadata.trim()
               }
             }
           }
@@ -323,23 +272,20 @@ export class ScanMarkdownFiles {
 
     const zotkeyregexpParam = getParam.zotkeyregexp()
 
-    /// pattern to match MD files
     const filefilterstrategy = getParam.filefilterstrategy().value
 
-    /// pattern to match citekey in MD file name
     let re_file = /^@.+\.md$/i
     if (filefilterstrategy === 'customfileregexp') {
       re_file = getParam.filepattern().value
     }
     const re_contents = zotkeyregexpParam.valid ? new RegExp(zotkeyregexpParam.value, 'm') : new RegExp('', 'm')
 
-    /// pattern to trim extension from filename
     const re_suffix = /\.md$/i
 
     let logseq_prefix_valid = false
     let logseq_prefix_file = ''
     if (protocol === 'logseq') {
-      /* logseq filename prefix, should be URL encoded */
+      // Logseq filename prefixes are URL-encoded.
       const logseqprefixParam = getParam.logseqprefix()
       logseq_prefix_valid = logseqprefixParam.valid
       logseq_prefix_file = logseqprefixParam.value
@@ -356,12 +302,11 @@ export class ScanMarkdownFiles {
 
         let noteName = filenamebase
         if (protocol === 'logseq' && logseq_prefix_valid) {
-          if (logseq_prefix_valid) {
-            if (noteName.startsWith(logseq_prefix_file)) {
-              noteName = noteName.replace(new RegExp(`^${logseq_prefix_file}`), '')
-            }
+          const stripped = stripAndDecodeNotePrefix(noteName, logseq_prefix_file)
+          if (stripped.malformedEncoding) {
+            Logger.log('resolveItems', `Malformed URL-encoding in note name: ${noteName}`, false, 'warn')
           }
-          noteName = decodeURIComponent(noteName)
+          noteName = stripped.value
         }
 
         const entry_res: Entry = {
@@ -374,14 +319,13 @@ export class ScanMarkdownFiles {
           path: filepath,
         }
 
-        /// get the ZoteroKey from the contents
         try {
-          const contentsRaw = await Zotero.File.getContentsAsync(filepath) // as string
+          const contentsRaw = await Zotero.File.getContentsAsync(filepath)
           const contents = contentsRaw && typeof contentsRaw === 'string' ? contentsRaw : ''
 
-          const reContents_match_res = contents.match(re_contents)
-          if (reContents_match_res && reContents_match_res.length > 1 && reContents_match_res[1].trim() !== '') {
-            entry_res.zotkeys.push(reContents_match_res[1].trim())
+          const zotkey = contents.match(re_contents)?.[1]?.trim()
+          if (zotkey !== undefined && zotkey !== '') {
+            entry_res.zotkeys.push(zotkey)
           }
         } catch (err) {
           Logger.log('scanVaultCustomRegex', `ERROR: get zotid from contents :: ${getErrorMessage(err)}`, false, 'warn')
@@ -440,16 +384,10 @@ export class ScanMarkdownFiles {
 
   @trace
   private static async mapCitekeysQuery(): Promise<Record<string, number[]>> {
-    /*
-     * make Record of Zotero native citationKey -> zoteroID for every item in the library
-     */
-
-    /// get all items in library
-    const s = new Zotero.Search()
-    if (getParam.grouplibraries().value === 'user') {
-      // @ts-ignore
-      s.libraryID = Zotero.Libraries.userLibraryID
-    }
+    const s =
+      getParam.grouplibraries().value === 'user'
+        ? new Zotero.Search({ libraryID: Zotero.Libraries.userLibraryID })
+        : new Zotero.Search()
     s.addCondition('deleted', 'false', '')
     const itemIds = await s.search()
 
@@ -463,15 +401,16 @@ export class ScanMarkdownFiles {
       try {
         citationKey = zotitem.getField('citationKey') || ''
       } catch {
-        // citationKey field may not exist on certain item types
+        // Some regular item types do not expose citationKey.
       }
       if (!citationKey) {
         return accumulator
       }
-      if (!accumulator[citationKey]) {
+      const existingIds = accumulator[citationKey]
+      if (existingIds === undefined) {
         accumulator[citationKey] = [zotitem.id]
       } else {
-        accumulator[citationKey].push(zotitem.id)
+        existingIds.push(zotitem.id)
       }
       return accumulator
     }, {})
@@ -483,31 +422,21 @@ export class ScanMarkdownFiles {
 
   @trace
   private static async mapIDkeysZoteroquery(): Promise<Record<string, number[]>> {
-    /*
-     * make Record of zoteroKey -> zoteroID for every item in the library
-     */
-
-    // const keymaperr = []
-
-    /// get all items in library
-    const s = new Zotero.Search()
-    if (getParam.grouplibraries().value === 'user') {
-      // @ts-ignore
-      s.libraryID = Zotero.Libraries.userLibraryID
-    }
+    const s =
+      getParam.grouplibraries().value === 'user'
+        ? new Zotero.Search({ libraryID: Zotero.Libraries.userLibraryID })
+        : new Zotero.Search()
     s.addCondition('deleted', 'false', '')
     const itemIds = await s.search()
 
     const ZotItems: Zotero.Item[] = await Zotero.Items.getAsync(itemIds)
 
     const keymap = ZotItems.reduce((accumulator: Record<string, number[]>, zotitem) => {
-      if (!itemIds.includes(zotitem.id)) {
-        return accumulator
-      }
-      if (!accumulator[zotitem.key]) {
+      const existingIds = accumulator[zotitem.key]
+      if (existingIds === undefined) {
         accumulator[zotitem.key] = [zotitem.id]
       } else {
-        accumulator[zotitem.key].push(zotitem.id)
+        existingIds.push(zotitem.id)
       }
       return accumulator
     }, {})
@@ -519,16 +448,6 @@ export class ScanMarkdownFiles {
 
   @trace
   private static sliceObj(res: Entry[], citekeymap: Record<string, number[]>): Entry[] {
-    /*
-     * res :: array of item data
-     * citekeymap :: dict of citekeys to Zotero itemIDs
-     */
-
-    // Logger.addDebugLog('sliceObj - res', `${res.length}`)
-    // Logger.addDebugLog('sliceObj - res[0].citekey', `${res[0].citekey}`)
-    // Logger.addDebugLog('sliceObj - Object.keys(citekeymap).length', `${Object.keys(citekeymap).length}`)
-    // Logger.addDebugLog('sliceObj - Object.keys(citekeymap).length', `${Object.keys(citekeymap)}`)
-
     const reserr: Entry[] = []
 
     const citekeys = Object.keys(citekeymap)
@@ -536,11 +455,11 @@ export class ScanMarkdownFiles {
     for (const entry_res of res) {
       if (entry_res.citekey) {
         if (citekeys.includes(entry_res.citekey)) {
-          entry_res.zotids = citekeymap[entry_res.citekey]
+          entry_res.zotids = citekeymap[entry_res.citekey] ?? []
         } else if (citekeys.includes(entry_res.citekey_metadata)) {
-          entry_res.zotids = citekeymap[entry_res.citekey_metadata]
+          entry_res.zotids = citekeymap[entry_res.citekey_metadata] ?? []
         } else if (citekeys.includes(entry_res.citekey_title)) {
-          entry_res.zotids = citekeymap[entry_res.citekey_title]
+          entry_res.zotids = citekeymap[entry_res.citekey_title] ?? []
         } else {
           reserr.push(entry_res)
         }
@@ -569,7 +488,7 @@ export class ScanMarkdownFiles {
         },
         notification: {
           title: 'Unmatched citekeys',
-          body: `${reserr.length} unmatched citekeys.`, // Run Sync from Tools menu to generate report.`,
+          body: `${reserr.length} unmatched citekeys.`,
           type: 'error',
         },
       }
@@ -594,24 +513,24 @@ export class ScanMarkdownFiles {
 
   @trace
   private static sliceObjCustomRegex(res: Entry[], zoterokeymap: Record<string, number[]>): Entry[] {
-    /*
-     * res :: array of item data
-     * zoterokeymap :: dict of Zotero itemKeys to Zotero itemIDs
-     */
-
     const reserr: Entry[] = []
 
     const zotkeys = Object.keys(zoterokeymap)
 
-    res.forEach((entry_res) => {
-      entry_res.zotkeys.forEach((zotkey) => {
+    for (const entry_res of res) {
+      const zotids = new Set<number>()
+      for (const zotkey of entry_res.zotkeys) {
         if (zotkeys.includes(zotkey)) {
-          entry_res.zotids = zoterokeymap[zotkey]
-        } else {
-          reserr.push(entry_res)
+          for (const zotid of zoterokeymap[zotkey] ?? []) {
+            zotids.add(zotid)
+          }
         }
-      })
-    })
+      }
+      entry_res.zotids = [...zotids]
+      if (entry_res.zotids.length === 0) {
+        reserr.push(entry_res)
+      }
+    }
 
     const enableSaveData = Logger.mode() === 'maximal'
     const LogDataKey = 'sliceObjCustomRegex'
@@ -633,7 +552,7 @@ export class ScanMarkdownFiles {
         },
         notification: {
           title: 'Unmatched zoteroKeys',
-          body: `${reserr.length} unmatched zoteroKeys.`, // Run Sync from Tools menu to generate report.`,
+          body: `${reserr.length} unmatched zoteroKeys.`,
           type: 'error',
         },
       }
@@ -658,28 +577,12 @@ export class ScanMarkdownFiles {
 
   @trace
   static async processData(): Promise<void> {
-    // debug = debug || false
     let res: Entry[] = []
 
     const matchstrategy = getParam.matchstrategy().value
 
-    /*
-    1 - match MD notes based on citation key
-    MD files to Include:
-    md notes begin with @mycitekey
-    (optional) md notes contain the citation key in the metadata id: 'citekey'
-
-    OR
-
-    2 - match MD notes based on zotero item key
-    MD files to Include:
-    include notes whose filenames match this regex: '^@.+'
-    regex to extract the zotkey: regex
-    */
-
     if (matchstrategy === 'citekeyyaml' || matchstrategy === 'citekeyregexp') {
-      //// get citekeys from markdown files ////
-      res = await this.scanVault() /// returns data array containing citekeys
+      res = await this.scanVault()
 
       if (res.length === 0) {
         let message: messageData
@@ -712,14 +615,11 @@ export class ScanMarkdownFiles {
         return
       }
 
-      //// get citationKeys and zoteroIDs for every item in Zotero library ////
-      const citekeymap: Record<string, number[]> = await this.mapCitekeysQuery() /// returns dict mapping citekey => [zoteroId_1, zoteroId_2, ...]
+      const citekeymap: Record<string, number[]> = await this.mapCitekeysQuery()
 
-      //// map citekeys from markdown files with zoteroIDs ////
       res = this.sliceObj(res, citekeymap)
     } else if (matchstrategy === 'zotitemkey') {
-      //// get zoterokeys from markdown files ////
-      res = await this.scanVaultCustomRegex() /// returns data array containing zoteroKeys
+      res = await this.scanVaultCustomRegex()
 
       if (res.length === 0) {
         let message: messageData
@@ -752,34 +652,14 @@ export class ScanMarkdownFiles {
         return
       }
 
-      //// get zoteroKeys and zoteroIDs for every item in Zotero library ////
-      const zoterokeymap: Record<string, number[]> = await this.mapIDkeysZoteroquery() /// returns dict mapping citekey => [zoteroId_1, zoteroId_2, ...]
+      const zoterokeymap: Record<string, number[]> = await this.mapIDkeysZoteroquery()
 
-      //// map zoteroKeys from markdown files with zoteroIDs ////
       res = this.sliceObjCustomRegex(res, zoterokeymap)
     }
-
-    // Logger.initalize()
-
-    // res.forEach((entry_res: Entry) => {
-    //   entry_res.zotids.forEach((zotid: number) => {
-    //     if (typeof zotid === 'number') {
-    //       /// filter located zoteroIDs from data array
-    //       if (Object.keys(this.data).includes(zotid.toString())) {
-    //         this.data[zotid.toString()].push(entry_res)
-    //       }
-    //       else {
-    //         this.data[zotid.toString()] = [entry_res]
-    //         this.dataZotIds.push(zotid)
-    //       }
-    //     }
-    //   })
-    // })
 
     for (const entry_res of res) {
       for (const zotid of entry_res.zotids) {
         if (typeof zotid === 'number') {
-          //// filter located zoteroIDs from data array ////
           DataManager.addEntry(zotid, entry_res)
         }
       }
@@ -787,9 +667,7 @@ export class ScanMarkdownFiles {
 
     const enableSaveData = Logger.mode() === 'maximal'
     const LogDataKey = 'scanVault'
-    // Logger.addData(`${LogDataKey}-clearun`, DataManager.isClean(), true)
     if (enableSaveData) Logger.addData(LogDataKey, DataManager.data(), true)
-    // Logger.addData(`${LogDataKey}-zotIds`, DataManager.zotIds(), true)
 
     if (DataManager.numberRecords() === 0) {
       const message: messageData = {
@@ -811,15 +689,6 @@ export class ScanMarkdownFiles {
           fileNameSuggest: `${config.addonName.replace('-', '')}-matched.json`,
           dataGetter: (): string => {
             return JSON.stringify(Logger.getData(LogDataKey), null, 1)
-            // return JSON.stringify(
-            //   {
-            //     cleanRun: Logger.getData(`${LogDataKey}-clearun`),
-            //     data: Logger.getData(`${LogDataKey}-data`),
-            //     zotIds: Logger.getData(`${LogDataKey}-zotIds`),
-            //   },
-            //   null,
-            //   1,
-            // )
           },
         }
       }
@@ -856,41 +725,34 @@ export class ScanMarkdownFiles {
   private static async updateItems(zotids: number[]) {
     const tagstr = getParam.tagstr().value
 
-    /// find all item already tagged
     const items_withtags: Zotero.Item[] = await Utils.findTaggedItems(tagstr)
     const items_withtags_zotids: number[] = items_withtags.map((item) => item.id)
 
-    /// find all items that should be tagged
     const items_withnotes: Zotero.Item[] = await Zotero.Items.getAsync(zotids)
     const items_withnotes_zotids: number[] = items_withnotes.map((item) => item.id)
 
-    /// find items to be tagged
     const items_totag = items_withnotes.filter((item) => !items_withtags_zotids.includes(item.id))
 
-    /// find items that should not be tagged
     let items_removetag: Zotero.Item[] = []
     if (getParam.removetags().value === 'keepsynced') {
       items_removetag = items_withtags.filter((item) => !items_withnotes_zotids.includes(item.id))
     }
 
-    /// find items that cannot be located in library
     const nitems_notlocatable = zotids.length - items_withnotes.length
 
-    /// remove tag from items that should not be tagged
     for (const item of items_removetag) {
       item.removeTag(tagstr)
       await item.saveTx()
     }
 
-    /// NB this doesn't run successfully as soon as Zotero is started, needs to wait for schema to load
-    /// add tag to items that should be tagged
     for (const item of items_totag) {
       item.addTag(tagstr)
       await item.saveTx()
     }
-    /// TODO set color :: https://github.com/zotero/zotero/blob/52932b6eb03f72b5fb5591ba52d8e0f4c2ef825f/chrome/content/zotero/tagColorChooser.js
+    // TODO: Assign the tag color; see
+    // https://github.com/zotero/zotero/blob/52932b6eb03f72b5fb5591ba52d8e0f4c2ef825f/chrome/content/zotero/tagColorChooser.js
 
-    const messageArray: notificationData['messageArray'] = [
+    const messageArray: NotificationMessage[] = [
       {
         body: `Found ${items_withnotes.length} notes.`,
         type: nitems_notlocatable === 0 ? 'success' : 'info',
@@ -933,28 +795,7 @@ export class ScanMarkdownFiles {
       dryrun = true
     }
 
-    //////////////
-    // Promise<notificationData['messageArray']>
-
-    // let messageArray: notificationData['messageArray'] = [{ body: 'Some Error Occurred', type: 'error' }]
-    // if (!dryrun) {
-    // messageArray = await this.updateItems(DataManager.zotIds())
-    // } else {
-    // messageArray = [{ body: `Found ${DataManager.numberRecords()} notes.`, type: 'error' }]
-    // }
-    // let header = 'Synced'
-
-    // Object.values(messageArray).map((value) => `${value?.body}`)
-    // let aaa: string[] = []
-    // for (const msg of messageArray) {
-    //   aaa.push(msg.body)
-    // }
-    //
-    // const summaryMessages = Object.entries(messageArray).map(([key, value]) => `${value.body}`)
-
-    ////////////////
-
-    let messageArray: notificationData['messageArray']
+    let messageArray: NotificationMessage[]
     if (!dryrun) {
       messageArray = await this.updateItems(DataManager.zotIds())
     } else {
@@ -975,8 +816,6 @@ export class ScanMarkdownFiles {
 
   @trace
   static async syncWrapper(displayReport = false, saveLogs = false) {
-    /// TODO validate settings on preference window close.
-
     const debug = displayReport || saveLogs
 
     if (debug) {
@@ -984,18 +823,16 @@ export class ScanMarkdownFiles {
     }
 
     if (Logger.mode() === 'minimal') {
-      //// clear logs, data, and messages ////
       Logger.clear()
     } else {
-      //// only clear messages ////
       Logger.clearMessages()
     }
 
     let header = 'Error'
 
-    let messageArray: notificationData['messageArray']
+    let messageArray: NotificationMessage[]
 
-    const configPass = await wrappers.startupConfigCheck()
+    const configPass = wrappers.startupConfigCheck()
     if (!configPass) {
       header = 'Error - Configuration Invalid'
       messageArray = [
@@ -1004,12 +841,6 @@ export class ScanMarkdownFiles {
           type: 'error',
         },
       ]
-      // Notifier.notify({
-      //   title: 'Configuration Invalid',
-      //   body: `Aborting. Check the ${config.addonName} preferences.`,
-      //   type: 'error',
-      // })
-      // return
     } else {
       try {
         messageArray = await this.syncRun()
@@ -1064,7 +895,7 @@ export class ScanMarkdownFiles {
     addon.data.dialog?.window?.close()
     addon.data.dialog = undefined
 
-    const dialogData: Record<string | number, any> = {
+    const dialogData: ReportDialogData = {
       loadCallback: () => {
         Logger.log('displayReportDialog - Dialog opened - loadCallback', dialogData, false, 'info')
       },
@@ -1074,11 +905,11 @@ export class ScanMarkdownFiles {
     }
 
     let nrows = 0
-    nrows += 2 // title h1 + summary h2
+    nrows += 2 // report title and summary heading
     nrows += summaryMessages.length
-    nrows += loggedMessages.length > 0 ? 2 : 0 // messages h2 + message p
-    nrows += 2 * loggedMessages.length // number of messages
-    nrows += loggedMessages.filter((x) => x.saveData).length // number of saveData buttons
+    nrows += loggedMessages.length > 0 ? 2 : 0 // messages heading and description
+    nrows += 2 * loggedMessages.length // title and body for each message
+    nrows += loggedMessages.filter((x) => x.saveData).length // one save button per saveable message
 
     let irow = 0
 
@@ -1090,7 +921,7 @@ export class ScanMarkdownFiles {
     dialogHelper
       .addCell(irow++, 0, {
         tag: 'h1',
-        properties: { innerHTML: config.addonName },
+        properties: { textContent: config.addonName },
         namespace: 'html',
         styles: {
           textAlign: 'center',
@@ -1100,7 +931,7 @@ export class ScanMarkdownFiles {
       })
       .addCell(irow++, 0, {
         tag: 'h2',
-        properties: { innerHTML: 'Summary' },
+        properties: { textContent: 'Summary' },
         namespace: 'html',
         styles: {
           textAlign: 'center',
@@ -1113,11 +944,12 @@ export class ScanMarkdownFiles {
       dialogHelper.addCell(irow++, 0, {
         tag: 'p',
         properties: {
-          innerHTML: msgstr.replace('\n', '<br>'),
+          textContent: msgstr,
         },
         namespace: 'html',
         styles: {
           textAlign: 'center',
+          whiteSpace: 'pre-line',
           minWidth: minWidth,
           maxWidth: maxWidth,
         },
@@ -1128,7 +960,7 @@ export class ScanMarkdownFiles {
       dialogHelper
         .addCell(irow++, 0, {
           tag: 'h2',
-          properties: { innerHTML: 'Messages' },
+          properties: { textContent: 'Messages' },
           namespace: 'html',
           styles: {
             textAlign: 'center',
@@ -1139,7 +971,7 @@ export class ScanMarkdownFiles {
         .addCell(irow++, 0, {
           tag: 'p',
           properties: {
-            innerHTML: `Specific errors and warnings are listed below. For a complete debugging log, click the "${getString(
+            textContent: `Specific errors and warnings are listed below. For a complete debugging log, click the "${getString(
               'report-savedebuglogs',
             )}" button.`,
           },
@@ -1157,7 +989,7 @@ export class ScanMarkdownFiles {
         .addCell(irow++, 0, {
           tag: 'h3',
           properties: {
-            innerHTML: msg.rowData.title,
+            textContent: msg.rowData.title,
           },
           namespace: 'html',
           styles: {
@@ -1172,11 +1004,12 @@ export class ScanMarkdownFiles {
         .addCell(irow++, 0, {
           tag: 'p',
           properties: {
-            innerHTML: msg.rowData.message,
+            textContent: msg.rowData.message,
           },
           namespace: 'html',
           styles: {
             textAlign: 'center',
+            whiteSpace: 'pre-line',
             minWidth: minWidth,
             maxWidth: maxWidth,
           },
@@ -1193,8 +1026,6 @@ export class ScanMarkdownFiles {
               type: 'button',
             },
             styles: {
-              // border: '3px solid blue',
-              // marginLeft: 'auto',
               minWidth: minWidth,
               maxWidth: maxWidth,
             },
@@ -1214,14 +1045,10 @@ export class ScanMarkdownFiles {
               {
                 tag: 'div',
                 properties: {
-                  innerHTML: msg.saveData?.saveButtonTitle,
+                  textContent: msg.saveData?.saveButtonTitle,
                 },
                 namespace: 'html',
                 styles: {
-                  // border: '2px solid green',
-                  // color: 'red',
-                  // textAlign: 'center',
-                  // marginLeft: 'auto',
                   padding: '2.5px 15px',
                   whiteSpace: 'nowrap',
                 },
@@ -1255,13 +1082,10 @@ export class ScanMarkdownFiles {
     dialogHelper.setDialogData(dialogData)
 
     dialogHelper.open(`${config.addonName} Report`, {
-      // width: 400, // ignored if fitContent is true
       centerscreen: true,
       resizable: true,
       fitContent: true,
-      // noDialogMode: false,
-      // alwaysRaised?: boolean;
-    }) // { resizable: true, centerscreen: true }
+    })
 
     addon.data.dialog = dialogHelper
     await dialogData.unloadLock?.promise

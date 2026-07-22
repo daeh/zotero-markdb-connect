@@ -1,11 +1,10 @@
 {
   "extends": "./tsconfig.base",
   "compilerOptions": {
-    "strictNullChecks": true,
-    /* Enable JavaScript Compilation */
     "allowJs": true,
     "checkJs": true
   },
-  "include": ["src", "typings", "node_modules/zotero-types", "./*.ts", "./*.mjs", "./*.js", ".release-it.ts"],
-  "exclude": ["build", "addon"]
+  "include": ["src", "typings", "./*.ts", "./*.mjs", "./*.js"],
+  // ESLint's flat-config types do not satisfy checkJs.
+  "exclude": ["build", "addon", "eslint.config.mjs"]
 }

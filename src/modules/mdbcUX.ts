@@ -6,9 +6,16 @@ import { getPref, setPref } from '../utils/prefs'
 import { getErrorMessage, Logger, trace } from './mdbcLogger'
 import { getParam } from './mdbcParam'
 
-import type { Entry, notificationData, NotificationType, NotifyCreateLineOptions, ZoteroIconURI } from '../mdbcTypes'
+import type {
+  Entry,
+  notificationData,
+  NotificationMessage,
+  NotificationType,
+  NotifyCreateLineOptions,
+  ZoteroIconURI,
+} from '../mdbcTypes'
 
-const favIcon = `chrome://${config.addonRef}/content/icons/favicon.png` as const // TODO: move def and import form all modules
+const favIcon = `chrome://${config.addonRef}/content/icons/favicon.png` as const
 
 const additionalIcons = [favIcon, 'chrome://zotero/skin/toolbar-item-add@2x.png'] as const
 type AddonIconURI = (typeof additionalIcons)[number]
@@ -18,20 +25,19 @@ export class Notifier {
   static readonly notificationTypes: Record<NotificationType, IconURI> = {
     addon: favIcon,
     success: 'chrome://zotero/skin/tick@2x.png',
-    error: 'chrome://zotero/skin/error@2x.png', //'cross@2x.png',
+    error: 'chrome://zotero/skin/error@2x.png',
     warn: 'chrome://zotero/skin/warning@2x.png',
     info: 'chrome://zotero/skin/prefs-advanced.png',
     debug: 'chrome://zotero/skin/treeitem-patent@2x.png',
     config: 'chrome://zotero/skin/prefs-general.png',
     itemsadded: 'chrome://zotero/skin/toolbar-item-add@2x.png',
     itemsremoved: 'chrome://zotero/skin/minus@2x.png',
-    // xmark@2x.png
   }
 
   static notify(data: notificationData): void {
     const header = `${config.addonName} : ${data.title}`
 
-    let messageArray: notificationData['messageArray']
+    let messageArray: NotificationMessage[]
     try {
       if (!('messageArray' in data) || !Array.isArray(data.messageArray) || data.messageArray.length === 0) {
         if (!data.body || !data.type) return
@@ -45,9 +51,8 @@ export class Notifier {
     }
 
     const timeout = 5 // seconds
-    const ms = 1000 // milliseconds
+    const ms = 1000
     const popupWin = new ztoolkit.ProgressWindow(header, {
-      // window?: Window,
       closeOnClick: true,
       closeTime: timeout * ms,
       closeOtherProgressWindows: false,
@@ -74,10 +79,9 @@ export class systemInterface {
 
     if (ids === 'selected') {
       try {
-        // return Zotero.getActiveZoteroPane().getSelectedItems(true)
         return ztoolkit.getGlobal('ZoteroPane').getSelectedItems(true)
       } catch (err) {
-        // zoteroPane.getSelectedItems() doesn't test whether there's a selection and errors out if not
+        // getSelectedItems throws when the selection is empty.
         Logger.log('expandSelection', `Could not get selected items: ${getErrorMessage(err)}`, false, 'warn')
         return []
       }
@@ -103,11 +107,6 @@ export class systemInterface {
 
     if (!filepathstr) return
 
-    // const fileObj = Zotero.File.pathToFile(pathstr)
-    // if (fileObj instanceof Components.interfaces.nsIFile) {}
-    // fileObj.normalize()
-    // fileObj.isFile()
-
     Logger.log('saveDebuggingLog', `Saving to ${filepathstr}`, false, 'info')
 
     await Zotero.File.putContentsAsync(filepathstr, data)
@@ -115,15 +114,6 @@ export class systemInterface {
 
   @trace
   static async dumpJsonFile(data: string, title: string, filename: string) {
-    // saveButtonTitle
-    // saveDialogTitle
-    // fileNameSuggest
-    // dataGetter
-
-    // const data = JSON.stringify(Logger.dump(), null, 1)
-
-    // const filename = `${config.addonName.replace('-', '')}-logs.json`
-
     if (!data) {
       Logger.log(
         'saveJsonFile',
@@ -145,11 +135,6 @@ export class systemInterface {
 
     if (!filepathstr) return
 
-    // const fileObj = Zotero.File.pathToFile(pathstr)
-    // if (fileObj instanceof Components.interfaces.nsIFile) {}
-    // fileObj.normalize()
-    // fileObj.isFile()
-
     Logger.log('saveJsonFile', `Saving to ${filepathstr}`, false, 'info')
 
     await Zotero.File.putContentsAsync(filepathstr, data)
@@ -165,7 +150,7 @@ export class systemInterface {
           fileObj.reveal()
           Logger.log('showSelectedItemMarkdownInFilesystem', `Revealing ${fileObj.path}`, false, 'info')
         } catch (err) {
-          // On platforms that don't support nsIFileObj.reveal() (e.g. Linux), launch the parent directory
+          // reveal() is unavailable on some platforms, including Linux.
           Zotero.launchFile(fileObj.parent.path)
           Logger.log(
             'showSelectedItemMarkdownInFilesystem',
@@ -205,11 +190,8 @@ export class systemInterface {
       const uri_spec = getParam.obsidianresolve().value
       const paneType = getParam.obsidianpanetype().value
       const vaultnameParam = getParam.obsidianvaultname()
-      // TODO(vault-encoding): Obsidian's URI docs require %20-style encoding, and
-      // https://github.com/Taitava/obsidian-shellcommands/discussions/412 documents
-      // vault names with spaces failing. Not wrapped in encodeURIComponent here to
-      // avoid double-encoding users who entered encoded values as a workaround.
-      // Revisit with a one-shot migration if a bug is reported.
+      // Encoding here would double-encode workaround values entered for vault names
+      // with spaces: https://github.com/Taitava/obsidian-shellcommands/discussions/412
       const vaultKey = vaultnameParam.valid ? `vault=${vaultnameParam.value}&` : ''
 
       const fileKey =
@@ -231,27 +213,22 @@ export class systemInterface {
   @trace
   static openLogseqURI(entry_res: Entry): void {
     try {
-      /// get filename without extension
       const fileObj = Zotero.File.pathToFile(entry_res.path)
       fileObj.normalize()
-      // const filename = fileObj.getRelativePath(fileObj.parent)
-      // const filename = fileObj.displayName
       const filename = fileObj.leafName
       const filenamebase = filename.replace(/\.md$/i, '')
 
-      /// get graph name
       let graphName = ''
       const graphNameParam = getParam.logseqgraph()
       if (graphNameParam.valid) {
         graphName = graphNameParam.value
       } else {
-        /* if graph name not specified, try to get it from the path */
+        // Infer the graph name from the note's grandparent directory.
         try {
           graphName = fileObj.parent.parent.leafName
         } catch (err) {
           Logger.log('openLogseqURI', `ERROR :: ${entry_res?.path} :: ${getErrorMessage(err)}`, false, 'warn')
-          /* if candidate graph name not found, abort */
-          graphName = '' /// will case error below
+          graphName = ''
         }
       }
 
@@ -264,13 +241,9 @@ export class systemInterface {
         throw new Error('graphName not resolved')
       }
 
-      /// if using re-encoded note name
-      // const fileKey = `page=${logseq_prefix_file}${filenamebase}`
-      /// if using filename
       const fileKey = `page=${filenamebase}`
       const uri = `logseq://graph/${graphName}?${fileKey}`
 
-      /* prefix not encoded, filename encoded */
       Zotero.launchURL(uri)
 
       Logger.log('openLogseqURI', `Launching ${entry_res.path} :: ${uri}`, false, 'info')
@@ -283,8 +256,7 @@ export class systemInterface {
 export class UIHelpers {
   @trace
   static registerWindowMenuItem_Sync() {
-    // zotero-types doesn't expose MenuManager yet, hence the cast
-    ;(Zotero as any).MenuManager.registerMenu({
+    Zotero.MenuManager.registerMenu({
       menuID: `${config.addonRef}-tools-menu-sync`,
       pluginID: config.addonID,
       target: 'main/menubar/tools',
@@ -303,7 +275,7 @@ export class UIHelpers {
 
   @trace
   static registerWindowMenuItem_Debug() {
-    ;(Zotero as any).MenuManager.registerMenu({
+    Zotero.MenuManager.registerMenu({
       menuID: `${config.addonRef}-tools-menu-troubleshoot`,
       pluginID: config.addonID,
       target: 'main/menubar/tools',
@@ -319,9 +291,7 @@ export class UIHelpers {
     })
   }
 
-  // Replaces the old monkey-patch of ZoteroPane.buildItemContextMenu (gone in zot 9).
-  // Registers four MenuManager entries at main/library/item — flat open+reveal for
-  // single-match items, submenu open+reveal for multi-match — toggled via onShowing.
+  // Single matches use direct actions; multiple matches use submenus populated by onShowing.
   static registerRightClickMenuItem() {
     const dispatchOpen = (entry: Entry): void => {
       try {
@@ -350,15 +320,17 @@ export class UIHelpers {
       }
     }
 
-    const openSubmenuChildren: any[] = []
-    const revealSubmenuChildren: any[] = []
-
     type Action = 'open' | 'reveal'
+    type LibraryMenuContext = _ZoteroTypes.MenuManager.LibraryMenuContext
+    type LibraryMenuData = _ZoteroTypes.MenuManager.MenuData<LibraryMenuContext>
 
-    const buildChild = (action: Action, entry: Entry, i: number) => ({
+    const openSubmenuChildren: LibraryMenuData[] = []
+    const revealSubmenuChildren: LibraryMenuData[] = []
+
+    const buildChild = (action: Action, entry: Entry, i: number): LibraryMenuData => ({
       menuType: 'menuitem',
       _key: `zotero-custom-menu-mdbc-${action}-${i}`,
-      onShowing: (_ev: Event, ctx: any) => {
+      onShowing: (_ev: Event, ctx: LibraryMenuContext) => {
         try {
           ctx.menuElem.setAttribute('label', entry.name)
         } catch (e) {
@@ -375,12 +347,12 @@ export class UIHelpers {
       },
     })
 
-    const rebuildChildren = (target: any[], action: Action, entries: Entry[]) => {
+    const rebuildChildren = (target: LibraryMenuData[], action: Action, entries: Entry[]): void => {
       target.length = 0
       entries.forEach((entry, i) => target.push(buildChild(action, entry, i)))
     }
 
-    ;(Zotero as any).MenuManager.registerMenu({
+    Zotero.MenuManager.registerMenu({
       menuID: `${config.addonID}-itemmenu-open`,
       pluginID: config.addonID,
       target: 'main/library/item',
@@ -389,18 +361,19 @@ export class UIHelpers {
           menuType: 'menuitem',
           l10nID: getLocaleID('contextmenuitem-open-default'),
           icon: 'chrome://zotero/skin/treeitem-note@2x.png',
-          onShowing: (_event: Event, context: any) => {
+          onShowing: (_event: Event, context: LibraryMenuContext) => {
             const entries = UIHelpers.getEntriesForSelection()
             context.setVisible(!!entries && entries.length === 1)
           },
           onCommand: () => {
             const entries = UIHelpers.getEntriesForSelection()
-            if (entries?.length === 1) dispatchOpen(entries[0])
+            const entry = entries?.length === 1 ? entries[0] : undefined
+            if (entry !== undefined) dispatchOpen(entry)
           },
         },
       ],
     })
-    ;(Zotero as any).MenuManager.registerMenu({
+    Zotero.MenuManager.registerMenu({
       menuID: `${config.addonID}-itemmenu-reveal`,
       pluginID: config.addonID,
       target: 'main/library/item',
@@ -409,18 +382,19 @@ export class UIHelpers {
           menuType: 'menuitem',
           l10nID: getLocaleID('contextmenuitem-reveal'),
           icon: 'chrome://zotero/skin/toolbar-advanced-search.png',
-          onShowing: (_event: Event, context: any) => {
+          onShowing: (_event: Event, context: LibraryMenuContext) => {
             const entries = UIHelpers.getEntriesForSelection()
             context.setVisible(!!entries && entries.length === 1)
           },
           onCommand: () => {
             const entries = UIHelpers.getEntriesForSelection()
-            if (entries?.length === 1) dispatchReveal(entries[0])
+            const entry = entries?.length === 1 ? entries[0] : undefined
+            if (entry !== undefined) dispatchReveal(entry)
           },
         },
       ],
     })
-    ;(Zotero as any).MenuManager.registerMenu({
+    Zotero.MenuManager.registerMenu({
       menuID: `${config.addonID}-itemmenu-open-submenu`,
       pluginID: config.addonID,
       target: 'main/library/item',
@@ -428,7 +402,7 @@ export class UIHelpers {
         {
           menuType: 'submenu',
           icon: 'chrome://zotero/skin/treeitem-note@2x.png',
-          onShowing: (_ev: Event, ctx: any) => {
+          onShowing: (_ev: Event, ctx: LibraryMenuContext) => {
             const entries = UIHelpers.getEntriesForSelection()
             if (!entries || entries.length < 2) {
               ctx.setVisible(false)
@@ -442,7 +416,7 @@ export class UIHelpers {
         },
       ],
     })
-    ;(Zotero as any).MenuManager.registerMenu({
+    Zotero.MenuManager.registerMenu({
       menuID: `${config.addonID}-itemmenu-reveal-submenu`,
       pluginID: config.addonID,
       target: 'main/library/item',
@@ -450,7 +424,7 @@ export class UIHelpers {
         {
           menuType: 'submenu',
           icon: 'chrome://zotero/skin/toolbar-advanced-search.png',
-          onShowing: (_ev: Event, ctx: any) => {
+          onShowing: (_ev: Event, ctx: LibraryMenuContext) => {
             const entries = UIHelpers.getEntriesForSelection()
             if (!entries || entries.length < 2) {
               ctx.setVisible(false)
@@ -466,14 +440,15 @@ export class UIHelpers {
     })
   }
 
-  // used by onShowing and onCommand in the context-menu registrations above
   static getEntriesForSelection(): Entry[] | null {
     try {
       const pane = Zotero.getActiveZoteroPane()
       if (!pane) return null
       const items = pane.getSelectedItems()
       if (items?.length !== 1) return null
-      const itemId = items[0].id
+      const item = items[0]
+      if (item === undefined) return null
+      const itemId = item.id
       if (!DataManager.checkForZotId(itemId)) return null
       const entries = DataManager.getEntryList(itemId)
       return entries.length > 0 ? entries : null
@@ -488,28 +463,17 @@ export class UIHelpers {
 
   @trace
   static highlightTaggedRows() {
-    /* Render primary cell
-    _renderCell
-    _renderPrimaryCell
-    https://github.com/zotero/zotero/blob/32ba987c2892e2aee6046a82c08d69145e758afd/chrome/content/zotero/elements/colorPicker.js#L178
-    https://github.com/windingwind/ZoteroStyle/blob/6b7c7c95abb7e5d75d0e1fbcc2d824c0c4e2e81a/src/events.ts#L263
-    https://github.com/ZXLYX/ZoteroStyle/blob/57fa178a1a45e710a73706f0087892cf19c9caf1/src/events.ts#L286
-     */
     const tagstrParam = getParam.tagstr()
     if (!tagstrParam.valid) return
     const tagstr = tagstrParam.value
 
-    // Select all span elements with aria-label containing "Tag ObsCite."
     const spans: NodeListOf<HTMLSpanElement> = Zotero.getMainWindow().document.querySelectorAll(
       `span[aria-label*="Tag ${tagstr}."]`,
     )
 
-    // Iterate over the NodeList and change the text color to red
     spans.forEach((span) => {
       span.style.color = 'red'
     })
-
-    // await ztoolkit.ItemTree.register()
   }
 }
 
@@ -541,10 +505,10 @@ export class prefHelpers {
   static isValidRegExp(str: string): boolean {
     try {
       new RegExp(str)
-      return true // No error means it's a valid RegExp
+      return true
     } catch (err) {
       Logger.log('isValidRegExp', `ERROR: RegExp is not valid:: >> ${str} <<.`, false, 'warn')
-      return false // An error indicates an invalid RegExp
+      return false
     }
   }
 
@@ -589,12 +553,6 @@ export class prefHelpers {
       }
       if (found.length > 0) {
         Logger.log('checkMetadataFormat', `ERROR: metadata id cannot contain: ${found.join(' or ')}.`, false, 'warn')
-        // TODO handle notification
-        // Notifier.showNotification(
-        //   'Warning',
-        //   `Invalid citekey metadata. metadata keyword cannot contain: ${found.join(' or ')}.`,
-        //   false,
-        // )
         return false
       } else {
         return true
@@ -607,6 +565,7 @@ export class prefHelpers {
   static checkTagStr(tagstr: string): boolean {
     if (typeof tagstr === 'string' && tagstr.length > 0) {
       const found: string[] = []
+      // '/' and '#' are allowed in tag strings.
       const notallowed = [
         "'",
         '"',
@@ -624,7 +583,6 @@ export class prefHelpers {
         '`',
         '~',
         '!',
-        // '#',
         '$',
         '%',
         '^',
@@ -637,7 +595,6 @@ export class prefHelpers {
         '}',
         ' ',
       ]
-      // '/',
       for (const char of notallowed) {
         if (tagstr.includes(char)) {
           found.push(char)
@@ -645,10 +602,6 @@ export class prefHelpers {
       }
       if (found.length > 0) {
         Logger.log('checkTagStr', `ERROR: TagStr cannot contain: ${found.join(' or ')}.`, false, 'warn')
-        // TODO Issue-145 - Deal with config string validation before the preference pane is closed (rather than when the sync is run).
-        // TODO allow more
-        // Change invalid value behavior from silent reversion to default into vocal reversion to the last-valid value.
-        // Notifier.showNotification('Warning', `Invalid tag string. Tag cannot contain: ${found.join(' or ')}.`, false)
         return false
       } else {
         return true
@@ -662,13 +615,11 @@ export class prefHelpers {
 export class Registrar {
   @trace
   static registerPrefs() {
-    Zotero.PreferencePanes.register({
+    void Zotero.PreferencePanes.register({
       pluginID: addon.data.config.addonID,
       src: rootURI + 'content/preferences.xhtml',
       label: getString('prefs-title'),
       image: `chrome://${addon.data.config.addonRef}/content/icons/favicon.png`,
-      // image: favIcon,
-      // defaultXUL: true,
     })
   }
 }
@@ -682,7 +633,6 @@ export class KeyboardShortcuts {
     const pref = getPref('shortcutOpenNote')
     const shortcut = pref && pref.trim() !== '' ? pref.trim() : null
 
-    // Unregister old callback if exists
     if (this.currentCallback) {
       ztoolkit.Keyboard.unregister(this.currentCallback)
       this.currentCallback = null
@@ -699,7 +649,7 @@ export class KeyboardShortcuts {
       if (keyOptions.keyboard) {
         const kb = keyOptions.keyboard as { equals: (s: string) => boolean }
 
-        // Block accel+A (Select All) to prevent freezing with large selections
+        // Block accel+A (Select All) to prevent freezing with large selections.
         if (kb.equals('accel,a')) {
           return
         }
@@ -742,6 +692,7 @@ export class KeyboardShortcuts {
       }
 
       const itemId = selectedItemIds[0]
+      if (itemId === undefined) return
 
       if (!DataManager.checkForZotId(itemId)) {
         Notifier.notify({
@@ -763,8 +714,8 @@ export class KeyboardShortcuts {
         return
       }
 
-      // Open the first linked note (same behavior as single-entry context menu)
       const entry = entryList[0]
+      if (entry === undefined) return
       const protocol = getParam.mdeditor().value
 
       switch (protocol) {
@@ -782,7 +733,6 @@ export class KeyboardShortcuts {
           break
       }
 
-      // Notify user if there are multiple notes (they can use context menu for others)
       if (entryList.length > 1) {
         Notifier.notify({
           title: 'Multiple Notes',

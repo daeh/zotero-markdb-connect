@@ -1,36 +1,22 @@
-### Local config files ###
-
-
-# dot files
+# macOS
 .DS_Store
 
-### Runtime ###
+# Node
 node_modules/
-
-dist/
-
-yarn.lock
-.DS_Store
-
-### Editor directories and files ###
-.vscode/
-# .idea/
-
-### Generated files ###
-eslint.config.js
-
-# Node.js
-node_modules
 pnpm-lock.yaml
 yarn.lock
 
-# TSC
+# Build / generated
+dist/
+build/
+logs/
 tsconfig.tsbuildinfo
+eslint.config.js
+
+# Editor (.vscode is tracked as shared config; .idea is per-developer)
+.idea/
+VSCProject.code-workspace
 
 # Scaffold
 .env
 .scaffold/
-build/
-logs/
-
-VSCProject.code-workspace

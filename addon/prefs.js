@@ -1,32 +1,29 @@
 /* eslint-disable no-undef */
 pref('enable', true)
 
-//
-
 pref('configuration', '0.0.0')
 pref('debugmode', 'minimal')
 
 pref('sourcedir', '')
 
-pref('filefilterstrategy', 'default') // ['default', 'customfileregexp'][0]
+pref('filefilterstrategy', 'default')
 pref('filepattern', '^@.+\\.md$')
 
-pref('matchstrategy', 'citekeyyaml') // ['citekeyyaml', 'citekeyregexp', 'zotitemkey'][0]
+pref('matchstrategy', 'citekeyyaml')
 pref('yamlkeyword', '')
 pref('citekeypattern', '')
 pref('zotkeyregexp', '')
 
-pref('mdeditor', 'obsidian') // ['obsidian', 'logseq', 'system'][0]
+pref('mdeditor', 'obsidian')
 pref('obsidianvaultname', '')
-// pref('obsidianresolvewithfile', false) // [false, true][0]
-pref('obsidianresolvespec', 'path') // ['path', 'file'][0]
-pref('obsidianpanetype', 'tab') // ['tab', 'active', 'window'][0]
+pref('obsidianresolvespec', 'path')
+pref('obsidianpanetype', 'tab')
 
 pref('logseqgraph', '')
 pref('logseqprefix', '')
 
-pref('grouplibraries', 'user') // ['user', 'group'][0]
-pref('removetags', 'keepsynced') // ['keepsynced', 'addonly'][0]
+pref('grouplibraries', 'user')
+pref('removetags', 'keepsynced')
 pref('tagstr', 'ObsCite')
 
-pref('shortcutOpenNote', 'accel,shift,p') // keyboard shortcut to open linked note, e.g. 'accel,shift,p' or 'shift,o'
+pref('shortcutOpenNote', 'accel,shift,p') // comma-separated modifiers and key

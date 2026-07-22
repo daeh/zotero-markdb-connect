@@ -6,23 +6,35 @@ import { getErrorMessage, Logger, trace } from './mdbcLogger'
 import { getParam } from './mdbcParam'
 import { Notifier } from './mdbcUX'
 
+interface UpdateManifest {
+  addons: Record<string, unknown>
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function isUpdateManifest(value: unknown): value is UpdateManifest {
+  return isRecord(value) && isRecord(value.addons)
+}
+
 export class wrappers {
   @trace
   static async fetchAndParseJsonFromGitHub(): Promise<'match' | 'mismatch' | 'error'> {
     const url = config.updateJSON
     let status: 'match' | 'mismatch' | 'error'
     try {
-      // Fetch data from the GitHub repository
       const response = await Zotero.HTTP.request('GET', url, {})
 
-      // Check if the response status is 200 (OK)
       if (response.status !== 200) {
         throw new Error(`Failed to fetch data: Status code ${response.status}`)
       }
 
-      // Parse JSON data
       try {
-        const jsonData = JSON.parse(response.responseText)
+        const jsonData: unknown = JSON.parse(response.responseText)
+        if (!isUpdateManifest(jsonData)) {
+          throw new TypeError('Update manifest must contain an addons object')
+        }
         const addonIds = Object.keys(jsonData.addons)
         status = config.addonID === 'dev@daeh.info' && addonIds.includes('daeda@mit.edu') ? 'mismatch' : 'match'
         Logger.log('fetchAndParseJsonFromGitHub', `JSON data: ${JSON.stringify(Object.keys(jsonData))}`, false, 'debug')
@@ -30,10 +42,9 @@ export class wrappers {
         throw new Error('Failed to parse JSON data', { cause: jsonError })
       }
     } catch (error) {
-      // Handle network errors or other issues
       const message = getErrorMessage(error)
       Logger.log('fetchAndParseJsonFromGitHub', `Error fetching JSON data: ${message}`, false, 'error')
-      throw error // Re-throw the error if you want to handle it outside this function
+      throw error
     }
     return status
   }
@@ -52,9 +63,9 @@ export class wrappers {
     }
     const versionThis_rematch = version_re.exec(version)
     if (versionThis_rematch?.groups) {
-      configurationVersionThis.major = parseInt(versionThis_rematch.groups.major)
-      configurationVersionThis.minor = parseInt(versionThis_rematch.groups.minor)
-      configurationVersionThis.patch = parseInt(versionThis_rematch.groups.patch)
+      configurationVersionThis.major = Number.parseInt(versionThis_rematch.groups.major ?? '0', 10)
+      configurationVersionThis.minor = Number.parseInt(versionThis_rematch.groups.minor ?? '0', 10)
+      configurationVersionThis.patch = Number.parseInt(versionThis_rematch.groups.patch ?? '0', 10)
       configurationVersionThis.release = versionThis_rematch.groups.release ? versionThis_rematch.groups.release : ''
     }
 
@@ -72,9 +83,9 @@ export class wrappers {
         if (version_re.test(configurationVersionPreviousStr)) {
           const version_rematch = version_re.exec(configurationVersionPreviousStr)
           if (version_rematch?.groups) {
-            configurationVersionPrevious.major = parseInt(version_rematch.groups.major)
-            configurationVersionPrevious.minor = parseInt(version_rematch.groups.minor)
-            configurationVersionPrevious.patch = parseInt(version_rematch.groups.patch)
+            configurationVersionPrevious.major = Number.parseInt(version_rematch.groups.major ?? '0', 10)
+            configurationVersionPrevious.minor = Number.parseInt(version_rematch.groups.minor ?? '0', 10)
+            configurationVersionPrevious.patch = Number.parseInt(version_rematch.groups.patch ?? '0', 10)
             configurationVersionPrevious.release = version_rematch.groups.release ? version_rematch.groups.release : ''
           }
         }
@@ -90,11 +101,8 @@ export class wrappers {
   }
 
   @trace
-  static async startupVersionCheck() {
+  static startupVersionCheck() {
     const versionParse = this.findPreviousVersion()
-
-    // Logger.log('startupVersionCheck - versionParse.app', versionParse.app, false, 'debug')
-    // Logger.log('startupVersionCheck - configurationVersionPrevious', versionParse.config, false, 'debug')
 
     if (versionParse.config.str !== versionParse.app.str) {
       let prezot7 = versionParse.config.major === 0 && versionParse.config.minor < 1
@@ -106,13 +114,10 @@ export class wrappers {
 
       if (!preprerename1) {
         const test0 = getPref('sourcedir')
-        // Logger.log('startupVersionCheck - preprerename1 - test0', test0, false, 'debug')
         if (typeof test0 !== 'string' || test0 === '') {
-          // @ts-ignore old pref key
-          const test1 = getPref('source_dir') // preference key prior to v...
-          // Logger.log('startupVersionCheck - preprerename1 - test1', test1, false, 'debug')
+          // @ts-expect-error Legacy preference key is absent from PluginPrefsMap.
+          const test1 = getPref('source_dir')
           if (test1 && typeof test1 === 'string' && test1.length > 0) {
-            // Logger.log('startupVersionCheck - preprerename1 - AMHERE0', test1, false, 'debug')
             preprerename1 = true
           }
         }
@@ -127,25 +132,18 @@ export class wrappers {
         }
       }
 
-      // Logger.log('startupVersionCheck - preprerename1', preprerename1, false, 'debug')
-
-      // Logger.log('startupVersionCheck - prezot7', prezot7, false, 'debug')
-
-      /// sourcedir
+      // sourcedir
       try {
         if (preprerename1) {
-          // @ts-ignore old pref key
-          const val = getPref('source_dir') // preference key prior to v...
-          // Logger.log('startupVersionCheck - sourcedir - val', val, false, 'debug')
+          // @ts-expect-error Legacy preference key is absent from PluginPrefsMap.
+          const val = getPref('source_dir')
           if (val && typeof val === 'string' && val.length > 0) {
             setPref('sourcedir', val)
             getParam.sourcedir()
           }
         } else if (prezot7) {
-          const val = Zotero.Prefs.get('extensions.mdbconnect.source_dir', true) // as string
-          // Logger.log('startupVersionCheck - sourcedir - val2', val, false, 'debug')
+          const val = Zotero.Prefs.get('extensions.mdbconnect.source_dir', true)
           if (val && typeof val === 'string' && val.length > 0) {
-            // Logger.log('startupVersionCheck - sourcedir - AMHERE2', val, false, 'debug')
             setPref('sourcedir', val)
             getParam.sourcedir()
           }
@@ -154,13 +152,12 @@ export class wrappers {
         Logger.log('startupDependencyCheck', `sourcedir ERROR: ${getErrorMessage(err)}`, false, 'error')
       }
 
-      /// filefilterstrategy
+      // filefilterstrategy
       try {
         if (preprerename1) {
-          const val = getPref('filefilterstrategy') // as string
+          const val = getPref('filefilterstrategy')
           if (val === 'customfileregex') {
             setPref('filefilterstrategy', 'customfileregexp')
-            // } else if (paramVals.filefilterstrategy.includes(val as paramTypes['filefilterstrategy'])) {
           } else if (
             val &&
             typeof val === 'string' &&
@@ -172,7 +169,7 @@ export class wrappers {
           }
           getParam.filefilterstrategy()
         } else if (prezot7) {
-          const val = Zotero.Prefs.get('extensions.mdbconnect.filefilterstrategy', true) // as string
+          const val = Zotero.Prefs.get('extensions.mdbconnect.filefilterstrategy', true)
           if (val === 'customfileregex') {
             setPref('filefilterstrategy', 'customfileregexp')
           } else if (
@@ -190,14 +187,14 @@ export class wrappers {
         Logger.log('startupDependencyCheck', `filefilterstrategy ERROR: ${getErrorMessage(err)}`, false, 'error')
       }
 
-      /// filepattern
+      // filepattern
       try {
         if (preprerename1) {
-          const val = getPref('filepattern') //as string
+          const val = getPref('filepattern')
           if (val && typeof val === 'string') setPref('filepattern', val)
           getParam.filepattern()
         } else if (prezot7) {
-          const val = Zotero.Prefs.get('extensions.mdbconnect.filepattern', true) //as string
+          const val = Zotero.Prefs.get('extensions.mdbconnect.filepattern', true)
           if (val && typeof val === 'string') setPref('filepattern', val)
           getParam.filepattern()
         }
@@ -205,10 +202,10 @@ export class wrappers {
         Logger.log('startupDependencyCheck', `filepattern ERROR: ${getErrorMessage(err)}`, false, 'error')
       }
 
-      /// matchstrategy
+      // matchstrategy
       try {
         if (preprerename1) {
-          const val = getPref('matchstrategy') // as string
+          const val = getPref('matchstrategy')
           if (val === 'bbtcitekey' || val === 'bbtcitekeyyaml') {
             setPref('matchstrategy', 'citekeyyaml')
           } else if (val === 'bbtcitekeyregexp') {
@@ -220,7 +217,7 @@ export class wrappers {
           }
           getParam.matchstrategy()
         } else if (prezot7) {
-          const val = Zotero.Prefs.get('extensions.mdbconnect.matchstrategy', true) // as string
+          const val = Zotero.Prefs.get('extensions.mdbconnect.matchstrategy', true)
           if (val === 'bbtcitekey' || val === 'bbtcitekeyyaml') {
             setPref('matchstrategy', 'citekeyyaml')
           } else if (val === 'bbtcitekeyregexp') {
@@ -236,17 +233,17 @@ export class wrappers {
         Logger.log('startupDependencyCheck', `matchstrategy ERROR: ${getErrorMessage(err)}`, false, 'error')
       }
 
-      /// yamlkeyword (formerly bbtyamlkeyword)
+      // yamlkeyword
       try {
         if (preprerename1) {
-          // @ts-ignore old pref key
-          const val = getPref('metadatakeyword') // preference key prior to v...
+          // @ts-expect-error Legacy preference key is absent from PluginPrefsMap.
+          const val = getPref('metadatakeyword')
           if (val && typeof val === 'string') {
             setPref('yamlkeyword', val)
           }
           getParam.yamlkeyword()
         } else if (prezot7) {
-          const val = Zotero.Prefs.get('extensions.mdbconnect.metadatakeyword', true) // as string
+          const val = Zotero.Prefs.get('extensions.mdbconnect.metadatakeyword', true)
           if (val && typeof val === 'string') {
             setPref('yamlkeyword', val)
           }
@@ -256,17 +253,17 @@ export class wrappers {
         Logger.log('startupDependencyCheck', `yamlkeyword ERROR: ${getErrorMessage(err)}`, false, 'error')
       }
 
-      /// zotkeyregexp
+      // zotkeyregexp
       try {
         if (preprerename1) {
-          // @ts-ignore old pref key
-          const val = getPref('zotkeyregex') // preference key prior to v...
+          // @ts-expect-error Legacy preference key is absent from PluginPrefsMap.
+          const val = getPref('zotkeyregex')
           if (val && typeof val === 'string') {
             setPref('zotkeyregexp', val)
           }
           getParam.zotkeyregexp()
         } else if (prezot7) {
-          const val = Zotero.Prefs.get('extensions.mdbconnect.zotkeyregex', true) // as string
+          const val = Zotero.Prefs.get('extensions.mdbconnect.zotkeyregex', true)
           if (val && typeof val === 'string') {
             setPref('zotkeyregexp', val)
           }
@@ -276,11 +273,11 @@ export class wrappers {
         Logger.log('startupDependencyCheck', `zotkeyregexp ERROR: ${getErrorMessage(err)}`, false, 'error')
       }
 
-      /// mdeditor
+      // mdeditor
       try {
         if (preprerename1) {
-          // @ts-ignore old pref key
-          const val = getPref('vaultresolution') // preference key prior to v...
+          // @ts-expect-error Legacy preference key is absent from PluginPrefsMap.
+          const val = getPref('vaultresolution')
           if (val === 'path') {
             setPref('mdeditor', 'obsidian')
             setPref('obsidianresolvespec', 'path')
@@ -297,7 +294,7 @@ export class wrappers {
           }
           getParam.mdeditor()
         } else if (prezot7) {
-          const val = Zotero.Prefs.get('extensions.mdbconnect.vaultresolution', true) // as string
+          const val = Zotero.Prefs.get('extensions.mdbconnect.vaultresolution', true)
           if (val === 'path') {
             setPref('mdeditor', 'obsidian')
             setPref('obsidianresolvespec', 'path')
@@ -318,17 +315,17 @@ export class wrappers {
         Logger.log('startupDependencyCheck', `mdeditor ERROR: ${getErrorMessage(err)}`, false, 'error')
       }
 
-      /// obsidianvaultname
+      // obsidianvaultname
       try {
         if (preprerename1) {
-          // @ts-ignore old pref key
-          const val = getPref('vaultname') // preference key prior to v... // && typeof val === 'string' as string
+          // @ts-expect-error Legacy preference key is absent from PluginPrefsMap.
+          const val = getPref('vaultname')
           if (val && typeof val === 'string') {
             setPref('obsidianvaultname', val)
           }
           getParam.obsidianvaultname()
         } else if (prezot7) {
-          const val = Zotero.Prefs.get('extensions.mdbconnect.vaultname', true) // as string
+          const val = Zotero.Prefs.get('extensions.mdbconnect.vaultname', true)
           if (val && typeof val === 'string') {
             setPref('obsidianvaultname', val)
           }
@@ -338,16 +335,16 @@ export class wrappers {
         Logger.log('startupDependencyCheck', `obsidianvaultname ERROR: ${getErrorMessage(err)}`, false, 'error')
       }
 
-      /// logseqgraph
+      // logseqgraph
       try {
         if (preprerename1) {
-          const val = getPref('logseqgraph') // as string
+          const val = getPref('logseqgraph')
           if (val && typeof val === 'string') {
             setPref('logseqgraph', val)
           }
           getParam.logseqgraph()
         } else if (prezot7) {
-          const val = Zotero.Prefs.get('extensions.mdbconnect.logseqgraph', true) // as string
+          const val = Zotero.Prefs.get('extensions.mdbconnect.logseqgraph', true)
           if (val && typeof val === 'string') {
             setPref('logseqgraph', val)
           }
@@ -357,16 +354,16 @@ export class wrappers {
         Logger.log('startupDependencyCheck', `logseqgraph ERROR: ${getErrorMessage(err)}`, false, 'error')
       }
 
-      /// grouplibraries
+      // grouplibraries
       try {
         if (preprerename1) {
-          const val = getPref('grouplibraries') // as string
+          const val = getPref('grouplibraries')
           if (val && typeof val === 'string' && paramVals.grouplibraries.find((validName) => validName === val)) {
             setPref('grouplibraries', val)
           } else setPref('grouplibraries', paramVals.grouplibraries[0])
           getParam.grouplibraries()
         } else if (prezot7) {
-          const val = Zotero.Prefs.get('extensions.mdbconnect.grouplibraries', true) // as string
+          const val = Zotero.Prefs.get('extensions.mdbconnect.grouplibraries', true)
           if (val && typeof val === 'string' && paramVals.grouplibraries.find((validName) => validName === val)) {
             setPref('grouplibraries', val)
           } else setPref('grouplibraries', paramVals.grouplibraries[0])
@@ -376,10 +373,10 @@ export class wrappers {
         Logger.log('startupDependencyCheck', `grouplibraries ERROR: ${getErrorMessage(err)}`, false, 'error')
       }
 
-      /// removetags
+      // removetags
       try {
         if (preprerename1) {
-          const val = getPref('removetags') // as string
+          const val = getPref('removetags')
           if (val && typeof val === 'string' && paramVals.removetags.find((validName) => validName === val)) {
             setPref('removetags', val)
           } else if (val) {
@@ -387,7 +384,7 @@ export class wrappers {
           }
           getParam.removetags()
         } else if (prezot7) {
-          const val = Zotero.Prefs.get('extensions.mdbconnect.removetags', true) // as string
+          const val = Zotero.Prefs.get('extensions.mdbconnect.removetags', true)
           if (val && typeof val === 'string' && paramVals.removetags.find((validName) => validName === val)) {
             setPref('removetags', val)
           } else if (val) {
@@ -398,16 +395,16 @@ export class wrappers {
         Logger.log('startupDependencyCheck', `removetags ERROR: ${getErrorMessage(err)}`, false, 'error')
       }
 
-      /// tagstr
+      // tagstr
       try {
         if (preprerename1) {
-          const val = getPref('tagstr') // as string
+          const val = getPref('tagstr')
           if (val) {
             setPref('tagstr', val)
           }
           getParam.tagstr()
         } else if (prezot7) {
-          const val = Zotero.Prefs.get('extensions.mdbconnect.tagstr', true) // as string
+          const val = Zotero.Prefs.get('extensions.mdbconnect.tagstr', true)
           if (val && typeof val === 'string' && val.length > 0) {
             setPref('tagstr', val)
           }
@@ -417,9 +414,8 @@ export class wrappers {
         Logger.log('startupDependencyCheck', `tagstr ERROR: ${getErrorMessage(err)}`, false, 'error')
       }
 
-      /// migrate BBT-prefixed pref keys to new names
+      // Migrate BBT-prefixed preference keys.
       try {
-        // matchstrategy values
         const matchVal = getPref('matchstrategy')
         if (matchVal === 'bbtcitekey' || matchVal === 'bbtcitekeyyaml') {
           setPref('matchstrategy', 'citekeyyaml')
@@ -427,15 +423,13 @@ export class wrappers {
           setPref('matchstrategy', 'citekeyregexp')
         }
 
-        // pref key: bbtyamlkeyword -> yamlkeyword
-        // @ts-ignore old pref key
+        // @ts-expect-error Legacy preference key is absent from PluginPrefsMap.
         const yamlVal = getPref('bbtyamlkeyword')
         if (yamlVal && typeof yamlVal === 'string' && yamlVal.length > 0) {
           setPref('yamlkeyword', yamlVal)
         }
 
-        // pref key: bbtregexp -> citekeypattern
-        // @ts-ignore old pref key
+        // @ts-expect-error Legacy preference key is absent from PluginPrefsMap.
         const regexpVal = getPref('bbtregexp')
         if (regexpVal && typeof regexpVal === 'string' && regexpVal.length > 0) {
           setPref('citekeypattern', regexpVal)
@@ -481,7 +475,7 @@ export class wrappers {
   }
 
   @trace
-  static async startupConfigCheck() {
+  static startupConfigCheck() {
     let success = true
 
     if (!getParam.sourcedir().valid) {

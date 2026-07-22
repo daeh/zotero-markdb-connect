@@ -3,15 +3,7 @@ export type DebugMode = 'minimal' | 'maximal'
 export type LogType = 'error' | 'warn' | 'info' | 'debug' | 'trace' | 'config'
 
 export type NotificationType =
-  | 'addon'
-  | 'success'
-  | 'error'
-  | 'warn'
-  | 'info'
-  | 'debug'
-  | 'config'
-  | 'itemsadded'
-  | 'itemsremoved'
+  'addon' | 'success' | 'error' | 'warn' | 'info' | 'debug' | 'config' | 'itemsadded' | 'itemsremoved'
 
 export type ZoteroIconFile = `${keyof typeof globalThis._ZoteroTypes.IconFile}`
 export type ZoteroIconURI = globalThis._ZoteroTypes.IconURI
@@ -24,9 +16,6 @@ export interface Entry {
   zotids: number[]
   name: string
   path: string
-  // filename: string
-  // filenamebase: string
-  // displayname: string
 }
 
 export interface NotifyCreateLineOptions {
@@ -37,15 +26,28 @@ export interface NotifyCreateLineOptions {
   idx?: number
 }
 
-export interface notificationData {
-  title: string
-  // zotType?: 'default' | 'success' | 'fail'
-  // iconFile?: ZoteroIconFile
-  // iconURI?: ZoteroIconURI
-  body?: string
-  type?: NotificationType
-  messageArray?: { body: string; type: NotificationType }[]
+export interface NotificationMessage {
+  body: string
+  type: NotificationType
 }
+
+interface NotificationDataBase {
+  title: string
+}
+
+interface NotificationBodyData extends NotificationDataBase {
+  body: string
+  type: NotificationType
+  messageArray?: never
+}
+
+interface NotificationArrayData extends NotificationDataBase {
+  body?: never
+  type?: never
+  messageArray: NotificationMessage[]
+}
+
+export type notificationData = NotificationBodyData | NotificationArrayData
 
 export interface messageData {
   rowData: {

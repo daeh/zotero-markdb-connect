@@ -8,28 +8,27 @@ import type { ColumnOptions, DialogHelper } from 'zotero-plugin-toolkit'
 class Addon {
   public data: {
     alive: boolean
+    initialized: boolean
     config: typeof config
-    // Env type, see build.js
-    env: 'development' | 'production'
+    env: 'development' | 'production' | 'test'
     ztoolkit: ZToolkit
     locale?: {
-      current: any
+      current: Localization
     }
     prefs?: {
       window: Window
       columns: ColumnOptions[]
       rows: Record<string, string>[]
     }
-    dialog?: DialogHelper
+    dialog?: DialogHelper | undefined
   }
-  // Lifecycle hooks
   public hooks: typeof hooks
-  // APIs
   public api: object
 
   constructor() {
     this.data = {
       alive: true,
+      initialized: false,
       config,
       env: __env__,
       ztoolkit: createZToolkit(),
