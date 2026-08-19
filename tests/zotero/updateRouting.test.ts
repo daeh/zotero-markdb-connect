@@ -72,7 +72,6 @@ const betaEntries = (updateBetaManifest as Manifest).addons[config.addonID]?.upd
  * Add a row per release; a range left un-bumped fails here.
  */
 const ROUTING = [
-  { zotero: '10.0', installed: '0.0.1', expected: '0.2.3' },
   { zotero: '9.0.6', installed: '0.0.1', expected: '0.2.2' },
   { zotero: '8.0', installed: '0.0.1', expected: '0.1.8' },
   { zotero: '7.0.32', installed: '0.0.1', expected: '0.1.8' },
@@ -97,7 +96,6 @@ describe('updater routing', function () {
   it('never offers a release above a version line’s ceiling', function () {
     // The complement of the table: each line must not reach the next line's release.
     const ceilings = [
-      { zotero: '9.0.6', mustNotReach: '0.2.3' },
       { zotero: '8.0', mustNotReach: '0.2.2' },
       { zotero: '7.0.32', mustNotReach: '0.2.2' },
     ] as const
@@ -121,7 +119,7 @@ describe('updater routing', function () {
   })
 
   it('offers nothing when the installed version is already newest', function () {
-    assert.isNull(selectUpdate(releaseEntries, '10.0', '0.2.3'))
+    assert.isNull(selectUpdate(releaseEntries, '9.0.6', '0.2.2'))
   })
 
   it('confirms the N.999 minimum excludes its own major line', function () {

@@ -20,7 +20,6 @@ const repoRoot = join(import.meta.dirname, '..', '..')
 
 /** Every entry the release add-on must advertise, newest first. */
 const EXPECTED_ENTRIES = [
-  { version: '0.2.3', min: '9.999', max: '10.*' },
   { version: '0.2.2', min: '8.999', max: '9.*' },
   { version: '0.1.8', min: '6.999', max: '8.*' },
 ] as const
