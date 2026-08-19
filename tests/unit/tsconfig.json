@@ -16,5 +16,5 @@
     "skipLibCheck": true,
     "types": ["node"]
   },
-  "include": ["./**/*.test.ts", "../src/utils/time.ts", "../src/utils/noteName.ts", "../src/utils/json.ts"]
+  "include": ["./**/*.test.ts", "../../src/utils/time.ts", "../../src/utils/noteName.ts", "../../src/utils/json.ts"]
 }

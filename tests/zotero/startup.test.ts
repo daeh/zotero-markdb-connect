@@ -1,5 +1,5 @@
-import { config } from '../package.json'
-import { prefHelpers } from '../src/modules/mdbcUX'
+import { config } from '../../package.json'
+import { prefHelpers } from '../../src/modules/mdbcUX'
 
 import { getTestPlugin } from './helpers/plugin'
 

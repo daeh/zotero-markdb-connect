@@ -15,12 +15,13 @@ pnpm-lock.yaml
 
 # Local scratch directories
 **/.scaffold/
+**/.claude/
 _agents/
 _memories/
 _development/
 
 # SHA-256-pinned third-party bundle
-test/vendor/chai.js
+tests/zotero/vendor/chai.js
 
 # Scaffold-generated typings
 typings/i10n.d.ts

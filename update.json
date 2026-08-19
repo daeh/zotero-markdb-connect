@@ -4,7 +4,7 @@
       "updates": [
         {
           "version": "0.2.2",
-          "update_link": "https://github.com/daeh/zotero-markdb-connect/releases/latest/download/markdb-connect.xpi",
+          "update_link": "https://github.com/daeh/zotero-markdb-connect/releases/download/v0.2.2/markdb-connect.xpi",
           "applications": {
             "zotero": {
               "strict_min_version": "8.999",
@@ -37,12 +37,12 @@
     "dev@daeh.info": {
       "updates": [
         {
-          "version": "0.1.9",
+          "version": "0.2.3",
           "update_link": "https://github.com/daeh/zotero-markdb-connect/releases/latest/download/markdb-connect.xpi",
           "applications": {
             "zotero": {
-              "strict_min_version": "8.999",
-              "strict_max_version": "9.*"
+              "strict_min_version": "9.999",
+              "strict_max_version": "10.*"
             }
           }
         }

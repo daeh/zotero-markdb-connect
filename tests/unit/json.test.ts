@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 
-import { assembleDump, JSON_UNSERIALIZABLE, safeJsonClone, safeJsonObjectClone } from '../src/utils/json.ts'
+import { assembleDump, JSON_UNSERIALIZABLE, safeJsonClone, safeJsonObjectClone } from '../../src/utils/json.ts'
 
 void test('safeJsonClone deep-clones plain JSON data', () => {
   const input = { a: 1, b: [2, 'x'], c: null, d: { e: true } }

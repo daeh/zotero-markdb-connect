@@ -1,8 +1,8 @@
-import { ScanMarkdownFiles } from '../src/modules/mdbcScan'
+import { ScanMarkdownFiles } from '../../src/modules/mdbcScan'
 
 import { getTestPlugin } from './helpers/plugin'
 
-import type { Entry } from '../src/mdbcTypes'
+import type { Entry } from '../../src/mdbcTypes'
 
 const fixtureCitationKey = 'mdbc-test-fixture'
 const fixtureFilename = `@${fixtureCitationKey}.md`

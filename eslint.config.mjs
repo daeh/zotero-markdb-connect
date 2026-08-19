@@ -105,7 +105,12 @@ export default defineConfig([
     settings: {
       'import-x/resolver-next': [
         createTypeScriptImportResolver({
-          project: ['./tsconfig.json', './tests/tsconfig.json', './test/tsconfig.json', './tsconfig.repo.json'],
+          project: [
+            './tsconfig.json',
+            './tests/unit/tsconfig.json',
+            './tests/zotero/tsconfig.json',
+            './tsconfig.repo.json',
+          ],
           noWarnOnMultipleProjects: true,
           alwaysTryTypes: true,
         }),
@@ -156,7 +161,6 @@ export default defineConfig([
     files: [
       `src/**/*.{${allTsExtensions}}`,
       `tests/**/*.{${allTsExtensions}}`,
-      `test/**/*.{${allTsExtensions}}`,
       'typings/**/*.d.ts',
       `*.config.{${allTsExtensions}}`,
     ],
@@ -167,7 +171,7 @@ export default defineConfig([
 
   // Node test runner.
   {
-    files: ['tests/**/*.ts'],
+    files: ['tests/unit/**/*.ts'],
     languageOptions: {
       globals: {
         ...globals.node,
@@ -204,7 +208,7 @@ export default defineConfig([
 
   // In-Zotero Mocha/Chai tests.
   {
-    files: ['test/**/*.ts'],
+    files: ['tests/zotero/**/*.ts'],
     languageOptions: {
       globals: {
         ...globals.mocha,
