@@ -19,4 +19,7 @@ function initZToolkit(_ztoolkit: ReturnType<typeof createZToolkit>) {
   _ztoolkit.UI.basicOptions.ui.enableElementDOMLog = enableDebugLogs
   _ztoolkit.basicOptions.api.pluginID = config.addonID
   _ztoolkit.ProgressWindow.setIconURI('default', `chrome://${config.addonRef}/content/icons/favicon.png`)
+  // The toolkit's built-in success/fail icons point at PNGs Zotero 10 removed.
+  _ztoolkit.ProgressWindow.setIconURI('success', 'chrome://zotero/skin/16/universal/tick.svg')
+  _ztoolkit.ProgressWindow.setIconURI('fail', 'chrome://zotero/skin/16/universal/cross.svg')
 }

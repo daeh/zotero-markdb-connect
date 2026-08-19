@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 
-import { stripAndDecodeNotePrefix } from '../src/utils/noteName.ts'
+import { stripAndDecodeNotePrefix } from '../../src/utils/noteName.ts'
 
 void test('strips a matching prefix and URL-decodes the remainder', () => {
   assert.deepEqual(stripAndDecodeNotePrefix('prefix%2Ffoo%20bar', 'prefix'), {

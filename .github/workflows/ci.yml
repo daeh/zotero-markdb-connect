@@ -10,6 +10,8 @@ permissions:
   contents: read
 
 env:
+  RELEASE_NODE_VERSION: "26.7.0"
+  RELEASE_NPM_VERSION: "12.0.2"
   # zotero-types uses public GitHub dependencies recorded as SSH URLs.
   GIT_CONFIG_COUNT: "1"
   GIT_CONFIG_KEY_0: "url.https://github.com/.insteadOf"
@@ -17,7 +19,7 @@ env:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   build:
@@ -30,22 +32,36 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Restore npm cache
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-node-${{ env.RELEASE_NODE_VERSION }}-npm-${{ env.RELEASE_NPM_VERSION }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            npm-${{ runner.os }}-node-${{ env.RELEASE_NODE_VERSION }}-npm-${{ env.RELEASE_NPM_VERSION }}-
+
       - name: Setup Node
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 26
-          cache: npm
+          node-version: ${{ env.RELEASE_NODE_VERSION }}
+
+      - name: Install pinned npm
+        run: npm install --global "npm@$RELEASE_NPM_VERSION"
+        shell: bash
+        working-directory: ${{ runner.temp }}
+
+      - name: Verify toolchain
+        run: |
+          test "$(node --version)" = "v$RELEASE_NODE_VERSION"
+          test "$(npm --version)" = "$RELEASE_NPM_VERSION"
+        shell: bash
 
       - name: Install dependencies
         run: npm ci --allow-git=all
         shell: bash
 
-      - name: Format check
-        run: npm run format:check
-        shell: bash
-
-      - name: Lint
-        run: npm run lint:check
+      - name: Lint without changes
+        run: npm run lint-dry
         shell: bash
 
       - name: Typecheck
@@ -64,8 +80,40 @@ jobs:
         run: git diff --exit-code -- typings/i10n.d.ts typings/prefs.d.ts
         shell: bash
 
+      - name: Prepare release candidate
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          candidate_dir="$RUNNER_TEMP/release-candidate"
+          mkdir -p "$candidate_dir"
+          cp .scaffold/build/markdb-connect.xpi "$candidate_dir/"
+          cp .scaffold/build/update*.json "$candidate_dir/"
+          (
+            cd "$candidate_dir"
+            sha256sum markdb-connect.xpi > markdb-connect.xpi.sha256
+          )
+          test -s "$candidate_dir/markdb-connect.xpi"
+          test -s "$candidate_dir/markdb-connect.xpi.sha256"
+          test -s "$candidate_dir/update-beta.json"
+          version="$(node -p "require('./package.json').version")"
+          if [[ "$version" == *-* ]]; then
+            test ! -e "$candidate_dir/update.json"
+          else
+            test -s "$candidate_dir/update.json"
+          fi
+        shell: bash
+
+      - name: Upload release candidate
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: release-candidate-${{ github.sha }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/release-candidate/
+          if-no-files-found: error
+          retention-days: 90
+          overwrite: false
+
   zotero:
-    name: Zotero 9.0.6 integration tests
+    name: Zotero 10.0 integration tests
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
@@ -74,11 +122,29 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Restore npm cache
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-node-${{ env.RELEASE_NODE_VERSION }}-npm-${{ env.RELEASE_NPM_VERSION }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            npm-${{ runner.os }}-node-${{ env.RELEASE_NODE_VERSION }}-npm-${{ env.RELEASE_NPM_VERSION }}-
+
       - name: Setup Node
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 26
-          cache: npm
+          node-version: ${{ env.RELEASE_NODE_VERSION }}
+
+      - name: Install pinned npm
+        run: npm install --global "npm@$RELEASE_NPM_VERSION"
+        shell: bash
+        working-directory: ${{ runner.temp }}
+
+      - name: Verify toolchain
+        run: |
+          test "$(node --version)" = "v$RELEASE_NODE_VERSION"
+          test "$(npm --version)" = "$RELEASE_NPM_VERSION"
+        shell: bash
 
       - name: Install dependencies
         run: npm ci --allow-git=all
@@ -90,25 +156,25 @@ jobs:
           sudo apt-get install --yes libasound2t64 libdbus-glib-1-2 x11-xkb-utils xkb-data xvfb
         shell: bash
 
-      - name: Cache Zotero 9.0.6 archive
+      - name: Cache Zotero 10.0 archive
         id: zotero-cache
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
-          path: .cache/zotero/Zotero-9.0.6_linux-x86_64.tar.xz
-          key: zotero-linux-9.0.6-0db6e8f94bd0d84e862e6ef5c3e217030e173c0cd3c6dfbc836252c650fea3dd
+          path: .cache/zotero/Zotero-10.0_linux-x86_64.tar.xz
+          key: zotero-linux-10.0-fad10b2bee0b6178248a0ffb7b4add0bc2b1e71088f47d5549423e1cc80034b8
 
-      - name: Download Zotero 9.0.6
+      - name: Download Zotero 10.0
         if: steps.zotero-cache.outputs.cache-hit != 'true'
         run: |
           mkdir -p .cache/zotero
           curl --fail --location --retry 3 --retry-all-errors \
-            --output .cache/zotero/Zotero-9.0.6_linux-x86_64.tar.xz \
-            https://download.zotero.org/client/release/9.0.6/Zotero-9.0.6_linux-x86_64.tar.xz
+            --output .cache/zotero/Zotero-10.0_linux-x86_64.tar.xz \
+            https://download.zotero.org/client/release/10.0/Zotero-10.0_linux-x86_64.tar.xz
         shell: bash
 
       - name: Verify Zotero archive
         run: |
-          echo '0db6e8f94bd0d84e862e6ef5c3e217030e173c0cd3c6dfbc836252c650fea3dd  .cache/zotero/Zotero-9.0.6_linux-x86_64.tar.xz' \
+          echo 'fad10b2bee0b6178248a0ffb7b4add0bc2b1e71088f47d5549423e1cc80034b8  .cache/zotero/Zotero-10.0_linux-x86_64.tar.xz' \
             | sha256sum --check --strict
         shell: bash
 
@@ -116,7 +182,7 @@ jobs:
         run: |
           mkdir -p .cache/zotero/runtime
           tar --extract --xz \
-            --file .cache/zotero/Zotero-9.0.6_linux-x86_64.tar.xz \
+            --file .cache/zotero/Zotero-10.0_linux-x86_64.tar.xz \
             --directory .cache/zotero/runtime
           test -x .cache/zotero/runtime/Zotero_linux-x86_64/zotero
         shell: bash
@@ -132,7 +198,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: zotero-9.0.6-test-log
+          name: zotero-10.0-test-log
           path: zotero-test.log
           if-no-files-found: warn
           retention-days: 7

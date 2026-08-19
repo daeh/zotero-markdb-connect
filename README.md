@@ -2,12 +2,12 @@
 
 # MarkDB-Connect (Zotero Markdown DataBase Connect)
 
-[![zotero target version](https://img.shields.io/badge/Zotero-9-green?style=flat-square&logo=zotero&logoColor=CC2936)](https://www.zotero.org) [![Using Zotero Plugin Template](https://img.shields.io/badge/Using-Zotero%20Plugin%20Template-blue?style=flat-square&logo=github)](https://github.com/windingwind/zotero-plugin-template)
+[![zotero target version](https://img.shields.io/badge/Zotero-10-green?style=flat-square&logo=zotero&logoColor=CC2936)](https://www.zotero.org) [![Using Zotero Plugin Template](https://img.shields.io/badge/Using-Zotero%20Plugin%20Template-blue?style=flat-square&logo=github)](https://github.com/windingwind/zotero-plugin-template)
 
 - **_Scans your Markdown database and adds a colored tag to associated Zotero items._**
 - **_Jump to Markdown notes from the contextual menu of Zotero items._**
 - **_Supports various Markdown databases, including [Obsidian](https://obsidian.md), [logseq](https://logseq.com), and [Zettlr](https://www.zettlr.com)._**
-- **_Zotero 9 compatible._**
+- **_Zotero 10 compatible._**
 
 ![MarkDBConnectScreenshot](./docs/assets/readme/MarkDBConnectScreenshot.png)
 
@@ -35,8 +35,10 @@ Opens an existing markdown note in [Obsidian](https://obsidian.md), [logseq](htt
 - Restart Zotero
 
 > [!NOTE]
+> The last release for Zotero 9 was [`v0.2.2`](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.2.2).
+>
 > The last release for Zotero 7 and 8 was [`v0.1.8`](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.1.8).
-> 
+>
 > The last release for Zotero 6 was [`v0.0.27`](https://github.com/daeh/zotero-markdb-connect/releases/tag/v0.0.27).
 
 
@@ -209,13 +211,13 @@ tags:
 
 ## Suppressing the Zotero security notification
 
-Recent builds of Zotero show a security notification every time an application-specific URI (such as `obsidian://…`) is launched, because Zotero does not remember the user's link preferences. The notification can be suppressed from Zotero's advanced configuration, but the procedure differs between Zotero 9 and earlier versions because the underlying Gecko preference changed.
+Recent builds of Zotero show a security notification every time an application-specific URI (such as `obsidian://…`) is launched, because Zotero does not remember the user's link preferences. The notification can be suppressed from Zotero's advanced configuration, but the procedure differs between Zotero 9 or later and earlier versions because the underlying Gecko preference changed.
 
 ![Zotero Security Notification](./docs/assets/readme/ExternalLinkNotificationScreenshot.png)
 
 <details>
 
-<summary>Zotero 9</summary>
+<summary>Zotero 9 and 10</summary>
 
 The dialog can be bypassed on a per-scheme basis by creating a `network.protocol-handler.external.<scheme>` preference set to `true`. The setting must be added manually (it does not exist by default).
 

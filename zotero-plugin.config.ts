@@ -9,11 +9,11 @@ import pkg from './package.json'
 const CHAI_SHA256 = 'bdc229d660afad0313fc10d6afb5a339956a18c4c6e819d3eb5d8b94f314c202'
 const MOCHA_SHA256 = '8f46c07ab4422da71bdb27e8f54d0a9ba59b736face2c9f5534c414623c55ef6'
 
-const chaiSource = resolve('test/vendor/chai.js')
+const chaiSource = resolve('tests/zotero/vendor/chai.js')
 const mochaSource = resolve('node_modules/mocha/mocha.js')
 const scaffoldCache = resolve('.scaffold/cache')
 const scaffoldTestVault = resolve('.scaffold/test/data/fixture-vault')
-const testFixtureVault = resolve('test/fixtures/vault')
+const testFixtureVault = resolve('tests/zotero/fixtures/vault')
 
 async function verifySha256(filePath: string, expected: string): Promise<void> {
   const actual = createHash('sha256')
@@ -77,11 +77,12 @@ export default defineConfig({
     ],
     // Leave generated manifests in .scaffold/build; root manifests have legacy ranges and two add-on blocks.
     makeUpdateJson: {
-      hash: false,
+      hash: true,
     },
   },
 
   test: {
+    entries: 'tests/zotero',
     waitForPlugin: `() => Zotero.${pkg.config.addonInstance}.data.initialized`,
     hooks: {
       'test:init': async (ctx) => {

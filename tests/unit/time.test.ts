@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 
-import { elapsedMs, formatTimestamp } from '../src/utils/time.ts'
+import { elapsedMs, formatTimestamp } from '../../src/utils/time.ts'
 
 void test('elapsedMs returns the exact integer millisecond difference', () => {
   const from = Temporal.Instant.fromEpochMilliseconds(1_000)

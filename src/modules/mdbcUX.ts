@@ -17,21 +17,22 @@ import type {
 
 const favIcon = `chrome://${config.addonRef}/content/icons/favicon.png` as const
 
-const additionalIcons = [favIcon, 'chrome://zotero/skin/toolbar-item-add@2x.png'] as const
+const additionalIcons = [favIcon, 'chrome://zotero/skin/16/universal/plus.svg'] as const
 type AddonIconURI = (typeof additionalIcons)[number]
 type IconURI = AddonIconURI | ZoteroIconURI
 
 export class Notifier {
+  // Zotero 10 removed the flat PNG icon set; these come from the 16/universal SVG set.
   static readonly notificationTypes: Record<NotificationType, IconURI> = {
     addon: favIcon,
-    success: 'chrome://zotero/skin/tick@2x.png',
-    error: 'chrome://zotero/skin/error@2x.png',
-    warn: 'chrome://zotero/skin/warning@2x.png',
-    info: 'chrome://zotero/skin/prefs-advanced.png',
-    debug: 'chrome://zotero/skin/treeitem-patent@2x.png',
-    config: 'chrome://zotero/skin/prefs-general.png',
-    itemsadded: 'chrome://zotero/skin/toolbar-item-add@2x.png',
-    itemsremoved: 'chrome://zotero/skin/minus@2x.png',
+    success: 'chrome://zotero/skin/16/universal/tick.svg',
+    error: 'chrome://zotero/skin/16/universal/cross.svg',
+    warn: 'chrome://zotero/skin/16/universal/report.svg',
+    info: 'chrome://zotero/skin/16/universal/info.svg',
+    debug: 'chrome://zotero/skin/16/universal/dialog-options.svg',
+    config: 'chrome://zotero/skin/16/universal/options.svg',
+    itemsadded: 'chrome://zotero/skin/16/universal/plus.svg',
+    itemsremoved: 'chrome://zotero/skin/16/universal/minus.svg',
   }
 
   static notify(data: notificationData): void {
@@ -360,7 +361,7 @@ export class UIHelpers {
         {
           menuType: 'menuitem',
           l10nID: getLocaleID('contextmenuitem-open-default'),
-          icon: 'chrome://zotero/skin/treeitem-note@2x.png',
+          icon: 'chrome://zotero/skin/16/universal/note.svg',
           onShowing: (_event: Event, context: LibraryMenuContext) => {
             const entries = UIHelpers.getEntriesForSelection()
             context.setVisible(!!entries && entries.length === 1)
@@ -381,7 +382,7 @@ export class UIHelpers {
         {
           menuType: 'menuitem',
           l10nID: getLocaleID('contextmenuitem-reveal'),
-          icon: 'chrome://zotero/skin/toolbar-advanced-search.png',
+          icon: 'chrome://zotero/skin/16/universal/show-item.svg',
           onShowing: (_event: Event, context: LibraryMenuContext) => {
             const entries = UIHelpers.getEntriesForSelection()
             context.setVisible(!!entries && entries.length === 1)
@@ -401,7 +402,7 @@ export class UIHelpers {
       menus: [
         {
           menuType: 'submenu',
-          icon: 'chrome://zotero/skin/treeitem-note@2x.png',
+          icon: 'chrome://zotero/skin/16/universal/note.svg',
           onShowing: (_ev: Event, ctx: LibraryMenuContext) => {
             const entries = UIHelpers.getEntriesForSelection()
             if (!entries || entries.length < 2) {
@@ -423,7 +424,7 @@ export class UIHelpers {
       menus: [
         {
           menuType: 'submenu',
-          icon: 'chrome://zotero/skin/toolbar-advanced-search.png',
+          icon: 'chrome://zotero/skin/16/universal/show-item.svg',
           onShowing: (_ev: Event, ctx: LibraryMenuContext) => {
             const entries = UIHelpers.getEntriesForSelection()
             if (!entries || entries.length < 2) {

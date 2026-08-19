@@ -1,6 +1,6 @@
-import { config } from '../../package.json'
+import { config } from '../../../package.json'
 
-import type { Entry } from '../../src/mdbcTypes'
+import type { Entry } from '../../../src/mdbcTypes'
 
 interface TestPlugin {
   data: {
