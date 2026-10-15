@@ -199,7 +199,7 @@ Make a file (e.g. `zotlit-properties.eta.md`) with the following contents, and p
 citekey: "<%= it.citekey %>"
 title: "<%= it.title %>"
 <% if (it.date) { %>year: <%= it.date %><% } %>
-authors: [<%= it.authors.map(v => v.firstName v.lastName) %>]
+authors: [<%= it.authors.map(v => v.firstName + ' ' + v.lastName) %>]
 <% if (it.publicationTitle) { %>publication: "<%= it.publicationTitle %>"<% } %>
 <% if (it.DOI) { %>doi: "<%= it.DOI %>"<% } %>
 aliases: ["@<%= it.citekey %>", "@<%= it.citekey %> <%= it.title %>"]
