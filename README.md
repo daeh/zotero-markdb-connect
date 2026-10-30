@@ -191,21 +191,34 @@ tags:
 [Open in Zotero]({{zoteroSelectURI}})
 ```
 
-#### Template for ZotLit
+#### Example for [ZotLit v2](https://zotlit.aidenlx.site)
 
-Make a file (e.g. `zotlit-properties.eta.md`) with the following contents, and point to that file in ZotLit settings: `Template` > `Note Properties`.
+ZotLit v2 uses [managed frontmatter fields](https://zotlit.aidenlx.site/docs/reference/templates/frontmatter), not a `Note Properties` Eta file. In Obsidian's `Settings > ZotLit > Templates > Frontmatter`, keep (or restore) the default `citekey` field:
 
-```eta
-citekey: "<%= it.citekey %>"
-title: "<%= it.title %>"
-<% if (it.date) { %>year: <%= it.date %><% } %>
-authors: [<%= it.authors.map(v => v.firstName v.lastName) %>]
-<% if (it.publicationTitle) { %>publication: "<%= it.publicationTitle %>"<% } %>
-<% if (it.DOI) { %>doi: "<%= it.DOI %>"<% } %>
-aliases: ["@<%= it.citekey %>", "@<%= it.citekey %> <%= it.title %>"]
-tags:
- - readingNote
+- **Key:** `citekey`
+- **Expression:** `zt.citationKey` (without `{{ }}`)
+- **Language:** Liquid
+- **Merge strategy:** Replace
+
+Use an item with a nonempty, filename-safe, whitespace-free citation key (for example, `saxe2017emobtom`). ZotLit writes `citekey: null` for an item without a citation key; that cannot identify an item using MarkDB-Connect's citation-key mode.
+
+To keep MarkDB-Connect's default `@` filename filter, create an editable **Note filename** template under `Settings > ZotLit > Templates`. In `zotlit-filename.liquid.md`, use:
+
+```liquid
+@{{ zt.citationKey }}{% suffix %}
 ```
+
+ZotLit appends `.md` automatically; `suffix` handles filename collisions. Keep the template folder outside the folder MarkDB-Connect scans, and set that scan folder to your literature notes folder. In MarkDB-Connect, select **Citation key - taken from YAML metadata** and set the keyword to `citekey`. This also works for suffixed filenames because the key comes from frontmatter, not the filename.
+
+For example, a note named `@saxe2017emobtom.md` will contain this property (alongside ZotLit's other frontmatter):
+
+```yaml
+citekey: saxe2017emobtom
+```
+
+Optional metadata can also be configured as Liquid fields with **Replace**: `title` → `zt.title` (already a default), `authors` → `zt.authors | map: "fullName"`, `year` → `zt.date.year`, `publication` → `zt.containerTitle`, and `doi` → `zt.DOI`. These expressions return typed values; ZotLit handles YAML serialization, including quoting and author arrays. No JavaScript Templates opt-in is needed for this example.
+
+For existing notes, ZotLit's **Update literature note metadata** command refreshes managed frontmatter without replacing the note body. Then run **MarkDB-Connect Sync Tags** in Zotero as described above. This example only configures note matching; see ZotLit's [v1 template migration guide](https://zotlit.aidenlx.site/docs/how-to/migrate-v1-eta-templates) for migrating other templates.
 
 </details>
 
