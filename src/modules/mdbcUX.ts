@@ -254,10 +254,64 @@ export class systemInterface {
   }
 }
 
+type MenuName = 'sync' | 'troubleshoot' | 'itemOpen' | 'itemReveal' | 'itemOpenSubmenu' | 'itemRevealSubmenu'
+
+const menuNames: readonly MenuName[] = [
+  'sync',
+  'troubleshoot',
+  'itemOpen',
+  'itemReveal',
+  'itemOpenSubmenu',
+  'itemRevealSubmenu',
+]
+
+// Keys returned by Zotero.MenuManager.registerMenu, so unregistering uses Zotero's own namespacing.
+const registeredMenus = new Map<MenuName, string>()
+
+function registerMenu<T extends _ZoteroTypes.MenuManager.ValidTarget>(
+  name: MenuName,
+  options: _ZoteroTypes.MenuManager.MenuOptions<T>,
+): string | false {
+  const key = Zotero.MenuManager.registerMenu(options)
+  if (key) registeredMenus.set(name, key)
+  return key
+}
+
 export class UIHelpers {
+  /**
+   * Register the window-independent menus once per plugin lifetime.
+   * Returns the keys Zotero assigned; an empty array after shutdown.
+   */
+  static registerGlobalUI(): string[] {
+    if (!addon.data.alive) return []
+    const keys = [UIHelpers.registerWindowMenuItem_Sync(), ...UIHelpers.registerRightClickMenuItem()]
+    KeyboardShortcuts.registerShortcuts()
+    return keys.filter((key): key is string => key !== false)
+  }
+
+  /**
+   * Register the troubleshooting menu after a scan that failed or matched nothing.
+   * Returns the menu key when this call registered it.
+   */
+  static ensureTroubleshootMenu(): string | false {
+    if (!addon.data.alive || registeredMenus.has('troubleshoot')) return false
+    if (DataManager.isClean() && DataManager.numberRecords() > 0 && addon.data.env !== 'development') return false
+    return UIHelpers.registerWindowMenuItem_Debug()
+  }
+
+  /** Unregister every menu this plugin registered; returns the result per menu. */
+  static unregisterGlobalUI(): Record<MenuName, boolean> {
+    const results = Object.fromEntries(menuNames.map((name) => [name, false])) as Record<MenuName, boolean>
+    for (const [name, key] of registeredMenus) {
+      results[name] = Zotero.MenuManager.unregisterMenu(key)
+    }
+    registeredMenus.clear()
+    return results
+  }
+
   @trace
-  static registerWindowMenuItem_Sync() {
-    Zotero.MenuManager.registerMenu({
+  static registerWindowMenuItem_Sync(): string | false {
+    return registerMenu('sync', {
       menuID: `${config.addonRef}-tools-menu-sync`,
       pluginID: config.addonID,
       target: 'main/menubar/tools',
@@ -275,8 +329,8 @@ export class UIHelpers {
   }
 
   @trace
-  static registerWindowMenuItem_Debug() {
-    Zotero.MenuManager.registerMenu({
+  static registerWindowMenuItem_Debug(): string | false {
+    return registerMenu('troubleshoot', {
       menuID: `${config.addonRef}-tools-menu-troubleshoot`,
       pluginID: config.addonID,
       target: 'main/menubar/tools',
@@ -293,7 +347,7 @@ export class UIHelpers {
   }
 
   // Single matches use direct actions; multiple matches use submenus populated by onShowing.
-  static registerRightClickMenuItem() {
+  static registerRightClickMenuItem(): (string | false)[] {
     const dispatchOpen = (entry: Entry): void => {
       try {
         const protocol = getParam.mdeditor().value
@@ -353,7 +407,7 @@ export class UIHelpers {
       entries.forEach((entry, i) => target.push(buildChild(action, entry, i)))
     }
 
-    Zotero.MenuManager.registerMenu({
+    const itemOpen = registerMenu('itemOpen', {
       menuID: `${config.addonID}-itemmenu-open`,
       pluginID: config.addonID,
       target: 'main/library/item',
@@ -374,7 +428,7 @@ export class UIHelpers {
         },
       ],
     })
-    Zotero.MenuManager.registerMenu({
+    const itemReveal = registerMenu('itemReveal', {
       menuID: `${config.addonID}-itemmenu-reveal`,
       pluginID: config.addonID,
       target: 'main/library/item',
@@ -395,7 +449,7 @@ export class UIHelpers {
         },
       ],
     })
-    Zotero.MenuManager.registerMenu({
+    const itemOpenSubmenu = registerMenu('itemOpenSubmenu', {
       menuID: `${config.addonID}-itemmenu-open-submenu`,
       pluginID: config.addonID,
       target: 'main/library/item',
@@ -417,7 +471,7 @@ export class UIHelpers {
         },
       ],
     })
-    Zotero.MenuManager.registerMenu({
+    const itemRevealSubmenu = registerMenu('itemRevealSubmenu', {
       menuID: `${config.addonID}-itemmenu-reveal-submenu`,
       pluginID: config.addonID,
       target: 'main/library/item',
@@ -439,6 +493,7 @@ export class UIHelpers {
         },
       ],
     })
+    return [itemOpen, itemReveal, itemOpenSubmenu, itemRevealSubmenu]
   }
 
   static getEntriesForSelection(): Entry[] | null {

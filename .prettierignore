@@ -3,15 +3,16 @@
 **/.idea/
 **/build/
 **/dist/
-**/package-lock.json
+**/.yarn/
 **/*.lock
 logs
 **/node_modules
-package-lock.json
 yarn.lock
 pnpm-lock.yaml
 **/*_lintignore*
 **/*-lintignore*
+**/*_pubignore*
+**/*-pubignore*
 
 # Local scratch directories
 **/.scaffold/
@@ -19,6 +20,7 @@ pnpm-lock.yaml
 _agents/
 _memories/
 _development/
+.superpowers/
 
 # SHA-256-pinned third-party bundle
 tests/zotero/vendor/chai.js

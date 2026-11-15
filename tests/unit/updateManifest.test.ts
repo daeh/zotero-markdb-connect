@@ -6,14 +6,14 @@ import { test } from 'node:test'
 /**
  * Structural invariants for the hand-maintained root updater manifests.
  *
- * These assertions deliberately require no version comparison, so they can run
- * under plain `node --test` with nothing to get subtly wrong. The semantic
- * question — which entry a given Zotero version is actually offered — needs the
- * real Mozilla version comparator and lives in `tests/zotero/updateRouting.test.ts`.
+ * These assertions use no version comparison, so they run under plain
+ * `node --test` with nothing to get subtly wrong. Which entry a given Zotero
+ * version is offered depends on the real Mozilla version comparator, so that is
+ * tested in `tests/zotero/updateRouting.test.ts`.
  *
- * The expected table below is the point: stating the intended shape explicitly
- * means a release that drops or mis-ranges an entry fails here rather than
- * silently stranding the users who depended on it.
+ * The expected table below states the intended shape explicitly, so a release
+ * that drops or mis-ranges an entry fails here instead of stranding the users
+ * who depended on it.
  */
 
 const repoRoot = join(import.meta.dirname, '..', '..')
@@ -27,8 +27,8 @@ const EXPECTED_ENTRIES = [
 
 /**
  * v0.0.27 predates the `applications.zotero` scheme and targets the toolkit via
- * `applications.gecko`. That is what makes it invisible to Zotero 7+ and keeps
- * Zotero 6 from ever being offered anything newer.
+ * `applications.gecko`. This makes it invisible to Zotero 7+ and keeps Zotero 6
+ * from ever being offered anything newer.
  */
 const EXPECTED_LEGACY_ENTRY = { version: '0.0.27', geckoMin: '60.9', geckoMax: '60.9' } as const
 
@@ -146,8 +146,8 @@ void test('the legacy dev@daeh.info block stays a single entry', () => {
     assert.ok(manifest)
     const legacy = manifest.addons['dev@daeh.info']
     assert.ok(legacy, `${name} retains the dev@daeh.info block`)
-    // It exists to tell stranded 2023 prerelease installs that something newer
-    // exists; it is intentionally not an installable update path.
+    // It tells stranded 2023 prerelease installs that something newer exists.
+    // It is intentionally not an installable update path.
     assert.equal(legacy.updates.length, 1)
   }
 })

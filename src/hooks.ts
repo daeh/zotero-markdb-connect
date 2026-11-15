@@ -5,7 +5,6 @@ import { wrappers } from './modules/mdbcStartupHelpers'
 import { KeyboardShortcuts, Notifier, prefHelpers, Registrar, systemInterface, UIHelpers } from './modules/mdbcUX'
 import { registerPrefsScripts } from './modules/preferenceScript'
 import { getString, initLocale } from './utils/locale'
-import { createZToolkit } from './utils/ztoolkit'
 
 type PrefsEvent =
   | [type: 'load', data: { window: Window }]
@@ -23,12 +22,15 @@ async function onStartup() {
 
   await Promise.all(Zotero.getMainWindows().map((win) => onMainWindowLoad(win)))
 
+  // Shutdown may have run while the initial scans were pending.
+  if (!addon.data.alive) return
+
+  UIHelpers.registerGlobalUI()
+
   addon.data.initialized = true
 }
 
 async function onMainWindowLoad(win: _ZoteroTypes.MainWindow): Promise<void> {
-  addon.data.ztoolkit = createZToolkit()
-
   // MenuManager requires the localization IDs before registration.
   win.MozXULElement.insertFTLIfNeeded(`${addon.data.config.addonRef}-addon.ftl`)
 
@@ -56,14 +58,7 @@ async function onMainWindowLoad(win: _ZoteroTypes.MainWindow): Promise<void> {
     text: `[80%]  ${getString('startup-finish')}`,
   })
 
-  UIHelpers.registerWindowMenuItem_Sync()
-  if (!DataManager.isClean() || DataManager.numberRecords() === 0 || addon.data.env === 'development') {
-    UIHelpers.registerWindowMenuItem_Debug()
-  }
-
-  UIHelpers.registerRightClickMenuItem()
-
-  KeyboardShortcuts.registerShortcuts()
+  UIHelpers.ensureTroubleshootMenu()
 
   popupWin.changeLine({
     progress: 100,
@@ -90,6 +85,7 @@ async function syncMarkDB(): Promise<void> {
 
   try {
     await ScanMarkdownFiles.syncWrapper(displayReport, saveLogsToggle)
+    UIHelpers.ensureTroubleshootMenu()
     Logger.log('syncMarkDB', 'finished', true, 'info')
   } catch (err) {
     Logger.log('syncMarkDB', `ERROR :: ${getErrorMessage(err)}`, true, 'error')
@@ -102,6 +98,7 @@ function syncMarkDBReport() {
 
   ScanMarkdownFiles.syncWrapper(displayReport, saveLogsToggle)
     .then(() => {
+      UIHelpers.ensureTroubleshootMenu()
       Logger.log('syncMarkDBReport', 'finished', true, 'info')
     })
     .catch((err) => {
@@ -115,6 +112,7 @@ function syncMarkDBSaveDebug() {
 
   ScanMarkdownFiles.syncWrapper(displayReport, saveLogsToggle)
     .then(() => {
+      UIHelpers.ensureTroubleshootMenu()
       Logger.log('syncMarkDBSaveDebug', 'finished', true, 'info')
     })
     .catch((err) => {
@@ -157,16 +155,18 @@ async function Logs() {
   return await Logger.dump()
 }
 
-function onMainWindowUnload(win: Window): void {
-  ztoolkit.unregisterAll()
+function onMainWindowUnload(_win: Window): void {
+  // The toolkit outlives windows: KeyboardManager detaches from a closing window on its own.
   addon.data.dialog?.window?.close()
 }
 
 function onShutdown(): void {
+  // Mark the instance stopped first so scans or a report still pending register nothing afterwards.
+  addon.data.alive = false
+  addon.data.initialized = false
+  UIHelpers.unregisterGlobalUI()
   ztoolkit.unregisterAll()
   addon.data.dialog?.window?.close()
-  addon.data.initialized = false
-  addon.data.alive = false
   // @ts-expect-error -- Zotero's type omits dynamic addon instance properties
   delete Zotero[addon.data.config.addonInstance]
 }
@@ -200,6 +200,18 @@ function openSelectedItemNote() {
   KeyboardShortcuts.openSelectedItemNote()
 }
 
+function registerGlobalUI(): string[] {
+  return UIHelpers.registerGlobalUI()
+}
+
+function unregisterGlobalUI() {
+  return UIHelpers.unregisterGlobalUI()
+}
+
+function ensureTroubleshootMenu(): string | false {
+  return UIHelpers.ensureTroubleshootMenu()
+}
+
 export default {
   onStartup,
   onShutdown,
@@ -210,6 +222,9 @@ export default {
   syncMarkDBReport,
   syncMarkDBSaveDebug,
   openSelectedItemNote,
+  registerGlobalUI,
+  unregisterGlobalUI,
+  ensureTroubleshootMenu,
   Logs,
   DataStore,
   Data,

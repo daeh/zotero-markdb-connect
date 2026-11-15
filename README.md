@@ -64,14 +64,18 @@ A markdown file can specify which Zotero item it's linked to using either a cita
 
 ### Option 1: Using citation keys
 
-_MarkDB-Connect_ can extract the citation key that specifies which Zotero Item a markdown note corresponds to. The citation key can be taken from a markdown file's filename, [YAML metadata](https://help.obsidian.md/Advanced+topics/YAML+front+matter), or elsewhere in the file's contents. Citation keys are stored in Zotero's native `citationKey` field and can be generated automatically by [Better BibTeX](https://retorque.re/zotero-better-bibtex/) or set manually.
+_MarkDB-Connect_ can extract the citation key that specifies which Zotero Item a markdown note corresponds to.
+The citation key can be taken from a markdown file's filename, [YAML metadata](https://obsidian.md/help/properties),
+or elsewhere in the file's contents.
+Citation keys are stored in Zotero's native `citationKey` field
+and can be generated automatically by [Better BibTeX](https://retorque.re/zotero-better-bibtex/) or set manually.
 
 <details>
 
 <summary>configuration details</summary>
 
 - In Zotero's Settings, click the `MarkDB-Connect` preference pane.
-  - Specify the location of the folder that contains your markdown reading notes (e.g. `/Users/me/Documents/ObsVault/ReadingNotes/`). The _MarkDB-Connect_ plugin will recursively search this path for markdown files.
+  - Specify the location of the folder that contains your markdown reading notes (e.g. `/Users/me/Documents/ObsVault/ReadingNotes/`). The _MarkDB-Connect_ plugin will recursively search this path for markdown files. Files and folders whose names begin with `.` (such as `.obsidian` and `.trash`) are skipped.
 
   - By default, _MarkDB-Connect_ expects that the filenames of your markdown reading note files begin with `@mycitekey` but can include extra information after it (e.g. a reading note with the citation key `shepard1987science` could have the filename `@shepard1987science.md` or `@shepard1987science Toward a universal law of generalization for psychological science.md`).
     - If your citation keys contain certain special characters (e.g. `:`, `/`), you will need to extract the citekeys from the markdown file's contents rather than its filename.
@@ -81,7 +85,7 @@ _MarkDB-Connect_ can extract the citation key that specifies which Zotero Item a
       - E.g. the default is `^@(\S+).*\.md$`, which looks for files beginning with `@` and uses the first word as the citation key.
 
     - **B. metadata** - Select `Citation key - taken from YAML metadata` and specify a keyword from the notes' YAML frontmatter (here's an [example](#example-markdown-note)).
-      - For info on metadata syntax, see [YAML front matter](https://help.obsidian.md/Advanced+topics/YAML+front+matter).
+      - For info on metadata syntax, see [Properties](https://obsidian.md/help/properties).
 
     - **C. contents** - Select `Citation key - captured with custom RegExp` and define a RegExp with a single capturing group to return exactly 1 match per file.
 
@@ -105,7 +109,7 @@ Zotero automatically generates Item Keys, they take the form of `ABCD1234`, as i
 <summary>configuration details</summary>
 
 - In Zotero's Settings, click the `MarkDB-Connect` preference pane.
-  - Specify the location of the folder that contains your markdown reading notes (e.g. `/Users/me/Documents/ObsVault/ReadingNotes/`). The _MarkDB-Connect_ plugin will recursively search this path for markdown files.
+  - Specify the location of the folder that contains your markdown reading notes (e.g. `/Users/me/Documents/ObsVault/ReadingNotes/`). The _MarkDB-Connect_ plugin will recursively search this path for markdown files. Files and folders whose names begin with `.` (such as `.obsidian` and `.trash`) are skipped.
     - The default behavior is to search for markdown files beginning with `@`.
 
     - Alternatively, you can define a custom RegExp pattern to match your reading note files.
@@ -133,7 +137,10 @@ Zotero automatically generates Item Keys, they take the form of `ABCD1234`, as i
 
 ## Example Markdown Note
 
-In this example markdown note (`@saxe2017emobtom.md`), _MarkDB-Connect_ will use the [YAML metadata](https://help.obsidian.md/Advanced+topics/YAML+front+matter) keyword `citekey` to find the citation key (`saxe2017emobtom`) that determines which Zotero item to associate with the markdown file. Notice that the markdown file can include other citation keys and Zotero-Item-Keys, which are ignored by the plugin.
+In this example markdown note (`@saxe2017emobtom.md`), _MarkDB-Connect_ will use the
+[YAML metadata](https://obsidian.md/help/properties) keyword `citekey` to find the citation key (`saxe2017emobtom`)
+that determines which Zotero item to associate with the markdown file.
+Notice that the markdown file can include other citation keys and Zotero-Item-Keys, which are ignored by the plugin.
 
 ```markdown
 ---
@@ -191,34 +198,46 @@ tags:
 [Open in Zotero]({{zoteroSelectURI}})
 ```
 
-#### Example for [ZotLit v2](https://zotlit.aidenlx.site)
+#### Example for [ZotLit](https://zotlit.aidenlx.site) 2.2.3 or later
 
-ZotLit v2 uses [managed frontmatter fields](https://zotlit.aidenlx.site/docs/reference/templates/frontmatter), not a `Note Properties` Eta file. In Obsidian's `Settings > ZotLit > Templates > Frontmatter`, keep (or restore) the default `citekey` field:
+ZotLit's default profile writes each item's citation key to a `citekey` property in the literature note's frontmatter. If you removed or changed that property, restore it in the profile's **Properties** tab with the name `citekey`, the JSON-e value `{ "$eval": "zt.citationKey" }`, and **Replace the existing value** on update (see ZotLit's [frontmatter reference](https://zotlit.aidenlx.site/docs/reference/templates/frontmatter)). Every profile that writes notes MarkDB-Connect scans needs it. Items without a citation key get `citekey: null`, which cannot match; give them a citation key, or see _Matching on `zotero-key`_ below.
 
-- **Key:** `citekey`
-- **Expression:** `zt.citationKey` (without `{{ }}`)
-- **Language:** Liquid
-- **Merge strategy:** Replace
+ZotLit's default note names have no `@` prefix (e.g. `saxe2017emobtom.md`), so MarkDB-Connect's default file filter skips them. In MarkDB-Connect's settings:
 
-Use an item with a nonempty, filename-safe, whitespace-free citation key (for example, `saxe2017emobtom`). ZotLit writes `citekey: null` for an item without a citation key; that cannot identify an item using MarkDB-Connect's citation-key mode.
+- Set **Folder Containing Markdown Reading Notes** to a folder that contains all your ZotLit literature notes (ZotLit's default is `literatures`). With the settings below, scanned files without a usable `citekey` value are reported as errors, so keep ZotLit's template folder and unrelated notes outside it, or see _Scanning only @-prefixed notes_ below.
+- Select **Custom File Filter** and enter `^.+\.md$`. The pattern has no capturing group, so the citation key comes only from the frontmatter.
+- Select **Citation key - taken from YAML metadata** and set the keyword to `citekey`.
+- For notes on items in group libraries, select **Also match items in Group Libraries.** under **Include Group Libraries?**.
 
-To keep MarkDB-Connect's default `@` filename filter, create an editable **Note filename** template under `Settings > ZotLit > Templates`. In `zotlit-filename.liquid.md`, use:
+To add the property to existing notes, run **ZotLit: Update notes** in Obsidian and choose **Update all notes**. Then run **MarkDB-Connect Sync Tags** in Zotero.
+
+<details>
+
+<summary>Matching on <code>zotero-key</code> (for items without citation keys)</summary>
+
+ZotLit also writes a `zotero-key` property: the item key (`zotero-key: IACZMXU4`), followed by `g` and the group ID in a group library. To match on it, use [Option 2](#option-2-using-zotero-item-keys), which replaces citation-key matching for the whole scan. Keep the **Custom File Filter** `^.+\.md$`, select **Zotero-Item-Key - captured with custom RegExp**, and enter this pattern, which reads the key from the frontmatter:
+
+```
+(?<![\s\S])\uFEFF?---\r?\n(?:(?!(?:---|\.\.\.)(?:\s|$)).*\r?\n)*?zotero-key:[ \t]*["']?([A-Z0-9]{8})(?:g\d+)?["']?\s*$
+```
+
+The pattern drops the group suffix, so if two included libraries have an item with the same key, the note is linked to both.
+
+</details>
+
+<details>
+
+<summary>Scanning only @-prefixed notes</summary>
+
+Use this option to scan only files whose names begin with `@`. In each ZotLit profile, set the **Note name template** to:
 
 ```liquid
-@{{ zt.citationKey }}{% suffix %}
+@{{ zt.citationKey | default: zt.DOI | default: zt.title | default: zt.key | replace: "/", "-" }}{% suffix %}
 ```
 
-ZotLit appends `.md` automatically; `suffix` handles filename collisions. Keep the template folder outside the folder MarkDB-Connect scans, and set that scan folder to your literature notes folder. In MarkDB-Connect, select **Citation key - taken from YAML metadata** and set the keyword to `citekey`. This also works for suffixed filenames because the key comes from frontmatter, not the filename.
+For a profile whose template language is Eta, write the equivalent in Eta. Add a leading `@` to existing note filenames that lack it. Then change the **Custom File Filter** to `^@.+\.md$`.
 
-For example, a note named `@saxe2017emobtom.md` will contain this property (alongside ZotLit's other frontmatter):
-
-```yaml
-citekey: saxe2017emobtom
-```
-
-Optional metadata can also be configured as Liquid fields with **Replace**: `title` → `zt.title` (already a default), `authors` → `zt.authors | map: "fullName"`, `year` → `zt.date.year`, `publication` → `zt.containerTitle`, and `doi` → `zt.DOI`. These expressions return typed values; ZotLit handles YAML serialization, including quoting and author arrays. No JavaScript Templates opt-in is needed for this example.
-
-For existing notes, ZotLit's **Update literature note metadata** command refreshes managed frontmatter without replacing the note body. Then run **MarkDB-Connect Sync Tags** in Zotero as described above. This example only configures note matching; see ZotLit's [v1 template migration guide](https://zotlit.aidenlx.site/docs/how-to/migrate-v1-eta-templates) for migrating other templates.
+</details>
 
 </details>
 

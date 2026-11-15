@@ -2,20 +2,20 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+      - "release-candidate/**"
   pull_request:
-    branches: [main]
+    branches:
+      - main
 
 permissions:
   contents: read
 
 env:
-  RELEASE_NODE_VERSION: "26.7.0"
-  RELEASE_NPM_VERSION: "12.0.2"
-  # zotero-types uses public GitHub dependencies recorded as SSH URLs.
-  GIT_CONFIG_COUNT: "1"
-  GIT_CONFIG_KEY_0: "url.https://github.com/.insteadOf"
-  GIT_CONFIG_VALUE_0: "ssh://git@github.com/"
+  # Node 25+ no longer bundles Corepack; a pinned one is installed to manage Yarn.
+  COREPACK_VERSION: "0.36.0"
+  COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -32,122 +32,119 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Restore npm cache
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
-        with:
-          path: ~/.npm
-          key: npm-${{ runner.os }}-node-${{ env.RELEASE_NODE_VERSION }}-npm-${{ env.RELEASE_NPM_VERSION }}-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            npm-${{ runner.os }}-node-${{ env.RELEASE_NODE_VERSION }}-npm-${{ env.RELEASE_NPM_VERSION }}-
-
       - name: Setup Node
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: ${{ env.RELEASE_NODE_VERSION }}
+          node-version-file: .node-version
 
-      - name: Install pinned npm
-        run: npm install --global "npm@$RELEASE_NPM_VERSION"
+      - name: Install pinned Corepack
+        run: |
+          npm install --global "corepack@$COREPACK_VERSION"
+          corepack enable
         shell: bash
         working-directory: ${{ runner.temp }}
 
       - name: Verify toolchain
+        id: toolchain
         run: |
-          test "$(node --version)" = "v$RELEASE_NODE_VERSION"
-          test "$(npm --version)" = "$RELEASE_NPM_VERSION"
+          test "$(node --version)" = "v$(cat .node-version)"
+          expected_yarn="$(node -p 'const m = /^yarn@([^+]+)\+sha512\./.exec(require("./package.json").packageManager); if (!m) process.exit(1); m[1]')"
+          test "$(yarn --version)" = "$expected_yarn"
+          echo "cache-folder=$(yarn config get cacheFolder)" >> "$GITHUB_OUTPUT"
         shell: bash
 
+      - name: Restore Yarn cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ steps.toolchain.outputs.cache-folder }}
+          key: yarn-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            yarn-${{ runner.os }}-
+
       - name: Install dependencies
-        run: npm ci --allow-git=all
+        run: yarn install --immutable
         shell: bash
 
       - name: Lint without changes
-        run: npm run lint-dry
+        run: yarn lint-dry
         shell: bash
 
       - name: Typecheck
-        run: npm run typecheck
+        run: yarn typecheck
         shell: bash
 
       - name: Unit tests
-        run: npm run test
+        run: yarn test
         shell: bash
 
       - name: Build
-        run: npm run build
+        run: yarn build
         shell: bash
 
       - name: Generated typings must not drift
         run: git diff --exit-code -- typings/i10n.d.ts typings/prefs.d.ts
         shell: bash
 
-      - name: Prepare release candidate
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          candidate_dir="$RUNNER_TEMP/release-candidate"
-          mkdir -p "$candidate_dir"
-          cp .scaffold/build/markdb-connect.xpi "$candidate_dir/"
-          cp .scaffold/build/update*.json "$candidate_dir/"
-          (
-            cd "$candidate_dir"
-            sha256sum markdb-connect.xpi > markdb-connect.xpi.sha256
-          )
-          test -s "$candidate_dir/markdb-connect.xpi"
-          test -s "$candidate_dir/markdb-connect.xpi.sha256"
-          test -s "$candidate_dir/update-beta.json"
-          version="$(node -p "require('./package.json').version")"
-          if [[ "$version" == *-* ]]; then
-            test ! -e "$candidate_dir/update.json"
-          else
-            test -s "$candidate_dir/update.json"
-          fi
-        shell: bash
-
-      - name: Upload release candidate
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - name: Upload build result
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: release-candidate-${{ github.sha }}-${{ github.run_attempt }}
-          path: ${{ runner.temp }}/release-candidate/
+          name: build-result
+          path: .scaffold/build
+          # .scaffold is a dot-directory, excluded by upload-artifact by default.
+          include-hidden-files: true
           if-no-files-found: error
-          retention-days: 90
-          overwrite: false
 
   zotero:
-    name: Zotero 10.0 integration tests
+    name: Zotero ${{ matrix.zotero.version }} integration tests
     runs-on: ubuntu-24.04
     timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        # One pinned runtime per supported Zotero major.
+        zotero:
+          - version: "10.0"
+            sha256: fad10b2bee0b6178248a0ffb7b4add0bc2b1e71088f47d5549423e1cc80034b8
+    env:
+      ZOTERO_ARCHIVE: .cache/zotero/Zotero-${{ matrix.zotero.version }}_linux-x86_64.tar.xz
+      ZOTERO_RUNTIME: .cache/zotero/runtime-${{ matrix.zotero.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
-      - name: Restore npm cache
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
-        with:
-          path: ~/.npm
-          key: npm-${{ runner.os }}-node-${{ env.RELEASE_NODE_VERSION }}-npm-${{ env.RELEASE_NPM_VERSION }}-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            npm-${{ runner.os }}-node-${{ env.RELEASE_NODE_VERSION }}-npm-${{ env.RELEASE_NPM_VERSION }}-
-
       - name: Setup Node
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: ${{ env.RELEASE_NODE_VERSION }}
+          node-version-file: .node-version
 
-      - name: Install pinned npm
-        run: npm install --global "npm@$RELEASE_NPM_VERSION"
+      - name: Install pinned Corepack
+        run: |
+          npm install --global "corepack@$COREPACK_VERSION"
+          corepack enable
         shell: bash
         working-directory: ${{ runner.temp }}
 
       - name: Verify toolchain
+        id: toolchain
         run: |
-          test "$(node --version)" = "v$RELEASE_NODE_VERSION"
-          test "$(npm --version)" = "$RELEASE_NPM_VERSION"
+          test "$(node --version)" = "v$(cat .node-version)"
+          expected_yarn="$(node -p 'const m = /^yarn@([^+]+)\+sha512\./.exec(require("./package.json").packageManager); if (!m) process.exit(1); m[1]')"
+          test "$(yarn --version)" = "$expected_yarn"
+          echo "cache-folder=$(yarn config get cacheFolder)" >> "$GITHUB_OUTPUT"
         shell: bash
 
+      - name: Restore Yarn cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ steps.toolchain.outputs.cache-folder }}
+          key: yarn-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            yarn-${{ runner.os }}-
+
       - name: Install dependencies
-        run: npm ci --allow-git=all
+        run: yarn install --immutable
         shell: bash
 
       - name: Install Zotero runtime packages
@@ -156,49 +153,56 @@ jobs:
           sudo apt-get install --yes libasound2t64 libdbus-glib-1-2 x11-xkb-utils xkb-data xvfb
         shell: bash
 
-      - name: Cache Zotero 10.0 archive
+      - name: Cache Zotero ${{ matrix.zotero.version }} archive
         id: zotero-cache
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          path: .cache/zotero/Zotero-10.0_linux-x86_64.tar.xz
-          key: zotero-linux-10.0-fad10b2bee0b6178248a0ffb7b4add0bc2b1e71088f47d5549423e1cc80034b8
+          path: ${{ env.ZOTERO_ARCHIVE }}
+          key: zotero-linux-${{ matrix.zotero.version }}-${{ matrix.zotero.sha256 }}
 
-      - name: Download Zotero 10.0
+      - name: Download Zotero ${{ matrix.zotero.version }}
         if: steps.zotero-cache.outputs.cache-hit != 'true'
         run: |
           mkdir -p .cache/zotero
           curl --fail --location --retry 3 --retry-all-errors \
-            --output .cache/zotero/Zotero-10.0_linux-x86_64.tar.xz \
-            https://download.zotero.org/client/release/10.0/Zotero-10.0_linux-x86_64.tar.xz
+            --output "$ZOTERO_ARCHIVE" \
+            "https://download.zotero.org/client/release/$ZOTERO_VERSION/Zotero-${ZOTERO_VERSION}_linux-x86_64.tar.xz"
         shell: bash
+        env:
+          ZOTERO_VERSION: ${{ matrix.zotero.version }}
 
       - name: Verify Zotero archive
-        run: |
-          echo 'fad10b2bee0b6178248a0ffb7b4add0bc2b1e71088f47d5549423e1cc80034b8  .cache/zotero/Zotero-10.0_linux-x86_64.tar.xz' \
-            | sha256sum --check --strict
+        run: echo "$ZOTERO_SHA256  $ZOTERO_ARCHIVE" | sha256sum --check --strict
         shell: bash
+        env:
+          ZOTERO_SHA256: ${{ matrix.zotero.sha256 }}
 
       - name: Extract Zotero
         run: |
-          mkdir -p .cache/zotero/runtime
-          tar --extract --xz \
-            --file .cache/zotero/Zotero-10.0_linux-x86_64.tar.xz \
-            --directory .cache/zotero/runtime
-          test -x .cache/zotero/runtime/Zotero_linux-x86_64/zotero
+          mkdir -p "$ZOTERO_RUNTIME"
+          tar --extract --xz --file "$ZOTERO_ARCHIVE" --directory "$ZOTERO_RUNTIME"
+          test -x "$ZOTERO_RUNTIME/Zotero_linux-x86_64/zotero"
+          echo "ZOTERO_PLUGIN_ZOTERO_BIN_PATH=$GITHUB_WORKSPACE/$ZOTERO_RUNTIME/Zotero_linux-x86_64/zotero" >> "$GITHUB_ENV"
         shell: bash
 
       - name: Run in-Zotero tests
-        run: npm run test:zotero 2>&1 | tee zotero-test.log
+        # The scaffold starts its own Xvfb when CI is set. Scaffold 0.9.4 exits 0
+        # whenever Zotero closes without a failure count, including when it exits
+        # before reporting any result, so require the reporter's success-form
+        # completion line as well.
+        run: |
+          yarn test:zotero 2>&1 | tee zotero-test.log
+          grep -Eq 'Test run completed - [1-9][0-9]* passed$' zotero-test.log \
+            || { echo "::error::The Zotero test run never reported a completed, passing run"; exit 1; }
         shell: bash
         env:
           CI: true
-          ZOTERO_PLUGIN_ZOTERO_BIN_PATH: ${{ github.workspace }}/.cache/zotero/runtime/Zotero_linux-x86_64/zotero
 
       - name: Upload Zotero test log on failure
         if: failure()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: zotero-10.0-test-log
+          name: zotero-${{ matrix.zotero.version }}-test-log
           path: zotero-test.log
           if-no-files-found: warn
           retention-days: 7

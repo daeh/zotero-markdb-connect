@@ -5,15 +5,15 @@
       "type": "node",
       "request": "launch",
       "name": "Start",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "start"]
+      "runtimeExecutable": "yarn",
+      "runtimeArgs": ["start"]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Build",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "build"]
+      "runtimeExecutable": "yarn",
+      "runtimeArgs": ["build"]
     }
   ]
 }

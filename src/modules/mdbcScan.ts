@@ -1,5 +1,7 @@
 import { config, version } from '../../package.json'
 import { DataManager } from '../dataGlobals'
+import { readFrontmatterScalar } from '../utils/frontmatter'
+import { indexIdsByKey } from '../utils/keyIndex'
 import { getString } from '../utils/locale'
 import { stripAndDecodeNotePrefix } from '../utils/noteName'
 import { getPref, setPref } from '../utils/prefs'
@@ -173,19 +175,11 @@ export class ScanMarkdownFiles {
         try {
           if (matchstrategy === 'citekeyyaml') {
             if (yamlkeywordParam.valid) {
-              const re_metadata = new RegExp(
-                `^${RegExp.escape(yamlkeywordParam.value)}: *(?:['"])?(\\S+?)(?:['"]|\\s|$)`,
-                'm',
-              )
               const contentsRaw = await Zotero.File.getContentsAsync(filepath)
               const contents = contentsRaw && typeof contentsRaw === 'string' ? contentsRaw : ''
-              const contentSections = contents.split('\n---')
-              const metadata = contentSections[0]
-              if (contentSections.length > 1 && metadata?.startsWith('---')) {
-                const citekeyMetadata = metadata.match(re_metadata)?.[1]
-                if (citekeyMetadata !== undefined) {
-                  entry_res.citekey_metadata = citekeyMetadata.trim()
-                }
+              const citekeyMetadata = readFrontmatterScalar(contents, yamlkeywordParam.value)
+              if (citekeyMetadata !== undefined) {
+                entry_res.citekey_metadata = citekeyMetadata
               }
             }
           } else if (matchstrategy === 'citekeyregexp') {
@@ -383,7 +377,7 @@ export class ScanMarkdownFiles {
   }
 
   @trace
-  private static async mapCitekeysQuery(): Promise<Record<string, number[]>> {
+  private static async mapCitekeysQuery(): Promise<Map<string, number[]>> {
     const s =
       getParam.grouplibraries().value === 'user'
         ? new Zotero.Search({ libraryID: Zotero.Libraries.userLibraryID })
@@ -393,35 +387,28 @@ export class ScanMarkdownFiles {
 
     const ZotItems: Zotero.Item[] = await Zotero.Items.getAsync(itemIds)
 
-    const citekeymap = ZotItems.reduce((accumulator: Record<string, number[]>, zotitem) => {
-      if (!zotitem.isRegularItem()) {
-        return accumulator
-      }
-      let citationKey = ''
-      try {
-        citationKey = zotitem.getField('citationKey') || ''
-      } catch {
-        // Some regular item types do not expose citationKey.
-      }
-      if (!citationKey) {
-        return accumulator
-      }
-      const existingIds = accumulator[citationKey]
-      if (existingIds === undefined) {
-        accumulator[citationKey] = [zotitem.id]
-      } else {
-        existingIds.push(zotitem.id)
-      }
-      return accumulator
-    }, {})
+    const citekeymap = indexIdsByKey(
+      ZotItems.flatMap((zotitem): [string, number][] => {
+        if (!zotitem.isRegularItem()) {
+          return []
+        }
+        let citationKey = ''
+        try {
+          citationKey = zotitem.getField('citationKey') || ''
+        } catch {
+          // Some regular item types do not expose citationKey.
+        }
+        return citationKey ? [[citationKey, zotitem.id]] : []
+      }),
+    )
 
-    Logger.addData('mapCitekeysQuery', citekeymap, true)
+    Logger.addData('mapCitekeysQuery', Object.fromEntries(citekeymap), true)
 
     return citekeymap
   }
 
   @trace
-  private static async mapIDkeysZoteroquery(): Promise<Record<string, number[]>> {
+  private static async mapIDkeysZoteroquery(): Promise<Map<string, number[]>> {
     const s =
       getParam.grouplibraries().value === 'user'
         ? new Zotero.Search({ libraryID: Zotero.Libraries.userLibraryID })
@@ -431,40 +418,27 @@ export class ScanMarkdownFiles {
 
     const ZotItems: Zotero.Item[] = await Zotero.Items.getAsync(itemIds)
 
-    const keymap = ZotItems.reduce((accumulator: Record<string, number[]>, zotitem) => {
-      const existingIds = accumulator[zotitem.key]
-      if (existingIds === undefined) {
-        accumulator[zotitem.key] = [zotitem.id]
-      } else {
-        existingIds.push(zotitem.id)
-      }
-      return accumulator
-    }, {})
+    const keymap = indexIdsByKey(ZotItems.map((zotitem) => [zotitem.key, zotitem.id] as const))
 
-    Logger.addData('mapIDkeysZoteroquery', keymap, true)
+    Logger.addData('mapIDkeysZoteroquery', Object.fromEntries(keymap), true)
 
     return keymap
   }
 
   @trace
-  private static sliceObj(res: Entry[], citekeymap: Record<string, number[]>): Entry[] {
+  private static sliceObj(res: Entry[], citekeymap: Map<string, number[]>): Entry[] {
     const reserr: Entry[] = []
 
-    const citekeys = Object.keys(citekeymap)
-
     for (const entry_res of res) {
-      if (entry_res.citekey) {
-        if (citekeys.includes(entry_res.citekey)) {
-          entry_res.zotids = citekeymap[entry_res.citekey] ?? []
-        } else if (citekeys.includes(entry_res.citekey_metadata)) {
-          entry_res.zotids = citekeymap[entry_res.citekey_metadata] ?? []
-        } else if (citekeys.includes(entry_res.citekey_title)) {
-          entry_res.zotids = citekeymap[entry_res.citekey_title] ?? []
-        } else {
-          reserr.push(entry_res)
-        }
-      } else {
+      const zotids = entry_res.citekey
+        ? (citekeymap.get(entry_res.citekey) ??
+          citekeymap.get(entry_res.citekey_metadata) ??
+          citekeymap.get(entry_res.citekey_title))
+        : undefined
+      if (zotids === undefined) {
         reserr.push(entry_res)
+      } else {
+        entry_res.zotids = zotids
       }
     }
 
@@ -512,18 +486,14 @@ export class ScanMarkdownFiles {
   }
 
   @trace
-  private static sliceObjCustomRegex(res: Entry[], zoterokeymap: Record<string, number[]>): Entry[] {
+  private static sliceObjCustomRegex(res: Entry[], zoterokeymap: Map<string, number[]>): Entry[] {
     const reserr: Entry[] = []
-
-    const zotkeys = Object.keys(zoterokeymap)
 
     for (const entry_res of res) {
       const zotids = new Set<number>()
       for (const zotkey of entry_res.zotkeys) {
-        if (zotkeys.includes(zotkey)) {
-          for (const zotid of zoterokeymap[zotkey] ?? []) {
-            zotids.add(zotid)
-          }
+        for (const zotid of zoterokeymap.get(zotkey) ?? []) {
+          zotids.add(zotid)
         }
       }
       entry_res.zotids = [...zotids]
@@ -615,7 +585,7 @@ export class ScanMarkdownFiles {
         return
       }
 
-      const citekeymap: Record<string, number[]> = await this.mapCitekeysQuery()
+      const citekeymap = await this.mapCitekeysQuery()
 
       res = this.sliceObj(res, citekeymap)
     } else if (matchstrategy === 'zotitemkey') {
@@ -652,7 +622,7 @@ export class ScanMarkdownFiles {
         return
       }
 
-      const zoterokeymap: Record<string, number[]> = await this.mapIDkeysZoteroquery()
+      const zoterokeymap = await this.mapIDkeysZoteroquery()
 
       res = this.sliceObjCustomRegex(res, zoterokeymap)
     }
@@ -834,6 +804,8 @@ export class ScanMarkdownFiles {
 
     const configPass = wrappers.startupConfigCheck()
     if (!configPass) {
+      // syncRun() is skipped, so the previous run's state would otherwise still read as clean.
+      DataManager.markFail()
       header = 'Error - Configuration Invalid'
       messageArray = [
         {
@@ -846,6 +818,7 @@ export class ScanMarkdownFiles {
         messageArray = await this.syncRun()
         header = 'Synced'
       } catch (err) {
+        DataManager.markFail()
         messageArray = [{ body: `An error occurred :: ${getErrorMessage(err)}`, type: 'error' }]
       }
     }

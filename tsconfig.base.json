@@ -7,7 +7,7 @@
     "lib": ["ES2023", "ES2025.RegExp", "ESNext.Temporal", "DOM", "DOM.Iterable"],
     // Legacy decorators require assignment semantics for class fields.
     "useDefineForClassFields": false,
-    "types": ["zotero-types"],
+    "types": ["zotero-types", "zotero-types/entries/mainWindow"],
 
     "experimentalDecorators": true,
     "resolveJsonModule": true,
@@ -27,6 +27,6 @@
     "exactOptionalPropertyTypes": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src", "typings", "package.json", "node_modules/zotero-types"],
+  "include": ["src", "typings", "package.json"],
   "exclude": ["build", "addon", "**/*-lintignore*", "**/*_lintignore*"]
 }

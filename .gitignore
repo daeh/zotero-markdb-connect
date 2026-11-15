@@ -1,10 +1,32 @@
+#########
+### specialized ignore patterns ###
+#########
+**/*-ignore/
+**/*-ignore-*
+**/*-ignore_*
+**/*-ignore.*
+**/*_ignore/
+**/*_ignore-*
+**/*_ignore_*
+**/*_ignore.*
+**/*-gitignore*
+**/*_gitignore*
+
 # macOS
 .DS_Store
 
 # Node
 node_modules/
 pnpm-lock.yaml
-yarn.lock
+
+### Yarn. Upstream's pattern: deny the directory's contents, then re-admit what is source.
+### Must be `.yarn/*`, not `.yarn/`: git cannot re-include a path whose parent directory is excluded.
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
 
 # Build / generated
 dist/
@@ -20,3 +42,4 @@ VSCProject.code-workspace
 # Scaffold
 .env
 .scaffold/
+
